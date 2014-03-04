@@ -1,4 +1,6 @@
 
+#include <iostream>
+
 #include "json.hh"
 
 #include "mgen.hh"
@@ -13,6 +15,10 @@ int main()
   Json js;
   ModelGen mg(js);
   uptr<ModelRun> mr{new ModelRun_impl(mg)};
+
+  auto ctx = mr->control_ctx();
+  // do stuff
+  // control sim.
 
   return 0;
 }

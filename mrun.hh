@@ -3,6 +3,7 @@
 #pragma once
 
 #include <queue>
+#include <utility>
 
 // Model interface
 class ModelRun
@@ -47,12 +48,13 @@ public:
   ModelRun_impl(ModelGen mgen):
     _modelgen(mgen),
     // # the "primary" system, an abstract interface for the user's control.
-    _sys_handles(systems())
+    _sys_handles(systems()),
+    _controlctx{new ControlCtx{&_modelgen, systems()}}
   {
     // create default controls
   }
 
-  ControlCtx* control_ctx() override {return new ControlCtx{&_modelgen, systems()};}
+  ControlCtx* control_ctx() override {return _controlctx.get();}
 
   // """\return a set of Systems and a control system
   // => (control, [contexts])
@@ -80,8 +82,7 @@ public:
   }
 
   // Run the model
-  ptr<ControlCtx>
-  run(ControlCtx* ctx=nullptr) override
+  ControlCtx* run(ControlCtx* ctx=nullptr) override
   {
     if (!ctx)
       ctx = control_ctx();
@@ -149,9 +150,9 @@ protected:
     // Create a vector of threads, and of event results, same size as condv
     v<thread> evaljobs;
     v<uptr<Event> > evtv(conds.size());
-    for (auto itc = begin(conds); itc != end(conds); ++itc)
+    for (auto itc = begin(conds), last = end(conds); itc != last; ++itc)
     {
-      auto ite = begin(evtv) + distance(begin(conds), itc);
+      auto ite = end(evtv) + distance(itc, last);
       evaljobs.emplace_back([=]{*ite = (**itc)();});
     }
     // TODO: threadpool or scheduling here
