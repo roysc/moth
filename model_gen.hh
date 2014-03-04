@@ -31,7 +31,7 @@ template <class T> using wptr = std::weak_ptr<T>;
 
 class ControlCtx;
 class ModelGen;
-class ModelRun_impl;
+class ModelRun;
 struct CptClass;
 // using CptClass_set = set<CptClass>;
 
@@ -51,9 +51,9 @@ public:
   }
 };
 using Compt_id = uint32_t;
+using Compt_own = uptr<Component>;
 using Compt_ptr = ptr<Component>;
-using Compt_data = m<Compt_id, Compt_ptr>;
-// using Compt_data = m<Compt_id, uptr<Component>>;
+using Compt_data = m<Compt_id, Compt_own>;
 using Compt_addr = pair<Entity_ptr, Compt_id>;
 // using Compt_set = set<Compt_ptr>;
 
@@ -75,22 +75,24 @@ using SystemHandle_opt = uptr<SystemHandle>;
 struct CptClass
 {
 protected:
-  ModelRun_impl* _modelrun;
-  uint32_t _id;
+  ModelGen* _modelgen;
+  // Compt_id _id;
   string _name;
+  // DataType _dtype;
 
 public:
-  CptClass(ModelRun_impl* mr, uint32_t id, string name): 
-    _modelrun(mr), _name(name), _id(id) {}
-
+  CptClass(ModelGen* mg, string name): 
+    _modelgen(mg), _name(name) {}
+  
   // meta data
-  string name() { return _name; }
-  set<CptClass> dependencies()
-  {
-    return {};
-  }
+  string name() const {return _name;}
+  // Compt_id id() const {return _id;}
+  // components needed to impl. this one
+  set<CptClass*> dependencies() const {return {};}
+  // create a control context for components of this type
+  SystemHandle* system_handle() {return new SystemHandle;}
 
-  SystemHandle* system_handle() {return {new SystemHandle{}};}
+  // bool operator<(const CptClass& that) {return _id }
 };
 
 // """
@@ -100,27 +102,77 @@ public:
 class ModelGen 
 {
 protected:
+  Compt_id _next_id;
   // Component types
-  set<CptClass> _components;
+  // m<Compt_id, CptClass> _cptclasses;
+  m<Compt_id, CptClass> _cptclasses;
   
 public:
-  ModelGen(Json js)
+  ModelGen(Json js):
+    _next_id{}
   {
-    {
     // js = json.load(fp)
-      auto cs = js.get_child("components");
-      for (auto&& c : cs)
-        _components.emplace(c.second.get<string>("name"), this);
-    }
+    auto cs = js.get_child("components");
+    for (auto&& c : cs)
+      _cptclasses.emplace(
+        fresh_id(), CptClass(this, c.second.get<string>("name")));
+    
   }
+
+  Compt_id fresh_id() {return ++_next_id;}
   set<CptClass*> component_types() 
   {
     set<CptClass*> ret;
-    std::transform(begin(_components), end(_components), back_inserter(ret),
-                   [](CptClass& c) {return &c;});
+    for (auto&& c: _cptclasses) ret.emplace(&c.second);
     return ret;
-    
   }
+
+  const CptClass* get_class(Compt_id cpid) 
+  {
+    auto it = _cptclasses.find(cpid);
+    return it != end(_cptclasses) ? &it->second : nullptr;
+  }
+};
+
+
+// TODO controller strategy
+// Control context for sim. instance
+struct ControlCtx 
+{
+  ControlCtx(ModelGen* mg, set<SystemHandle*> shs):
+    _modelgen(mg),
+    _end_cond(end_cond()),
+    _ctrl_ent(ctrl_entity())
+  {}
+  
+  // make an entity for control...
+  static
+  Entity_ptr ctrl_entity()
+  {
+    return 0;
+  }
+
+  // The condition, which when evaluated, ends the game;
+  // expressed as: 
+  static
+  Cond_ptr end_cond()
+  {
+    // eg. run ends after 4 "days"
+    // Condition(= time.n_day 4)
+    // -> Halt()
+    return 0;
+  }
+  set<Entity_ptr> entities() {return _entities;}
+  set<Cond_ptr> conditions() {return _conditions;}
+
+  const CptClass* get_class(Compt_id cpid) {return _modelgen->get_class(cpid);}
+
+protected:
+  ModelGen* _modelgen;
+  set<Entity_ptr> _entities;
+  set<Cond_ptr> _conditions;
+  uptr<Entity> _ctrl_ent;
+  uptr<Condition> _end_cond;
 };
 
 class ModelRun
@@ -138,9 +190,6 @@ public:
 
   virtual
   ControlCtx* run(ControlCtx* ctx=nullptr) = 0;
-  
-  virtual
-  CptClass* get_class(Compt_id) = 0;
 
 protected:        
   virtual
@@ -150,31 +199,29 @@ protected:
 struct Entity
 {
 protected:
-  ModelRun* _modelrun;
+  ControlCtx* _ctx;
   Compt_data _compts;
 
 public:
   // constructed with set of classes
-  Entity(ModelRun* mr, set<CptClass*> cpts):
-    _modelrun(mr)
+  Entity(ControlCtx* cx, m<Compt_id, CptClass*> cpts):
+    _ctx(cx)
   {
     // "Each C in Cpts represents a component meta-type"
     for (auto&& c : cpts)
-      _compts.emplace(c->name(), create(c));
+      _compts.emplace(c.first, Compt_own{create(c.second)});
   }
 
   // O(log n)
-  Compt_ptr get(const Compt_id ci) {return _compts.at(ci);}
+  Compt_ptr get(const Compt_id id) {return _compts.at(id).get();}
   // O(n)
   Compt_ptr find(const string& cn) 
   {
-    auto it = find_if(begin(_compts), end(_compts), 
-                      [&](Compt_id k, Compt_ptr) {
-                        return _modelrun->get_class(k)->name() == cn;
-                      });
-    return it != end(_compts) ? it->second : 0;
+    for (auto&& c: _compts)
+      if (_ctx->get_class(c.first)->name() == cn)
+        return c.second.get();
+    return {};
   }
-
 
   // TODO
   Compt_ptr create(CptClass* cpc) {return {};}
@@ -258,7 +305,7 @@ public:
     assert(valid(e));
     _repr = e;
   }
-  Expression(const char* c): Expression(c) {}
+  Expression(const char* c): Expression(string(c)) {}
 
   // check validity of string
   static bool valid(const string& e) {return true;}
@@ -279,7 +326,7 @@ public:
 
   // Here shall happen the magic
   // Conditions ideally are evaluated in as isolated a context as possible
-  Event_opt operator()()
+  uptr<Event> operator()()
   {
     // ~~~ m a g i c ~~~
     // Condition works as a closure of several (two?) instance (Field) references,
@@ -288,45 +335,8 @@ public:
     // An event is simple;
     // 
     
-    return nullptr;
+    return {};
   }
-};
-
-
-// TODO controller strategy
-// Control context for sim. instance
-struct ControlCtx 
-{
-  ControlCtx(set<SystemHandle*> shs):
-    _end_cond(end_cond()),
-    _ctrl_ent(ctrl_entity())
-  {}
-  
-  // make an entity for control...
-  static
-  Entity_ptr ctrl_entity()
-  {
-    return 0;
-  }
-
-  // The condition, which when evaluated, ends the game;
-  // expressed as: 
-  static
-  Cond_ptr end_cond()
-  {
-    // eg. run ends after 4 "days"
-    // Condition(= time.n_day 4)
-    // -> Halt()
-    return 0;
-  }
-  set<Entity_ptr> entities() {return _entities;}
-  set<Cond_ptr> conditions() {return _conditions;}
-
-protected:
-  set<Entity_ptr> _entities;
-  set<Cond_ptr> _conditions;
-  uptr<Entity> _ctrl_ent;
-  uptr<Condition> _end_cond;
 };
 
 // "Runnable model."
@@ -355,7 +365,7 @@ public:
     // create default controls
   }
 
-  ControlCtx* control_ctx() override {return new ControlCtx{};}
+  ControlCtx* control_ctx() override {return new ControlCtx{&_modelgen, systems()};}
 
   // """\return a set of Systems and a control system
   // => (control, [contexts])
@@ -382,11 +392,12 @@ public:
     return ret;
   }
 
+  // Run the model
   ptr<ControlCtx>
   run(ControlCtx* ctx=nullptr) override
   {
     if (!ctx)
-      ctx = control_ctx(_sys_handles);
+      ctx = control_ctx();
     // ctx = new ControlCtx{&conds, &events};
     
     _run_events(ctx);
@@ -406,12 +417,10 @@ protected:
   // struct EventQueue : private std::queue<Event_ptr>
   // {
   //   ControlCtx* _controlctx;
-  //   void push(Event_ptr e)
-  //   {
-      
-  //   }
+  //   void push(Event_ptr e);
   // };
-  using EventQueue = std::queue<Event_ptr>;
+  // using EventQueue = std::queue<Event_ptr>;
+  using EventQueue = std::queue<uptr<Event>>;
 
   void _run_events(ControlCtx* ctx) override
   {
@@ -451,23 +460,22 @@ protected:
     EventQueue evtq;
 
     // Create a vector of threads, and of event results, same size as condv
-    v<thread> condjobs;
-    v<Event_opt> evtv(conds.size());
-    for (size_t i{}; i < conds.size(); ++i)
+    v<thread> evaljobs;
+    v<uptr<Event> > evtv(conds.size());
+    for (auto itc = begin(conds); itc != end(conds); ++itc)
     {
-      auto ci = begin(conds) + i;
-      auto ei = begin(evtv) + i;
-      condjobs.emplace_back([=]{*ei = (**ci)();});
+      auto ite = begin(evtv) + distance(begin(conds), itc);
+      evaljobs.emplace_back([=]{*ite = (**itc)();});
     }
     // TODO: threadpool or scheduling here
-    for (auto&& cj: condjobs)
-      cj.join();
+    for (auto&& th: evaljobs)
+      th.join();
 
     // queue event results, skip duds
     for (auto&& e: evtv)
     {
       if (!e) continue;
-      evtq.push(e);
+      evtq.push(move(e));
     }
 
     // Scheduling events is the tricky part
