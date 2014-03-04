@@ -1,5 +1,12 @@
+
 #include "json.hh"
-#include "model_gen.hh"
+
+#include "mgen.hh"
+#include "component.hh"
+#include "entity.hh"
+#include "event.hh"
+#include "condition.hh"
+#include "mrun.hh"
 
 int main()
 {
@@ -7,5 +14,5 @@ int main()
   ModelGen mg(js);
   uptr<ModelRun> mr{new ModelRun_impl(mg)};
 
-  
+  return 0;
 }
