@@ -1,0 +1,60 @@
+{
+  "components": [
+    {
+      "name":"Firm",
+      "type": [
+        ["Product"],
+        ["Position"]
+      ]
+    },
+    {
+      "name": "Position",
+      "type": [
+        "Service",
+        "Firm",
+        "Employee"
+      ]
+    },
+    {
+      "name": "Household",
+      "type": ["Agent"]
+    }
+  ]
+}
+
+{
+  "components": [
+    {
+      "name": "Factor",
+      "type": 
+    },
+    {
+      "name": "Good",
+      "type": "Flow"
+    }
+  ]
+}
+
+{
+  "entity": [
+    {
+      "name": "Technique",
+      "type": [
+        [[""]],
+      ]
+    },
+    {
+      "name": "Good",
+      "type": "Flow"
+    }
+  ]
+}
+
+// 
+
+// technique:
+//  maps factors to goods
+//  
+// 
+
+// a factor is a component of 
