@@ -4,6 +4,7 @@
 
 #include "basic.hh"
 #include "mrun.hh"
+#include "component.hh"
 
 // 
 struct Entity
@@ -11,7 +12,7 @@ struct Entity
 protected:
   ControlCtx* _ctx;
   Compt_data _compts;
-
+  
 public:
   // constructed with set of classes
   Entity(ControlCtx* cx, m<Compt_id, CptClass*> cpts):
@@ -34,5 +35,9 @@ public:
   }
 
   // TODO
-  Compt_ptr create(CptClass* cpc) {return {};}
+  Compt_ptr create(CptClass* cpc) 
+  {
+    
+    return {};
+  }
 };

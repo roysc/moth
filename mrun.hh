@@ -17,6 +17,11 @@ struct ControlCtx
     _end_cond(end_cond()),
     _ctrl_ent(ctrl_entity())
   {}
+
+  set<Entity_ptr> entities() {return _entities;}
+  set<Cond_ptr> conditions() {return _conditions;}
+
+  const CptClass* get_class(Compt_id cpid) {return _modelgen->get_class(cpid);}
   
   // make an entity for control...
   static
@@ -35,10 +40,6 @@ struct ControlCtx
     // -> Halt()
     return {};
   }
-  set<Entity_ptr> entities() {return _entities;}
-  set<Cond_ptr> conditions() {return _conditions;}
-
-  const CptClass* get_class(Compt_id cpid) {return _modelgen->get_class(cpid);}
 
 protected:
   ModelGen* _modelgen;
