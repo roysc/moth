@@ -1,5 +1,6 @@
 
 #include <iostream>
+#include <fstream>
 
 #include "json.hh"
 
@@ -10,9 +11,23 @@
 #include "condition.hh"
 #include "mrun.hh"
 
-int main()
+// #include "util/io.hh"
+
+int main(int argc, const char* argv[])
 {
+  v<string> args(argv, argv + argc);
   Json js;
+
+  if (argc < 2) 
+  {
+    std::cout << "Usage: " << args[0] << " <file>.json\n";
+    exit(1);
+  }
+
+
+  std::ifstream in(args.at(1));
+  json::read_json(in, js);
+  
   ModelGen mg(js);
   uptr<ModelRun> mr{new ModelRun_impl(mg)};
 

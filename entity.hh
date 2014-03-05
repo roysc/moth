@@ -3,7 +3,7 @@
 #pragma once
 
 #include "basic.hh"
-#include "mgen.hh"
+#include "mrun.hh"
 
 // 
 struct Entity

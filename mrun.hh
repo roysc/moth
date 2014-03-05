@@ -4,6 +4,49 @@
 
 #include <queue>
 #include <utility>
+#include "entity.hh"
+#include "event.hh"
+#include "condition.hh"
+
+// TODO controller strategy
+// Control context for sim. instance
+struct ControlCtx 
+{
+  ControlCtx(ModelGen* mg, set<SystemHandle*> shs):
+    _modelgen(mg),
+    _end_cond(end_cond()),
+    _ctrl_ent(ctrl_entity())
+  {}
+  
+  // make an entity for control...
+  static
+  Entity_ptr ctrl_entity()
+  {
+    return {};
+  }
+
+  // The condition, which when evaluated as true, ends the game;
+  // expressed as: 
+  static
+  Cond_ptr end_cond()
+  {
+    // eg. run ends after 4 "days"
+    // Condition(= time.n_day 4)
+    // -> Halt()
+    return {};
+  }
+  set<Entity_ptr> entities() {return _entities;}
+  set<Cond_ptr> conditions() {return _conditions;}
+
+  const CptClass* get_class(Compt_id cpid) {return _modelgen->get_class(cpid);}
+
+protected:
+  ModelGen* _modelgen;
+  set<Entity_ptr> _entities;
+  set<Cond_ptr> _conditions;
+  uptr<Entity> _ctrl_ent;
+  uptr<Condition> _end_cond;
+};
 
 // Model interface
 class ModelRun
