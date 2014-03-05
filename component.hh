@@ -3,29 +3,10 @@
 #pragma once
 
 #include "basic.hh"
-#include "cptclass.hh"
+#include "data.hh"
 
-struct Component;
-using Compt_id = unsigned;
-using Compt_own = uptr<Component>;
-using Compt_ptr = Component*;
-using Compt_data = m<Compt_id, Compt_own>;
 // the idea is that a component is only accessed through Compt_addr keys
-using Compt_addr = pair<Entity_ptr, Compt_id>;
-
-// struct Field;
-
-// struct Field
-// {
-//   dtype::T _dtype;
-//   uptr<uint8_t> _ptr;
-  
-//   template <class D>
-//   Data get();
-// };
-
-// template<>
-// Field::get<dtype::ty_int>() {return _ptr}
+// using Compt_addr = pair<Entity_ptr, Compt_id>;
 
 // """A trait of an entity"""
 struct Component

@@ -2,6 +2,8 @@
 // event.hh
 #pragma once
 
+#include "basic.hh"
+
 // Event
 // represents a statement to be evaluated
 // * the set of statement operations that are to be defined
@@ -18,7 +20,7 @@
 // (spawning) an entity, (changing) one, or (destroying) one
 struct Event;
 // kinds of events
-enum class EventKind: uint32_t {spawn, update, destroy, N};
+enum class EventKind: unsigned {spawn, update, destroy, N};
 
 // Optional Event
 using Event_ptr = ptr<Event>;

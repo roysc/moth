@@ -19,8 +19,8 @@ class ModelGen
 protected:
   Compt_id _next_id;
   // Component types
-  // m<Compt_id, CptClass> _cptclasses;
   m<Compt_id, CptClass> _cptclasses;
+  m<CptClass*, Compt_id> _cpt_ids;
   
 public:
   ModelGen(Json js):
@@ -96,6 +96,13 @@ public:
   {
     auto it = _cptclasses.find(cpid);
     return it != end(_cptclasses) ? &it->second : nullptr;
+  }
+
+  Compt_id unget_class(CptClass* cp)
+  {
+    // auto it = find_if(begin(_cptclasses), end(cp), [])
+    auto it = _cpt_ids.find(cp);
+    return it != end(_cpt_ids)? it->second : throw err::Not_found(util::concat(cp));
   }
 };
 

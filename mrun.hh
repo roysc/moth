@@ -4,50 +4,17 @@
 
 #include <queue>
 #include <utility>
-#include "entity.hh"
+
 #include "event.hh"
 #include "condition.hh"
+#include "cptclass.hh"
+#include "controlctx.hh"
 
-// TODO controller strategy
-// Control context for sim. instance
-struct ControlCtx 
-{
-  ControlCtx(ModelGen* mg, set<SystemHandle*> shs):
-    _modelgen(mg),
-    _end_cond(end_cond()),
-    _ctrl_ent(ctrl_entity())
-  {}
-
-  set<Entity_ptr> entities() {return _entities;}
-  set<Cond_ptr> conditions() {return _conditions;}
-
-  const CptClass* get_class(Compt_id cpid) {return _modelgen->get_class(cpid);}
-  
-  // make an entity for control...
-  static
-  Entity_ptr ctrl_entity()
-  {
-    return {};
-  }
-
-  // The condition, which when evaluated as true, ends the game;
-  // expressed as: 
-  static
-  Cond_ptr end_cond()
-  {
-    // eg. run ends after 4 "days"
-    // Condition(= time.n_day 4)
-    // -> Halt()
-    return {};
-  }
-
-protected:
-  ModelGen* _modelgen;
-  set<Entity_ptr> _entities;
-  set<Cond_ptr> _conditions;
-  uptr<Entity> _ctrl_ent;
-  uptr<Condition> _end_cond;
-};
+// "Contexts" for components needing centralized control
+// eg. Location/coordinates
+//     Physics
+//     Information network
+struct ControlCtx;
 
 // Model interface
 class ModelRun
@@ -56,12 +23,6 @@ public:
   // 
   virtual
   ControlCtx* control_ctx() = 0;
-
-  // """\return a set of Systems and a control system
-  // => (control, [contexts])
-  // """
-  virtual
-  set<SystemHandle*> systems() = 0;
 
   virtual
   ControlCtx* run(ControlCtx* ctx=nullptr) = 0;
@@ -85,51 +46,38 @@ protected:
 class ModelRun_impl : public ModelRun
 {
   ModelGen _modelgen;
-  set<SystemHandle*> _sys_handles;
+  // set<SystemHandle*> _sys_handles;
   uptr<ControlCtx> _controlctx;
 
 public:
   ModelRun_impl(ModelGen mgen):
     _modelgen(mgen),
     // # the "primary" system, an abstract interface for the user's control.
-    _sys_handles(systems()),
-    _controlctx{new ControlCtx{&_modelgen, systems()}}
+    _controlctx{}
   {
     // create default controls
   }
 
   ControlCtx* control_ctx() override {return _controlctx.get();}
 
-  // """\return a set of Systems and a control system
-  // => (control, [contexts])
-  // """
-  set<SystemHandle*> systems() override
-  {
-    // # Cs = [C for C in self._Components if C.name == name]
-    // # ret = System(Cs)
-    // # "Contexts" for components needing centralized control
-    // # eg. Location/coordinates
-    // #     Physics
-    // #     Information network
-    set<SystemHandle*> ret;
-    
-    for (auto&& c : _modelgen.component_types())
-    {
-      SystemHandle* hdl;
-      // user ctrl integration:
-      // system_handle() => Handle(_) -- supports user control
-      //                  | nullptr   -- no
-      if ((hdl = c->system_handle()))
-        ret.emplace(hdl);
-    }
-    return ret;
-  }
-
   // Run the model
   ControlCtx* run(ControlCtx* ctx=nullptr) override
   {
-    if (!ctx)
-      ctx = control_ctx();
+    if (!ctx) {
+      set<SystemHandle*> shs;
+      for (auto&& c : _modelgen.component_types())
+      {
+        // user control integration:
+        // system_handle() => Handle(_) -- supports user control
+        //                  | nullptr   -- no
+
+        SystemHandle* sh;
+        if ((sh = c->system_handle()))
+          shs.emplace(sh);
+      }
+      ctx = new ControlCtx(&_modelgen, shs);
+    }
+    
     // ctx = new ControlCtx{&conds, &events};
     
     _run_events(ctx);

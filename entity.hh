@@ -3,9 +3,10 @@
 #pragma once
 
 #include "basic.hh"
-#include "mrun.hh"
 #include "component.hh"
 
+// 
+using Compt_data = m<Compt_id, Component>;
 // 
 struct Entity
 {
@@ -20,24 +21,17 @@ public:
   {
     // "Each C in Cpts represents a component meta-type"
     for (auto&& c : cpts)
-      _compts.emplace(c.first, Compt_own{create(c.second)});
+      _compts.emplace(c.first, c.second->create());
   }
 
   // O(log n)
-  Compt_ptr get(const Compt_id id) {return _compts.at(id).get();}
+  Compt_ptr get(const Compt_id id) {return &_compts.at(id);}
   // O(n)
-  Compt_ptr find(const string& cn) 
-  {
-    for (auto&& c: _compts)
-      if (_ctx->get_class(c.first)->name() == cn)
-        return c.second.get();
-    return {};
-  }
+  Compt_ptr find(const string& cn);
 
   // TODO
   Compt_ptr create(CptClass* cpc) 
   {
-    
     return {};
   }
 };

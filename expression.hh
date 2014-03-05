@@ -2,7 +2,7 @@
 // expression.hh
 #pragma once
 
-enum class Operation: uint32_t
+enum class Operation: unsigned
 {
   op_gt, // >,
   op_lt, // <,
@@ -29,6 +29,7 @@ enum class Operation: uint32_t
 //   }
 // };
 
+inline
 Operation to_operation(string s)
 {
   static const table<string, Operation> tbl = {
@@ -50,6 +51,7 @@ Operation to_operation(string s)
   return it != end(tbl)? it->second : throw err::Not_found(__func__);
 }
 
+inline
 string to_string(Operation op)
 {
   static const m<Operation, string> tbl = {
@@ -70,7 +72,6 @@ string to_string(Operation op)
   auto it = tbl.find(op);
   return it != end(tbl)? it->second : throw err::Not_found(__func__);
 }
-
 
 // _simple_ AST
 struct Expression
