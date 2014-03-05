@@ -6,6 +6,7 @@
 #include "cptclass.hh" 
 #include "component.hh"
 
+#include "err.hh"
 #include "log.hh"
 #include "json.hh"
 
@@ -25,16 +26,61 @@ public:
   ModelGen(Json js):
     _next_id{}
   {
+    LOG_PUSH_(lctor)(__func__);
+
     // js = json.load(fp)
-    auto cs = js.get_child("components");
-    for (auto&& c : cs)
-    {
-      auto name = c.second.get<string>("name");
-      LOG_(info)("creating CptClass: ", name);
-      auto res = _cptclasses.emplace(fresh_id(), CptClass(this, name));
+    LOG_(info)("loading JSON");
+    
+    auto cpts_js = js.get_child_optional("components");
+    auto ents_js = js.get_child_optional("entities");
+
+    auto make = [&lctor, this](string n, dtype::T dt) {
+      LOG_(info)("creating: ", n, ": ", dtype::to_string(dt));
+
+      auto res = _cptclasses.emplace(fresh_id(), CptClass(this, n, dt));
       if (!res.second)
-        LOG_(alert)("CptClass not inserted: ", name);
+        LOG_(error)("CptClass insertion failed");
+      // throw err::Internal("CptClass insertion failed");
+    };
+
+    for (auto&& c: cpts_js? *cpts_js : Json()) {
+      // name. easy.
+      auto name = c.second.get<string>("name");
       
+      { // get types
+
+        auto tp = c.second.get_child("type");
+        // type could be value, or dict.
+        // for value, define component
+        auto val = tp.get_value<string>();
+        if (!val.empty()) {
+          LOG_(info)("single-type");
+          auto dt = dtype::from_string(val);
+          make(name, dt);
+        }
+        // no children; it's an empty {}
+        else if (tp.empty()) {
+          LOG_(info)("empty-type");
+          make(name, dtype::ty_N);
+        }
+        // has multiple child components
+        else {
+          LOG_(info)("multi-type");
+          
+          for (auto&& child: tp)
+          {
+            auto ch_name = child.first;
+            auto ch_val = child.second.get_value<string>();
+            // LOG_(info)("type node: \"", ch_val, '"');
+
+            auto dt = dtype::from_string(ch_val);
+            // LOG_(info)(name, " child: ", ch_name);
+
+            auto mkname = util::concat(name, '.', ch_name);
+            make(mkname, dt);
+          }
+        }
+      }
     }
   }
 
