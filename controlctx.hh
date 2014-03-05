@@ -67,7 +67,6 @@ public:
 
   // The condition, which when evaluated as true, ends the game;
   // expressed as: 
-  static
   Cond_ptr end_cond()
   {
     // eg. run ends after 4 "days"

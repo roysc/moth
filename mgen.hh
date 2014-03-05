@@ -60,9 +60,13 @@ public:
     for (auto&& c: cpts_js? *cpts_js : Json()) {
       // name. easy.
       auto name = c.second.get<string>("name");
-      
-      { // get types
 
+      // get the system specs for the component
+      // not sure how this works yet
+      auto sys = c.second.get_optional<string>("system");
+      if (!sys) THROW_(Invalid, "system");
+
+      { // get types
         auto tp = c.second.get_child("type");
         // type could be value, or dict.
         // for value, define component
