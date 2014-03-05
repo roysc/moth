@@ -26,20 +26,20 @@ public:
   ModelGen(Json js):
     _next_id{}
   {
-    LOG_PUSH_(lctor)(__func__);
+    LOG_PUSH_(l)(__PRETTY_FUNCTION__);
 
     // js = json.load(fp)
-    LOG_(info)("loading JSON");
+    LOG_TO_(info, l)("loading JSON");
     
     auto cpts_js = js.get_child_optional("components");
     auto ents_js = js.get_child_optional("entities");
 
-    auto make = [&lctor, this](string n, dtype::T dt) {
-      LOG_(info)("creating: ", n, ": ", dtype::to_string(dt));
+    auto make = [&l, this](string n, dtype::T dt) {
+      LOG_TO_(info, l)("creating: ", n, ": ", dtype::to_string(dt));
 
       auto res = _cptclasses.emplace(fresh_id(), CptClass(this, n, dt));
       if (!res.second)
-        LOG_(error)("CptClass insertion failed");
+        LOG_TO_(error, l)("CptClass insertion failed");
       // throw err::Internal("CptClass insertion failed");
     };
 
@@ -54,27 +54,27 @@ public:
         // for value, define component
         auto val = tp.get_value<string>();
         if (!val.empty()) {
-          LOG_(info)("single-type");
+          LOG_TO_(info, l)("single-type");
           auto dt = dtype::from_string(val);
           make(name, dt);
         }
         // no children; it's an empty {}
         else if (tp.empty()) {
-          LOG_(info)("empty-type");
+          LOG_TO_(info, l)("empty-type");
           make(name, dtype::ty_N);
         }
         // has multiple child components
         else {
-          LOG_(info)("multi-type");
+          LOG_TO_(info, l)("multi-type");
           
           for (auto&& child: tp)
           {
             auto ch_name = child.first;
             auto ch_val = child.second.get_value<string>();
-            // LOG_(info)("type node: \"", ch_val, '"');
+            // LOG_TO_(info, l)("type node: \"", ch_val, '"');
 
             auto dt = dtype::from_string(ch_val);
-            // LOG_(info)(name, " child: ", ch_name);
+            // LOG_TO_(info, l)(name, " child: ", ch_name);
 
             auto mkname = util::concat(name, '.', ch_name);
             make(mkname, dt);

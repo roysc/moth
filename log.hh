@@ -15,7 +15,7 @@
 
 // scope a log by "pushing" to (global, or specific) log
 #define LOG_PUSH_TO_(logpush_, logtop_)                 \
-  ::logging::LogScoped logpush_(logtop_); (logpush_)
+  ::logging::LogScoped logpush_(logtop_); (logtop_)
 
 #define LOG_PUSH_(logpush_)                         \
   LOG_PUSH_TO_(logpush_, ::logging::get_global_log())
@@ -31,10 +31,12 @@ struct Log
 protected:
   ostream& _out;
   unsigned _refct;
-  static const string s_prelude;
+  const string _base_prelude = "  ";
+  // const string _suffix = "\n";
 
 public:
   Log(ostream& o): _out(o) {}
+
   template <class... Ts>
   void operator()(Ts&&... args) 
   {
@@ -45,8 +47,8 @@ public:
   string prelude()
   {
     string rv;
-    auto ct = _refct++;
-    while (ct--) rv += s_prelude; 
+    auto ct = ++_refct;
+    while (ct--) rv += _base_prelude; 
     return rv;
   }
   // void refplus() {++_refct;}
@@ -62,6 +64,13 @@ struct LogScoped: public Log
   LogScoped(Log& l):
     Log(l.stream()), _prelude(l.prelude())
   {}
+
+  template <class... Ts>
+  void operator()(Ts&&... args) 
+  {
+    Log::operator()(_prelude, std::forward<Ts>(args)...);
+  }
+
 };
 
 Log& get_global_log();

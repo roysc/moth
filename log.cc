@@ -3,8 +3,6 @@
 inline
 namespace logging
 {
-const string Log::s_prelude = "  ";
-
 Log& get_global_log() 
 {
   static Log s_log(std::cout);
