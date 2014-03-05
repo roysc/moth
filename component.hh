@@ -11,20 +11,12 @@
 // """A trait of an entity"""
 struct Component
 {
-  using Data = v<uint8_t>;
 protected:
-  dtype::T _dtype;
   Data _data;
 
 public:
   // Component(Size bytes)
   Component(dtype::T dt):
-    _dtype(dt), _data(dtype::size(dt)) {}
-
-  dtype::T dtype() const {return _dtype;}
-  Data::value_type* raw() 
-  {
-    assert(!_data.empty() && "data not initialized");
-    return &_data[0];
-  }
+    _data(dt) {}
+  
 };

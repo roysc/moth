@@ -10,6 +10,11 @@
 #include "log.hh"
 #include "json.hh"
 
+namespace konst
+{
+const string end_cond_name = "_end_";
+}
+
 // """
 // The generation context for a generator;
 // Namespace of Generation implementation
@@ -19,8 +24,9 @@ class ModelGen
 protected:
   Compt_id _next_id;
   // Component types
-  m<Compt_id, CptClass> _cptclasses;
-  m<CptClass*, Compt_id> _cpt_ids;
+  using CptClasses = m<Compt_id, const CptClass>;
+  CptClasses _cptclasses;
+  m<const CptClass*, Compt_id> _cpt_ids;
   
 public:
   ModelGen(Json js):
@@ -34,12 +40,20 @@ public:
     auto cpts_js = js.get_child_optional("components");
     auto ents_js = js.get_child_optional("entities");
 
-    auto make = [&l, this](string n, dtype::T dt) {
+    auto make_cpt = [&l, this](string n, dtype::T dt) {
       LOG_PUSH_TO_(lmk, l)("creating: ", n, ": ", dtype::to_string(dt));
 
-      auto res = _cptclasses.emplace(fresh_id(), CptClass(this, n, dt));
-      if (!res.second)
+      auto cpid = fresh_id();
+      auto insr = _cptclasses.emplace(cpid, CptClass(this, n, dt));
+      if (!insr.second)
         LOG_TO_(error, lmk)("CptClass insertion failed");
+      else
+      {
+        auto cptr = &(insr.first->second);
+        auto insr2 = _cpt_ids.emplace(cptr, cpid);
+        if (!insr2.second)
+          LOG_TO_(error, lmk)("Compt_id insertion failed");
+      }
       // throw err::Internal("CptClass insertion failed");
     };
 
@@ -56,12 +70,12 @@ public:
         if (!val.empty()) {
           LOG_TO_(info, l)("single-type");
           auto dt = dtype::from_string(val);
-          make(name, dt);
+          make_cpt(name, dt);
         }
         // no children; it's an empty {}
         else if (tp.empty()) {
           LOG_TO_(info, l)("empty-type");
-          make(name, dtype::ty_N);
+          make_cpt(name, dtype::ty_N);
         }
         // has multiple child components
         else {
@@ -77,18 +91,27 @@ public:
             // LOG_TO_(info, l)(name, " child: ", ch_name);
 
             auto mkname = util::concat(name, '.', ch_name);
-            make(mkname, dt);
+            make_cpt(mkname, dt);
           }
         }
-      }
-    }
+      } // get types
+    }   // process components
+    
+    auto itc = find_if(
+      begin(_cptclasses), end(_cptclasses), 
+      [](CptClasses::value_type v) {return v.second.name() == konst::end_cond_name;}
+    );
+    assert(itc == end(_cptclasses) && "end component already defined");
+    
+    make_cpt(konst::end_cond_name, dtype::ty_bool);
+    // entities
   }
 
   Compt_id fresh_id() {return ++_next_id;}
-  set<CptClass*> component_types() 
+  m<Compt_id, const CptClass*> component_classes() 
   {
-    set<CptClass*> ret;
-    for (auto&& c: _cptclasses) ret.emplace(&c.second);
+    m<Compt_id, const CptClass*> ret;
+    for (auto&& c: _cptclasses) ret.emplace(c.first, &c.second);
     return ret;
   }
 
@@ -98,7 +121,7 @@ public:
     return it != end(_cptclasses) ? &it->second : nullptr;
   }
 
-  Compt_id unget_class(CptClass* cp)
+  Compt_id unget_class(const CptClass* cp)
   {
     // auto it = find_if(begin(_cptclasses), end(cp), [])
     auto it = _cpt_ids.find(cp);

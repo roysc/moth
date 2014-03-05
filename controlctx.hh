@@ -33,11 +33,14 @@ public:
     // _end_cond(end_cond()),
     // _ctrl_ent(ctrl_entity())
   { 
-    for (auto&& c : _modelgen->component_types())
+    for (auto&& c : _modelgen->component_classes())
     {
-      auto sh = c->system_handle();
+      auto sh = c.second->system_handle();
       if (sh) _systems.emplace(sh);
     }
+    // auto ctrlsys = 
+    _ctrl_ent.reset(new Entity(this, {}));
+    _end_cond.reset(new Condition("=", {}));
   }
 
   set<Entity_ptr> entities() const {return _entities;}

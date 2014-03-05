@@ -67,7 +67,7 @@ public:
     //
     //   c= Cond(Body.pain > _)
     //   => e= Evt(Agent.Senses -> Agent.Senses)
-    //   r = e() = (s -> s.alarmed; s)
+    //   r = e() = (s > s.alarmed; s)
     // 
     //   Cond(Agent.decision ~ go(_))
     //   => Evt(Loc -> Loc)

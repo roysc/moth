@@ -2,6 +2,9 @@
 // expression.hh
 #pragma once
 
+#include "err.hh"
+#include "data.hh"
+
 enum class Operation: unsigned
 {
   op_gt, // >,
@@ -77,16 +80,14 @@ string to_string(Operation op)
 struct Expression
 {
 protected:
-  string _repr;
+  Operation _opn;
 
 public:
-  Expression(const string& e)
-  {
-    assert(valid(e));
-    _repr = e;
-  }
-  Expression(const char* c): Expression(string(c)) {}
+  Expression(Operation op): _opn(op) {}
+  Expression(const string& e): Expression(to_operation(e)) {}
+  Expression(const char* e): Expression(string(e)) {}
 
   // check validity of string
-  static bool valid(const string& e) {return true;}
+  // static bool valid(const string& e) {return true;}
+  
 };

@@ -37,8 +37,8 @@ public:
   // create a control context for components of this type
   // system_handle() => Handle(_) -- supports user control
   //                  | nullptr   -- no
-  SystemHandle* system_handle() {return {};}
+  SystemHandle* system_handle() const {return {};}
 
-  Component create() {return Component(_dtype);}
+  Component create() const {return Component(_dtype);}
   // bool operator<(const CptClass& that) {return _id }
 };

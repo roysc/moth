@@ -5,7 +5,6 @@
 #include <functional>
 
 #include "basic.hh"
-#include "err.hh"
 #include "expression.hh"
 
 
@@ -24,7 +23,7 @@ struct Condition
 protected:
   // Field_set _fields;
   Expression _expr;
-  v<Compt_addr > _args;
+  v<Compt_addr> _args;
 
 public:
   Condition(Expression ex, v<Compt_addr> as):
