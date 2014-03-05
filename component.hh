@@ -39,4 +39,10 @@ public:
   // Component(Size bytes)
   Component(dtype::T dt):
     _dtype(dt), _data(dtype::size(dt)) {}
+
+  Data::value_type* raw() 
+  {
+    assert(!_data.empty() && "data not initialized");
+    return &_data[0];
+  }
 };

@@ -27,7 +27,7 @@ unsigned size(T dt)
     // a pair (r, i) Range realm and index
     {dtype::ty_rdisc, sizeof(unsigned*) + sizeof(unsigned)},
     {dtype::ty_rcont, sizeof(unsigned*) + sizeof(unsigned)},
-    // --not sure how to impl. of if necessary
+    // --not sure how to impl. or if necessary
     {dtype::ty_str, sizeof(int)},
     // the nil type placeholder
     // {dtype::ty_N, 0}

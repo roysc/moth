@@ -6,6 +6,7 @@
 #include "cptclass.hh" 
 #include "component.hh"
 
+#include "log.hh"
 #include "json.hh"
 
 // """
@@ -27,9 +28,14 @@ public:
     // js = json.load(fp)
     auto cs = js.get_child("components");
     for (auto&& c : cs)
-      _cptclasses.emplace(
-        fresh_id(), CptClass(this, c.second.get<string>("name")));
-    
+    {
+      auto name = c.second.get<string>("name");
+      LOG_(info)("creating CptClass: ", name);
+      auto res = _cptclasses.emplace(fresh_id(), CptClass(this, name));
+      if (!res.second)
+        LOG_(alert)("CptClass not inserted: ", name);
+      
+    }
   }
 
   Compt_id fresh_id() {return ++_next_id;}
