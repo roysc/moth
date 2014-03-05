@@ -40,6 +40,7 @@ public:
   Component(dtype::T dt):
     _dtype(dt), _data(dtype::size(dt)) {}
 
+  dtype::T dtype() const {return _dtype;}
   Data::value_type* raw() 
   {
     assert(!_data.empty() && "data not initialized");
