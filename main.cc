@@ -16,7 +16,6 @@
 int main(int argc, const char* argv[])
 {
   v<string> args(argv, argv + argc);
-  Json js;
 
   if (argc < 2) 
   {
@@ -24,7 +23,7 @@ int main(int argc, const char* argv[])
     exit(1);
   }
 
-
+  Json js;
   std::ifstream in(args.at(1));
   json::read_json(in, js);
   
