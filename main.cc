@@ -29,9 +29,10 @@ int main(int argc, const char* argv[])
   json::read_json(in, js);
   
   ModelGen mg(js);
-  uptr<ModelRun> mr{new ModelRun_impl(mg)};
+  ControlCtx ctx(&mg);
 
-  auto ctx = mr->control_ctx();
+  ModelRun mr(&ctx);
+  mr.run_events();
   // do stuff
   // control sim.
 

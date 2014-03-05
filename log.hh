@@ -15,7 +15,7 @@
 
 // scope a log by "pushing" to (global, or specific) log
 #define LOG_PUSH_TO_(logpush_, logtop_)                 \
-  ::logging::LogScoped logpush_(logtop_); (logtop_)
+  ::logging::Log logpush_(&(logtop_)); (logtop_)
 
 #define LOG_PUSH_(logpush_)                         \
   LOG_PUSH_TO_(logpush_, ::logging::get_global_log())
@@ -30,48 +30,30 @@ struct Log
 {
 protected:
   ostream& _out;
-  unsigned _refct;
+  Log* _base{};
+  unsigned _indent;
   const string _base_prelude = "  ";
   // const string _suffix = "\n";
 
 public:
   Log(ostream& o): _out(o) {}
+  Log(Log* base): _out(base->_out), _base(base), _indent(base->_indent + 1) {}
 
-  template <class... Ts>
-  void operator()(Ts&&... args) 
-  {
-    util::print_to(_out, std::forward<Ts>(args)..., '\n');
-  }
   ostream& stream() {return _out;}
-  // current prelude for any stacked logs
+  // return indent depth for any stacked logs
   string prelude()
   {
     string rv;
-    auto ct = ++_refct;
-    while (ct--) rv += _base_prelude; 
+    for (auto ct = _indent; ct; --ct) 
+      rv += _base_prelude; 
     return rv;
   }
-  // void refplus() {++_refct;}
-};
-
-// struct LogThr: public Log {};
-
-// struct Chan: public Log {};
-
-struct LogScoped: public Log
-{
-  string _prelude;
-  LogScoped(Log& l):
-    Log(l.stream()), _prelude(l.prelude())
-  {}
 
   template <class... Ts>
-  void operator()(Ts&&... args) 
-  {
-    Log::operator()(_prelude, std::forward<Ts>(args)...);
-  }
-
+  void operator()(Ts&&... args) {util::print_to(_out, prelude(), std::forward<Ts>(args)..., '\n');}
 };
+
+// struct Chan: public Log {};
 
 Log& get_global_log();
 Log& get_thread_log();

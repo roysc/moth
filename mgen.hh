@@ -35,11 +35,11 @@ public:
     auto ents_js = js.get_child_optional("entities");
 
     auto make = [&l, this](string n, dtype::T dt) {
-      LOG_TO_(info, l)("creating: ", n, ": ", dtype::to_string(dt));
+      LOG_PUSH_TO_(lmk, l)("creating: ", n, ": ", dtype::to_string(dt));
 
       auto res = _cptclasses.emplace(fresh_id(), CptClass(this, n, dt));
       if (!res.second)
-        LOG_TO_(error, l)("CptClass insertion failed");
+        LOG_TO_(error, lmk)("CptClass insertion failed");
       // throw err::Internal("CptClass insertion failed");
     };
 

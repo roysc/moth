@@ -28,12 +28,17 @@ protected:
   uptr<Condition> _end_cond;
 
 public:
-  ControlCtx(ModelGen* mg, set<SystemHandle*> shs):
-    _modelgen(mg),
-    _systems(shs),
-    _end_cond(end_cond()),
-    _ctrl_ent(ctrl_entity())
-  { }
+  ControlCtx(ModelGen* mg):
+    _modelgen(mg)
+    // _end_cond(end_cond()),
+    // _ctrl_ent(ctrl_entity())
+  { 
+    for (auto&& c : _modelgen->component_types())
+    {
+      auto sh = c->system_handle();
+      if (sh) _systems.emplace(sh);
+    }
+  }
 
   set<Entity_ptr> entities() const {return _entities;}
   set<Cond_ptr> conditions() const {return _conditions;}

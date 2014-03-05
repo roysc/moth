@@ -17,20 +17,16 @@
 struct ControlCtx;
 
 // Model interface
-class ModelRun
-{
-public:
-  // 
-  virtual
-  ControlCtx* control_ctx() = 0;
+// class ModelRun
+// {
+// public:
+//   virtual
+//   ControlCtx* run() = 0;
 
-  virtual
-  ControlCtx* run(ControlCtx* ctx=nullptr) = 0;
-
-protected:        
-  virtual
-  void _run_events(ControlCtx*) = 0;
-};
+// protected:        
+//   virtual
+//   void _run_events(ControlCtx*) = 0;
+// };
 
 // "Runnable model."
 // # 1. instantiate systems
@@ -43,53 +39,12 @@ protected:
 // #     e <- e + new entities(v)
 // #     c <- update(c, v)
 // #
-class ModelRun_impl : public ModelRun
+class ModelRun
 {
-  ModelGen _modelgen;
-  // set<SystemHandle*> _sys_handles;
-  uptr<ControlCtx> _controlctx;
+  ControlCtx* _controlctx;
 
 public:
-  ModelRun_impl(ModelGen mgen):
-    _modelgen(mgen),
-    // # the "primary" system, an abstract interface for the user's control.
-    _controlctx{}
-  {
-    // create default controls
-  }
-
-  ControlCtx* control_ctx() override {return _controlctx.get();}
-
-  // Run the model
-  ControlCtx* run(ControlCtx* ctx=nullptr) override
-  {
-    if (!ctx) {
-      set<SystemHandle*> shs;
-      for (auto&& c : _modelgen.component_types())
-      {
-        // user control integration:
-        // system_handle() => Handle(_) -- supports user control
-        //                  | nullptr   -- no
-
-        SystemHandle* sh;
-        if ((sh = c->system_handle()))
-          shs.emplace(sh);
-      }
-      ctx = new ControlCtx(&_modelgen, shs);
-    }
-    
-    // ctx = new ControlCtx{&conds, &events};
-    
-    _run_events(ctx);
-
-    // # State at end
-    // # self._conditions = uneval'd conditions (may be some met)
-    // # self._entities = 
-    // # events = last delivered events
-    return ctx;
-  }
-
-protected:        
+  ModelRun(ControlCtx* ctx): _controlctx(ctx) {}
 
   // Processing this queue
   // yields mutation
@@ -102,7 +57,7 @@ protected:
   // using EventQueue = std::queue<Event_ptr>;
   using EventQueue = std::queue<uptr<Event>>;
 
-  void _run_events(ControlCtx* ctx) override
+  void run_events()
   {
     // what does event handle?
     // Types:
@@ -135,8 +90,8 @@ protected:
 
     // # The 0-condition
     // # meet this to end the game (just a bool in primary System)
-    auto end_cond = ctx->end_cond();
-    auto&& conds = ctx->conditions();
+    auto end_cond = _controlctx->end_cond();
+    auto&& conds = _controlctx->conditions();
     EventQueue evtq;
 
     // Create a vector of threads, and of event results, same size as condv
@@ -163,5 +118,10 @@ protected:
       // TaskSchedule sched{evtq};
       // ...?
     }
+
+    // # State at end
+    // # self._conditions = uneval'd conditions (may be some met)
+    // # self._entities = 
+    // # events = last delivered events
   }
 };

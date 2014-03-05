@@ -32,7 +32,11 @@ public:
   // Compt_id id() const {return _id;}
   // components needed to impl. this one
   set<CptClass*> dependencies() const {return {};}
+
+  // user control integration:
   // create a control context for components of this type
+  // system_handle() => Handle(_) -- supports user control
+  //                  | nullptr   -- no
   SystemHandle* system_handle() {return {};}
 
   Component create() {return Component(_dtype);}
