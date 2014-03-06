@@ -6,7 +6,6 @@
 #include "system.hh"
 #include "log.hh"
 #include "component.hh"
-#include "data.hh"
 
 // # each CptClass C
 // # represents state that is shared across System s

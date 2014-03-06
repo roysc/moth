@@ -6,7 +6,8 @@
 #include "util/io.hh"
 
 #include "basic.hh"
-#include "expression.hh"
+#include "entity.hh"
+#include "operation.hh"
 
 
 // Condition:
@@ -17,20 +18,44 @@
 //   => Event(...) -- condition is satisfied
 //   => None       -- not
 // """
-
-// 
-struct Condition
+namespace expr
+{
+struct Expression
 {
 protected:
   // Field_set _fields;
-  using Oper = expr::Operation;
-  Oper _oper;
+  Operation _oper;
   v<Compt_addr> _args;
 
 public:
-  Condition(Oper op, v<Compt_addr> as):
+  Expression(Operation op, v<Compt_addr> as):
     _oper(op), _args(as)
   { }
+
+  template <class Ch,class Tr>
+  friend std::basic_ostream<Ch,Tr>& operator<<(
+    std::basic_ostream<Ch,Tr>& out, 
+    const Expression& o)
+  {
+    util::print_to(out, "(\"", o._oper, "\", ", o._args, ')');
+    return out;
+  }
+
+  // E: {o: Op, as: [(e:Ent, c:Cpid)]}
+  Data eval()
+  { // pack as data pointers
+    v<Compt_ptr> cptrs;
+    for (auto&& arg: _args)
+      cptrs.push_back(arg.first->get(arg.second));
+    return _oper.eval(cptrs);
+  }
+};
+} // namespace expr
+
+// 
+struct Condition: public expr::Expression
+{
+  using Expression::Expression;
 
   // Here shall happen the magic
   // Conditions ideally are evaluated in as isolated a context as possible
@@ -47,14 +72,5 @@ public:
     
     return {};
   }
-
-  template <class Ch,class Tr>
-  friend 
-  std::basic_ostream<Ch,Tr>& operator<<(
-    std::basic_ostream<Ch,Tr>& out, const Condition& c
-  ) 
-  {
-    util::print_to(out, "(\"", c._oper, "\", ", c._args, ')');
-    return out;
-  }
-};
+}
+;

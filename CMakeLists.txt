@@ -19,7 +19,12 @@ set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} --std=c++11 -O0 -g")
 
 # main executable
 add_executable(Main
-  main.cc entity.cc log.cc controlctx.cc mgen.cc
+  main.cc
+  entity.cc
+  log.cc
+  controlctx.cc
+  mgen.cc
+  component.cc
 )
 
 # -llibs

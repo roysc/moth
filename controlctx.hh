@@ -3,6 +3,7 @@
 #pragma once
 
 #include "event.hh"
+
 #include "condition.hh"
 #include "cptclass.hh"
 #include "entity.hh"

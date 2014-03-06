@@ -72,4 +72,5 @@ struct Invalid: public Runtime {using Runtime::Runtime;};
 struct Logic: public std::logic_error, public ErrDiag {};
 struct Not_impl: public Logic {using Logic::Logic;};
 struct Internal: public Logic {using Logic::Logic;};
+struct Failed_assert: public Logic {using Logic::Logic;};
 }

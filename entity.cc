@@ -2,6 +2,7 @@
 // entity.cc
 
 #include "entity.hh"
+#include "controlctx.hh"
 
 // constructed with set of classes
 Entity::Entity(ControlCtx* cx, v<Compt_id> cpts):
