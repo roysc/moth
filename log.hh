@@ -23,16 +23,23 @@
 #define LOG_PUSH_(logpush_)                         \
   LOG_PUSH_TO_(logpush_, ::logging::get_global_log())
 
-#define LOG_SHOW_(x_) (([res_(x_)] {                          \
+// for gen. lambda captures
+#ifdef USE_STDCPP14
+#define LOG_SHOW_(x_) (([res_(x_)] {                                   \
         LOG_(debug)("(show): (" #x_ ") = ", res_);                     \
         return std::forward<std::decay_t<decltype(res_)> const>(res_); \
       })()                                                             \
   )
 
-#define LOG_TYPE_(x_) (([tnm_(::util::type_name<decltype(x_)>())] {     \
+#define LOG_TYPE_(x_) (([tnm_(::util::type_name<decltype(x_)>())] {    \
         LOG_(debug)("(type): (" #x_ ") : ", tnm_);                     \
       })()                                                             \
   )
+
+#else
+#define LOG_SHOW_(x_) (x_)
+#define LOG_TYPE_(x_) (x_)
+#endif
 
 inline
 namespace logging
