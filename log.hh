@@ -21,6 +21,12 @@
 #define LOG_PUSH_(logpush_)                         \
   LOG_PUSH_TO_(logpush_, ::logging::get_global_log())
 
+#define LOG_SHOW_(x_) (([&, res_(x_)] {                   \
+        LOG_(debug)("(show): (" #x_ ") = ", res_);            \
+        return std::forward<decltype(res_) const&>(res_);   \
+      })()                                                  \
+  )
+
 inline
 namespace logging
 {

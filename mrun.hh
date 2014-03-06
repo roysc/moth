@@ -114,11 +114,11 @@ public:
     {
       LOG_TO_(debug, lrun)("placing condn. for eval");
 
-      auto ite = end(evtv) + distance(itc, last);
+      auto ite = end(evtv) + LOG_SHOW_(distance(itc, last));
       evaljobs.emplace_back([=]{
-          // evaluate condition, place result in array
+      // evaluate condition, place result in array
           *ite = (**itc)();
-        });
+      });
     }
     // TODO: threadpool or scheduling here
     for (auto&& th: evaljobs)
