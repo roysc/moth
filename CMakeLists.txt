@@ -26,6 +26,7 @@ add_executable(Main
   controlctx.cc
   mgen.cc
   component.cc
+  util/demangle.cc
 )
 
 # -llibs

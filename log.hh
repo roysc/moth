@@ -6,6 +6,8 @@
 #include <iostream>
 #include <cassert>
 #include "util/io.hh"
+#include "util/std/type_traits"
+#include "util/demangle.hh"
 
 // 
 #define LOG_TO_(chan_, log_) (log_)
@@ -21,10 +23,15 @@
 #define LOG_PUSH_(logpush_)                         \
   LOG_PUSH_TO_(logpush_, ::logging::get_global_log())
 
-#define LOG_SHOW_(x_) (([&, res_(x_)] {                   \
-        LOG_(debug)("(show): (" #x_ ") = ", res_);            \
-        return std::forward<decltype(res_) const&>(res_);   \
-      })()                                                  \
+#define LOG_SHOW_(x_) (([res_(x_)] {                          \
+        LOG_(debug)("(show): (" #x_ ") = ", res_);                     \
+        return std::forward<std::decay_t<decltype(res_)> const>(res_); \
+      })()                                                             \
+  )
+
+#define LOG_TYPE_(x_) (([tnm_(::util::type_name<decltype(x_)>())] {     \
+        LOG_(debug)("(type): (" #x_ ") : ", tnm_);                     \
+      })()                                                             \
   )
 
 inline
