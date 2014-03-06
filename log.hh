@@ -15,8 +15,8 @@
 // #define LOG_THR_(chan_) (log::get_thread_log()) // thr_?
 
 // scope a log by "pushing" to (global, or specific) log
-#define LOG_PUSH_TO_(logpush_, logtop_)                 \
-  ::logging::Log logpush_(&(logtop_)); (logtop_)
+#define LOG_PUSH_TO_(logpush_, logtop_)             \
+  ::logging::Log logpush_(#logpush_, &(logtop_)); (logpush_)
 
 #define LOG_PUSH_(logpush_)                         \
   LOG_PUSH_TO_(logpush_, ::logging::get_global_log())
@@ -30,17 +30,28 @@ using std::ostream;
 struct Log
 {
 protected:
-  Log* _base;
+  string _name;
   ostream& _out;
   unsigned _indent;
+  Log* _base;
   const string _base_prelude = "  ";
   // const string _suffix = "\n";
 
 public:
-  Log(ostream& o): _base(nullptr), _out(o) {}
-  Log(Log* l): _base(l), _out(_base->_out), _indent(_base->_indent + 1) {++_base->_indent;}
-  ~Log() {assert(_base->_indent > 0); --_base->_indent;}
+  Log(string nm, ostream& o):
+    _name(nm), _out(o), _indent(0), _base(0) {}
+  Log(string nm, Log* l):
+    _name(nm), _out(l->_out),
+    _indent(++l->_indent), _base(l) {}
+  // ~Log() {}
+  ~Log() 
+  {
+    if (!_base) return;
+    assert(_base->_indent > 0);
+    --_base->_indent;
+  }
 
+  string name() const {return _name;}
   ostream& stream() {return _out;}
   // return indent depth for any stacked logs
   string prelude()
