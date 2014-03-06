@@ -21,13 +21,15 @@ const string end_cond_name = "_end_";
 // """
 class ModelGen 
 {
+  using CptClasses = m<Compt_id, const CptClass>;
+  using CptIDs = m<const CptClass*, Compt_id>;
 protected:
   Compt_id _next_id;
-  // Component types
-  using CptClasses = m<Compt_id, const CptClass>;
+  // Types
   CptClasses _cptclasses;
-  m<const CptClass*, Compt_id> _cpt_ids;
-  
+  CptIDs _cpt_ids;
+  Compt_id _switch_cptid;
+
 public:
   ModelGen(Json js):
     _next_id{}
@@ -40,7 +42,7 @@ public:
     auto cpts_js = js.get_child_optional("components");
     auto ents_js = js.get_child_optional("entities");
 
-    auto make_cpt = [&l, this](string n, dtype::T dt) {
+    auto make_cpt = [&l, this](string n, dtype::T dt) -> Compt_id {
       LOG_PUSH_TO_(lmk, l)("creating: ", n, ": ", dtype::to_string(dt));
 
       auto cpid = fresh_id();
@@ -55,6 +57,7 @@ public:
           LOG_TO_(error, lmk)("Compt_id insertion failed");
       }
       // throw err::Internal("CptClass insertion failed");
+      return cpid;
     };
 
     for (auto&& c: cpts_js? *cpts_js : Json()) {
@@ -64,7 +67,7 @@ public:
       // get the system specs for the component
       // not sure how this works yet
       auto sys = c.second.get_optional<string>("system");
-      if (!sys) THROW_(Invalid, "system");
+      // if (!sys) THROW_(Invalid, "system");
 
       { // get types
         auto tp = c.second.get_child("type");
@@ -107,7 +110,8 @@ public:
     );
     assert(itc == end(_cptclasses) && "end component already defined");
     
-    make_cpt(konst::end_cond_name, dtype::ty_bool);
+    auto cpid = make_cpt(konst::end_cond_name, dtype::ty_bool);
+    _switch_cptid = cpid;
     // entities
   }
 
@@ -118,6 +122,7 @@ public:
     for (auto&& c: _cptclasses) ret.emplace(c.first, &c.second);
     return ret;
   }
+  Compt_id switch_cpt() const {return _switch_cptid;}
 
   const CptClass* get_class(Compt_id cpid) 
   {

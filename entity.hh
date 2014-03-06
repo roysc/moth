@@ -4,6 +4,7 @@
 
 #include "basic.hh"
 #include "component.hh"
+#include "controlctx.hh"
 
 // 
 using Compt_data = m<Compt_id, Component>;
@@ -16,22 +17,10 @@ protected:
   
 public:
   // constructed with set of classes
-  Entity(ControlCtx* cx, m<Compt_id, CptClass*> cpts):
-    _ctx(cx)
-  {
-    // "Each C in Cpts represents a component meta-type"
-    for (auto&& c : cpts)
-      _compts.emplace(c.first, c.second->create());
-  }
+  Entity(ControlCtx* cx, v<Compt_id> cpts);  
 
   // O(log n)
   Compt_ptr get(const Compt_id id) {return &_compts.at(id);}
   // O(n)
   Compt_ptr find(const string& cn);
-
-  // TODO
-  Compt_ptr create(CptClass* cpc) 
-  {
-    return {};
-  }
 };

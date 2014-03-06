@@ -18,6 +18,7 @@ struct CptClass
 {
 protected:
   ModelGen* _modelgen;
+  // handled as map key for now
   // Compt_id _id;
   string _name;
   dtype::T _dtype;
@@ -30,6 +31,7 @@ public:
   // meta data
   string name() const {return _name;}
   // Compt_id id() const {return _id;}
+
   // components needed to impl. this one
   set<CptClass*> dependencies() const {return {};}
 

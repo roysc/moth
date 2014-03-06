@@ -1,3 +1,6 @@
+// -*- coding: utf-8 -*-
+// log.cc
+
 #include "log.hh"
 
 inline

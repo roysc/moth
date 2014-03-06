@@ -1,5 +1,5 @@
 // -*- coding: utf-8 -*-
-// mgen.hh
+// log.hh
 #pragma once
 
 #include <functional>

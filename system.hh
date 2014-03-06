@@ -2,10 +2,11 @@
 // mrun.hh
 #pragma once
 
+// struct SystemHandle: public CptClass {};
+
 struct SystemHandle
 {
+  const CptClass* cptclass() const {return _cptclass;}
 protected:
-  CptClass* _cptclass;
-public:
-  CptClass* cptclass() const {return _cptclass;}
+  const CptClass* _cptclass;
 };
