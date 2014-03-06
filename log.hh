@@ -4,6 +4,7 @@
 
 #include <functional>
 #include <iostream>
+#include <cassert>
 #include "util/io.hh"
 
 // 
@@ -29,15 +30,16 @@ using std::ostream;
 struct Log
 {
 protected:
+  Log* _base;
   ostream& _out;
-  Log* _base{};
   unsigned _indent;
   const string _base_prelude = "  ";
   // const string _suffix = "\n";
 
 public:
-  Log(ostream& o): _out(o) {}
-  Log(Log* base): _out(base->_out), _base(base), _indent(base->_indent + 1) {}
+  Log(ostream& o): _base(nullptr), _out(o) {}
+  Log(Log* l): _base(l), _out(_base->_out), _indent(_base->_indent + 1) {++_base->_indent;}
+  ~Log() {assert(_base->_indent > 0); --_base->_indent;}
 
   ostream& stream() {return _out;}
   // return indent depth for any stacked logs
@@ -50,7 +52,10 @@ public:
   }
 
   template <class... Ts>
-  void operator()(Ts&&... args) {util::print_to(_out, prelude(), std::forward<Ts>(args)..., '\n');}
+  void operator()(Ts&&... args) 
+  {
+    util::print_to(_out, prelude(), std::forward<Ts>(args)..., '\n');
+  }
 };
 
 // struct Chan: public Log {};
