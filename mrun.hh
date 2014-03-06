@@ -114,9 +114,7 @@ public:
     {
       LOG_TO_(debug, lrun)("placing condn. for eval");
 
-      auto ite = begin(evtv) - LOG_SHOW_(distance(itc, last));
-      LOG_TYPE_(ite);
-
+      auto ite = end(evtv) - LOG_SHOW_(distance(itc, last));
       evaljobs.emplace_back([=]{
       // evaluate condition, place result in array
           *ite = (**itc)();
