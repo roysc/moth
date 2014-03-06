@@ -13,7 +13,8 @@ project(Moth)
 # # lib/
 # link_directories()
 
-set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} --std=c++11 -O0 -g")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --std=c++11 -O0 -g")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-c++1y-extensions")
 # here we add definitions for any package if requred.
 # add_definitions()
 
