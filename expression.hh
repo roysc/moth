@@ -7,7 +7,7 @@
 
 namespace expr
 {
-enum class Operation: unsigned
+enum class OpType: unsigned
 {
   op_gt, // >,
   op_lt, // <,
@@ -26,96 +26,102 @@ enum class Operation: unsigned
   op_N // how many
 };
 
-// template <> class std::hash<Operation>
+// template <> class std::hash<OpType>
 // {
-//   std::size_t operator()(Operation o) 
+//   std::size_t operator()(OpType o) 
 //   { 
-//     using UT = std::underlying_type<Operation>::type;
+//     using UT = std::underlying_type<OpType>::type;
 //     return hash<UT>{}(static_cast<UT>(o));
 //   }
 // };
 
 inline
-Operation to_operation(string s)
+OpType to_operation(string s)
 {
-  static const table<string, Operation> tbl = {
-    {">", Operation::op_gt},
-    {"<", Operation::op_lt},
-    {">=", Operation::op_ge},
-    {"<=", Operation::op_le},
-    {"=", Operation::op_eq},
-    {"!=", Operation::op_ne},
-    {"+", Operation::op_add},
-    {"-", Operation::op_sub},
-    {"*", Operation::op_mul},
-    {"/", Operation::op_div},
-    {"∈", Operation::op_eof},
-    {"∉", Operation::op_nof},
-    {"~", Operation::op_match},
-    {"!", Operation::op_not},
+  static const table<string, OpType> tbl = {
+    {">", OpType::op_gt},
+    {"<", OpType::op_lt},
+    {">=", OpType::op_ge},
+    {"<=", OpType::op_le},
+    {"=", OpType::op_eq},
+    {"!=", OpType::op_ne},
+    {"+", OpType::op_add},
+    {"-", OpType::op_sub},
+    {"*", OpType::op_mul},
+    {"/", OpType::op_div},
+    {"∈", OpType::op_eof},
+    {"∉", OpType::op_nof},
+    {"~", OpType::op_match},
+    {"!", OpType::op_not},
   };
   auto it = tbl.find(s);
-  return it != end(tbl)? it->second : throw err::Not_found(__func__);
+  return it != end(tbl)? it->second : THROW_(Not_found, __func__);
 }
 
 inline
-string to_string(Operation op)
+string to_string(OpType op)
 {
-  static const m<Operation, string> tbl = {
-    {Operation::op_gt, ">"},
-    {Operation::op_lt, "<"},
-    {Operation::op_ge, ">="},
-    {Operation::op_le, "<="},
-    {Operation::op_eq, "="},
-    {Operation::op_ne, "!="},
-    {Operation::op_add, "+"},
-    {Operation::op_sub, "-"},
-    {Operation::op_mul, "*"},
-    {Operation::op_div, "/"},
-    {Operation::op_eof, "∈"},
-    {Operation::op_nof, "∉"},
-    {Operation::op_match, "~"},
-    {Operation::op_match, "!"},
+  static const m<OpType, string> tbl = {
+    {OpType::op_gt, ">"},
+    {OpType::op_lt, "<"},
+    {OpType::op_ge, ">="},
+    {OpType::op_le, "<="},
+    {OpType::op_eq, "="},
+    {OpType::op_ne, "!="},
+    {OpType::op_add, "+"},
+    {OpType::op_sub, "-"},
+    {OpType::op_mul, "*"},
+    {OpType::op_div, "/"},
+    {OpType::op_eof, "∈"},
+    {OpType::op_nof, "∉"},
+    {OpType::op_match, "~"},
+    {OpType::op_not, "!"},
   };
   auto it = tbl.find(op);
-  return it != end(tbl)? it->second : throw err::Not_found(__func__);
+  return it != end(tbl)? it->second : THROW_(Not_found, __func__);
 }
 
 inline
-unsigned arity(Operation op)
+unsigned arity(OpType op)
 {
-  static const m<Operation, unsigned> tbl = {
-    {Operation::op_gt, 2},
-    {Operation::op_lt, 2},
-    {Operation::op_ge, 2},
-    {Operation::op_le, 2},
-    {Operation::op_eq, 2},
-    {Operation::op_ne, 2},
-    {Operation::op_add, 2},
-    {Operation::op_sub, 2},
-    {Operation::op_mul, 2},
-    {Operation::op_div, 2},
-    {Operation::op_eof, 2},
-    {Operation::op_nof, 2},
-    {Operation::op_match, 2},
-    {Operation::op_not, 1}
+  static const m<OpType, unsigned> tbl = {
+    {OpType::op_gt, 2},
+    {OpType::op_lt, 2},
+    {OpType::op_ge, 2},
+    {OpType::op_le, 2},
+    {OpType::op_eq, 2},
+    {OpType::op_ne, 2},
+    {OpType::op_add, 2},
+    {OpType::op_sub, 2},
+    {OpType::op_mul, 2},
+    {OpType::op_div, 2},
+    {OpType::op_eof, 2},
+    {OpType::op_nof, 2},
+    {OpType::op_match, 2},
+    {OpType::op_not, 1}
   };
   auto it = tbl.find(op);
   return it != end(tbl)? it->second : THROW_(Not_found, __func__);
 }
 
 // _simple_ AST
-struct Expression
+struct Operation
 {
 protected:
-  Operation _opn;
+  OpType _opn;
 
 public:
-  Expression(Operation op): _opn(op) {}
-  Expression(const string& e): Expression(to_operation(e)) {}
-  Expression(const char* e): Expression(string(e)) {}
+  Operation(OpType op): _opn(op) {}
+  Operation(const string& e): Operation(to_operation(e)) {}
+  Operation(const char* e): Operation(string(e)) {}
 
   // check validity of string
   // static bool valid(const string& e) {return true;}
+
+  template <class Ch,class Tr>
+  friend 
+  std::basic_ostream<Ch,Tr>& operator<<(
+    std::basic_ostream<Ch,Tr>& out, const Operation& e
+  ) {return out << to_string(e._opn);}
 };
 }

@@ -52,6 +52,14 @@ struct Not_found: public Runtime
 {
   Not_found(string s): Runtime("Not found"+ (s.empty()?"":": "+s)) {}
 };
+
+// template <class K>
+// struct Not_found: public Runtime
+// {
+//   K _key;
+//   Not_found(string s, ): Runtime("Not found"+ (s.empty()?"":": "+s)) {}
+// };
+
 struct Invalid: public Runtime {using Runtime::Runtime;};
 
 // template <class T>

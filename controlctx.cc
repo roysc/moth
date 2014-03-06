@@ -33,6 +33,8 @@ ControlCtx::ControlCtx(ModelGen* mg):
   // 
   _ctrl_ent.reset(new Entity(this, {swid}));
   _end_cond.reset(new Condition("!", {{_ctrl_ent.get(), swid}}));
+
+  _conditions.emplace(_end_cond.get());
 }
 
 // const CptClass* get_class(Compt_id cpid) {return _modelgen->get_class(cpid);}

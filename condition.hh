@@ -3,6 +3,7 @@
 #pragma once
 
 #include <functional>
+#include "util/io.hh"
 
 #include "basic.hh"
 #include "expression.hh"
@@ -22,13 +23,13 @@ struct Condition
 {
 protected:
   // Field_set _fields;
-  using Expr = expr::Expression;
-  Expr _expr;
+  using Oper = expr::Operation;
+  Oper _oper;
   v<Compt_addr> _args;
 
 public:
-  Condition(expr::Expression ex, v<Compt_addr> as):
-    _expr(ex), _args(as)
+  Condition(Oper op, v<Compt_addr> as):
+    _oper(op), _args(as)
   { }
 
   // Here shall happen the magic
@@ -45,5 +46,15 @@ public:
     // 
     
     return {};
+  }
+
+  template <class Ch,class Tr>
+  friend 
+  std::basic_ostream<Ch,Tr>& operator<<(
+    std::basic_ostream<Ch,Tr>& out, const Condition& c
+  ) 
+  {
+    util::print_to(out, "(\"", c._oper, "\", ", c._args, ')');
+    return out;
   }
 };
