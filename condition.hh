@@ -68,7 +68,14 @@ struct Condition: public expr::Expression
     // perhaps analogous to an entity whose components are field references.
     
     // An event is simple;
-    // 
+    Event_ptr evp = new Event(kind, );
+    auto result = eval();
+
+    // One way to do this:
+    // result data refers to child expression
+    // recursively evaluate
+
+    // for now, just impl. end condition
     
     return {};
   }

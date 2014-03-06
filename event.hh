@@ -2,7 +2,9 @@
 // event.hh
 #pragma once
 
+#include "err.hh"
 #include "basic.hh"
+#include "component.hh"
 
 // Event
 // represents a statement to be evaluated
@@ -24,7 +26,6 @@ enum class EventKind: unsigned {spawn, update, destroy, N};
 
 // Optional Event
 using Event_ptr = ptr<Event>;
-using Event_opt = uptr<Event>;
 
 // example events:
 //
@@ -38,26 +39,31 @@ struct Event
 {
   using Kind = EventKind;
 
-  Event(Kind k, v<Compt_addr> args):
-    _kind(k)
+  Event(Kind k, Entity_ptr ent,
+        Data_ptr data = 0,
+        Event_ptr n = 0):
+    _kind(k), _ent(ent), _data(data), _next(n)
+  {}
+
+  void go()
   {
-    switch (k)
+    switch (_kind)
     {
     case Kind::spawn:
-      // 
       break;
     case Kind::update:
-
       break;
     case Kind::destroy:
-
       break;
     default:
-      {}
+      LOG_SHOW_(_kind);
+      THROW_(Invalid, "EventKind");
     }
   }
-
+  
 protected:
   Kind _kind;
-  v<Compt_addr> _args;
+  Entity_ptr _ent;
+  uptr<Data> _data;
+  uptr<Event> _next;
 };
