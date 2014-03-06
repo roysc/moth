@@ -1,8 +1,11 @@
+// -*- coding: utf-8 -*-
+// main.cc
 
 #include <iostream>
 #include <fstream>
 
 #include "json.hh"
+#include "log.hh"
 
 #include "mgen.hh"
 #include "component.hh"
@@ -10,8 +13,6 @@
 #include "event.hh"
 #include "condition.hh"
 #include "mrun.hh"
-
-// #include "util/io.hh"
 
 int main(int argc, const char* argv[])
 {
@@ -26,11 +27,17 @@ int main(int argc, const char* argv[])
   Json js;
   std::ifstream in(args.at(1));
   json::read_json(in, js);
-  
-  ModelGen mg(js);
-  ControlCtx ctx(&mg);
 
+  LOG_PUSH_(lmain)("main()");
+
+  LOG_TO_(info, lmain)("creating ModelGen");
+  ModelGen mg(js);
+  LOG_TO_(info, lmain)("creating ControlCtx");
+  ControlCtx ctx(&mg);
+  LOG_TO_(info, lmain)("creating ModelRun");
   ModelRun mr(&ctx);
+
+  LOG_TO_(info, lmain)("run_events");
   mr.run_events();
   // do stuff
   // control sim.

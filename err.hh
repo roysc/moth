@@ -2,6 +2,8 @@
 // entity.hh
 #pragma once
 
+#include "typedefs.hh"
+
 #include <stdexcept>
 // #include "util/io.hh"
 

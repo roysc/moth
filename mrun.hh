@@ -10,12 +10,6 @@
 #include "cptclass.hh"
 #include "controlctx.hh"
 
-// "Contexts" for components needing centralized control
-// eg. Location/coordinates
-//     Physics
-//     Information network
-struct ControlCtx;
-
 // Model interface
 // class ModelRun
 // {
