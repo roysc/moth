@@ -5,6 +5,8 @@
 #include <queue>
 #include <utility>
 
+#include "log.hh"
+
 #include "event.hh"
 #include "condition.hh"
 #include "cptclass.hh"
@@ -81,24 +83,40 @@ public:
     // # met conditions trigger events
     // # create set of Events
 
+    LOG_PUSH_(lrun)(__PRETTY_FUNCTION__);
 
+    EventQueue evtq;
     // # The 0-condition
     // # meet this to end the game (just a bool in primary System)
+    LOG_TO_(info, lrun)("setting end condition");
     auto end_cond = _controlctx->end_cond();
-    auto&& conds = _controlctx->conditions();
-    EventQueue evtq;
 
-    // Create a vector of threads, and of event results, same size as condv
+    // Create a thread pool, and array of event results, same size as condv
+
+    LOG_TO_(info, lrun)("setting conditions");
+    auto conds = _controlctx->conditions();
+
+    // Threadpool evalpool..?
     v<thread> evaljobs;
-    v<uptr<Event> > evtv(conds.size());
-    for (auto itc = begin(conds), last = end(conds); itc != last; ++itc)
+
+    LOG_TO_(info, lrun)("init events");
+    v<uptr<Event>> evtv(conds.size());
+    size_t i{};
+    // iterate on conditions... read-only here.
+    // for (auto itc = begin(conds), last = end(conds); itc != last; ++itc)
+    for (auto&& cond: conds)
     {
-      auto ite = end(evtv) + distance(itc, last);
-      evaljobs.emplace_back([=]{*ite = (**itc)();});
+      LOG_TO_(info, lrun)("placing condn. for eval");
+
+      // auto ite = end(evtv) + distance(itc, last);
+      // evaljobs.emplace_back([=]{
+      //     // evaluate condition, place result in array
+      //     *ite = (**itc)();
+      //   });
     }
     // TODO: threadpool or scheduling here
-    for (auto&& th: evaljobs)
-      th.join();
+    // for (auto&& th: evaljobs)
+    //   th.join();
 
     // queue event results, skip duds
     for (auto&& e: evtv)

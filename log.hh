@@ -43,7 +43,6 @@ public:
   Log(string nm, Log* l):
     _name(nm), _out(l->_out),
     _indent(++l->_indent), _base(l) {}
-  // ~Log() {}
   ~Log() 
   {
     if (!_base) return;

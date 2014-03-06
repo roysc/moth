@@ -22,11 +22,12 @@ struct Condition
 {
 protected:
   // Field_set _fields;
-  Expression _expr;
+  using Expr = expr::Expression;
+  Expr _expr;
   v<Compt_addr> _args;
 
 public:
-  Condition(Expression ex, v<Compt_addr> as):
+  Condition(expr::Expression ex, v<Compt_addr> as):
     _expr(ex), _args(as)
   { }
 

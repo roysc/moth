@@ -21,11 +21,11 @@ protected:
   ModelGen* _modelgen;
   m<Compt_id, SystemHandle*> _systems;
   // entity and condition data
-  set<Entity_ptr> _entities;
   set<Cond_ptr> _conditions;
+  set<Entity_ptr> _entities;
   // control 
-  uptr<Entity> _ctrl_ent;
   uptr<Condition> _end_cond;
+  uptr<Entity> _ctrl_ent;
 
 public:
   ControlCtx(ModelGen* mg);

@@ -10,7 +10,8 @@
 // The generation context for a generator;
 // Namespace of Generation implementation
 // """
-ModelGen::ModelGen(Json js)
+ModelGen::ModelGen(Json js):
+  _next_id(0), _switch_cptid(0)
 {
   LOG_PUSH_(l)(__PRETTY_FUNCTION__);
 
