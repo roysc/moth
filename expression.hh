@@ -5,6 +5,8 @@
 #include "err.hh"
 #include "data.hh"
 
+namespace expr
+{
 enum class Operation: unsigned
 {
   op_gt, // >,
@@ -20,6 +22,7 @@ enum class Operation: unsigned
   op_eof, // ∈,
   op_nof, // ∉,
   op_match, // ~
+  op_not, // !
   op_N // how many
 };
 
@@ -49,6 +52,7 @@ Operation to_operation(string s)
     {"∈", Operation::op_eof},
     {"∉", Operation::op_nof},
     {"~", Operation::op_match},
+    {"!", Operation::op_not},
   };
   auto it = tbl.find(s);
   return it != end(tbl)? it->second : throw err::Not_found(__func__);
@@ -70,10 +74,34 @@ string to_string(Operation op)
     {Operation::op_div, "/"},
     {Operation::op_eof, "∈"},
     {Operation::op_nof, "∉"},
-    {Operation::op_match, "~"}
+    {Operation::op_match, "~"},
+    {Operation::op_match, "!"},
   };
   auto it = tbl.find(op);
   return it != end(tbl)? it->second : throw err::Not_found(__func__);
+}
+
+inline
+unsigned arity(Operation op)
+{
+  static const m<Operation, unsigned> tbl = {
+    {Operation::op_gt, 2},
+    {Operation::op_lt, 2},
+    {Operation::op_ge, 2},
+    {Operation::op_le, 2},
+    {Operation::op_eq, 2},
+    {Operation::op_ne, 2},
+    {Operation::op_add, 2},
+    {Operation::op_sub, 2},
+    {Operation::op_mul, 2},
+    {Operation::op_div, 2},
+    {Operation::op_eof, 2},
+    {Operation::op_nof, 2},
+    {Operation::op_match, 2},
+    {Operation::op_not, 1}
+  };
+  auto it = tbl.find(op);
+  return it != end(tbl)? it->second : THROW_(Not_found, __func__);
 }
 
 // _simple_ AST
@@ -89,5 +117,5 @@ public:
 
   // check validity of string
   // static bool valid(const string& e) {return true;}
-  
 };
+}
