@@ -97,17 +97,16 @@ public:
     LOG_TO_(info, lrun)("setting conditions");
     auto conds = _controlctx->conditions();
 
-    // Threadpool evalpool..?
-    v<thread> evaljobs;
-
-    LOG_TO_(info, lrun)("init events");
-    v<uptr<Event>> evtv(conds.size());
-    size_t i{};
+    // show initial conditions
     v<string> condstrs;
     transform(begin(conds), end(conds), back_inserter(condstrs),
               [](Cond_ptr c) {return util::concat(*c);});
-
     LOG_TO_(debug, lrun)("conditions: ", condstrs);
+
+    // Threadpool evalpool..?
+    LOG_TO_(info, lrun)("starting eval");
+    v<thread> evaljobs;
+    v<uptr<Event>> evtv(conds.size());
 
     // iterate on conditions... read-only here.
     for (auto itc = begin(conds), last = end(conds); itc != last; ++itc)
@@ -122,10 +121,12 @@ public:
         });
     }
     // TODO: threadpool or scheduling here
-    LOG_TO_(debug, lrun)("condition eval finished");
     for (auto&& th: evaljobs)
       th.join();
 
+    LOG_TO_(debug, lrun)("condition eval finished");
+
+    LOG_TO_(debug, lrun)("queueing events");
     // queue event results, skip duds
     for (auto&& e: evtv)
     {

@@ -56,18 +56,19 @@ ModelGen::ModelGen(Json js):
       // for value, define component
       auto val = tp.get_value<string>();
       if (!val.empty()) {
-        LOG_TO_(info, l)("single-type");
+        // LOG_TO_(trivial, l)("single-type");
+
         auto dt = dtype::from_string(val);
         make_cpt(name, dt);
       }
       // no children; it's an empty {}
       else if (tp.empty()) {
-        LOG_TO_(info, l)("empty-type");
+        // LOG_TO_(trivial, l)("empty-type");
         make_cpt(name, dtype::ty_N);
       }
       // has multiple child components
       else {
-        LOG_TO_(info, l)("multi-type");
+        // LOG_TO_(trivial, l)("multi-type");
           
         for (auto&& child: tp)
         {
