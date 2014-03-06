@@ -61,10 +61,8 @@ OpType to_operation(string s)
   return it != end(tbl)? it->second : THROW_(Not_found, __func__);
 }
 
-template <class Ch,class Tr>
-std::basic_ostream<Ch,Tr>& operator<<(
-  std::basic_ostream<Ch,Tr>& out, OpType ot
-)
+inline
+string to_string(OpType op)
 {
   static const m<OpType, string> tbl = {
     {OpType::op_gt, ">"},
@@ -80,7 +78,31 @@ std::basic_ostream<Ch,Tr>& operator<<(
     {OpType::op_eof, "∈"},
     {OpType::op_nof, "∉"},
     {OpType::op_match, "~"},
-    {OpType::op_not, "!"},
+    {OpType::op_match, "!"},
+  };
+  auto it = tbl.find(op);
+  return it != end(tbl)? it->second : throw err::Not_found(__func__);
+}
+
+template <class Ch,class Tr>
+std::basic_ostream<Ch,Tr>& 
+operator<<(std::basic_ostream<Ch,Tr>& out, OpType ot)
+{
+  static const m<OpType, string> tbl = {
+    {OpType::op_gt, "OpType::op_gt"},
+    {OpType::op_lt, "OpType::op_lt"},
+    {OpType::op_ge, "OpType::op_ge"},
+    {OpType::op_le, "OpType::op_le"},
+    {OpType::op_eq, "OpType::op_eq"},
+    {OpType::op_ne, "OpType::op_ne"},
+    {OpType::op_add, "OpType::op_add"},
+    {OpType::op_sub, "OpType::op_sub"},
+    {OpType::op_mul, "OpType::op_mul"},
+    {OpType::op_div, "OpType::op_div"},
+    {OpType::op_eof, "OpType::op_eof"},
+    {OpType::op_nof, "OpType::op_nof"},
+    {OpType::op_match, "OpType::op_match"},
+    {OpType::op_not, "OpType::op_not"},
   };
   auto it = tbl.find(ot);
   if (it != end(tbl))
@@ -235,14 +257,14 @@ public:
     auto it = tbl.find(k);
     return (it != end(tbl))?
       it->second(cptrs) : (
-        LOG_(warning)("No operation implemented for ", k.second),
+        LOG_(warning)("No operation implemented for ", k),
         Data(dtype::ty_N)
       );
   }
 
   template <class Ch,class Tr>
-  friend std::basic_ostream<Ch,Tr>& operator<<(
-    std::basic_ostream<Ch,Tr>& out, const Operation& e
-  ) {return out << e._opn;}
+  friend std::basic_ostream<Ch,Tr>& 
+  operator<<(std::basic_ostream<Ch,Tr>& out, const Operation& e)
+  {return out << e._opn;}
 };
 }

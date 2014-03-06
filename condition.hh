@@ -37,7 +37,7 @@ public:
     std::basic_ostream<Ch,Tr>& out, 
     const Expression& o)
   {
-    util::print_to(out, "(\"", o._oper, "\", ", o._args, ')');
+    util::print_to(out, "(", o._oper, ", ", o._args, ')');
     return out;
   }
 
