@@ -3,6 +3,8 @@
 #pragma once
 
 #include "log.hh"
+#include "assert.hh"
+#include "err.hh"
 #include "basic.hh"
 
 // the idea is that a component is only accessed through Compt_addr keys
@@ -17,19 +19,19 @@ namespace dtype
 // essentially, built-in types
 enum T: unsigned 
 { 
-  // indentation sucks
+  // emacs indentation sucks
   ty_bool,                 // could be impl'd as discrete realm of 0|1
   ty_int,
-    ty_float,
-    // Realm-values (of a range)
-    ty_rdisc, // discrete (int)
-    ty_rcont, // continuous (float)
-    // ?
-    ty_str,   // string, for what?
-    // ty_tuple, // tuple rather than child grouping?
-    // ty_calc,  // compt. calculated on reference?..
-    ty_N // the nil-type
-    };
+  ty_float,
+  // Realm-values (of a range)
+  ty_rdisc, // discrete (int)
+  ty_rcont, // continuous (float)
+  // ?
+  ty_str,   // string, for what?
+  // ty_tuple, // tuple rather than child grouping?
+  // ty_calc,  // compt. calculated on reference?..
+  ty_N // the nil-type
+};
 
 enum class Tag: unsigned
 { boolean, number, realm, expr, any, N };
@@ -37,8 +39,8 @@ enum class Tag: unsigned
 
 namespace data
 {
-template <dtype::T DT> 
-struct DT_label {static const dtype::T dt = DT;};
+// template <dtype::T DT> 
+// struct DT_label {static const dtype::T dt = DT;};
 
 // Layout of data objects
 struct Bool {int32_t value;};
@@ -64,27 +66,71 @@ struct Data
 protected:
   using Bytes = v<uint8_t>;
   // using Bytes = uint8_t*;
-  const dtype::T _dtype;
+  dtype::T _dtype;
   Bytes _bytes;
 
 public:
-  Data(dtype::T dt): _dtype(dt), _bytes(dtype::size(dt)) {}
+  Data(dtype::T dt = dtype::ty_N): _dtype(dt), _bytes(dtype::size(dt)) {}
+  Data(Data const&) = default;
+
   dtype::T dtype() const {return _dtype;}
   const void* raw() const
   {
     assert(!_bytes.empty() && "data not initialized");
     return static_cast<const void*>(&_bytes[0]);
   }
+
+  string to_string() const
+  {
+    string ret;
+
+    // `val_' for value
+#define DATA_TO_STRING_CASE_(dt_, Type_, str_expr_) \
+    case dtype::dt_: {                              \
+      data::Type_ val_; get(val_);                  \
+      ret = ("{" #Type_ ", ") + (str_expr_) + '}';  \
+    } break
+    
+    switch (_dtype)
+    {
+      DATA_TO_STRING_CASE_(ty_bool, Bool, util::concat(val_.value));
+      DATA_TO_STRING_CASE_(ty_int, Int, util::concat(val_.value));
+      DATA_TO_STRING_CASE_(ty_float, Float, util::concat(val_.value));
+      DATA_TO_STRING_CASE_(ty_rdisc, RlmDisc, util::concat(
+                             '(', val_.index,
+                             ',', val_.realm_max, 
+                             ',', val_.offset, 
+                             ')'));
+      DATA_TO_STRING_CASE_(ty_rcont, RlmCont, util::concat(
+                             '(', val_.index,
+                             ',', val_.realm_max, 
+                             ',', val_.offset, 
+                             ')'));
+      DATA_TO_STRING_CASE_(ty_str, Str, string("\"\""));
+    default:
+      THROW_(Invalid, __PRETTY_FUNCTION__);
+    }
+    return ret;
+  }
+
+  // Data& operator=(Data const& that) 
+  // {
+  //   _dtype = that._dtype; 
+  //   _bytes = that._bytes;
+  //   return *this;
+  // }
   
 #define DATA_DEFINE_GET_SET_(Type_, dt_)                                \
   void get(data::Type_& dat_out_) const                                 \
   {                                                                     \
-    assert((_dtype == (dtype::dt_)) && ("Data::get(" #Type_ "): wrong dtype")); \
+    ASSERT_EQ_(_dtype, (dtype::dt_),                                    \
+                "Data::get(" #Type_ "): wrong dtype");                  \
     dat_out_ = *static_cast<const data::Type_*>(raw());                 \
   }                                                                     \
   void set(data::Type_ dat_in_)                                         \
   {                                                                     \
-    assert((_dtype == (dtype::dt_)) && ("Data::set(" #Type_ "): wrong dtype")); \
+    ASSERT_EQ_(_dtype, (dtype::dt_),                                    \
+               "Data::set(" #Type_ "): wrong dtype");                   \
     *static_cast<data::Type_*>(const_cast<void*>(raw())) = dat_in_;     \
   }
   

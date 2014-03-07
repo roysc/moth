@@ -3,6 +3,7 @@
 
 #include "err.hh"
 #include "log.hh"
+#include "assert.hh"
 
 #include "mgen.hh"
 
@@ -91,7 +92,7 @@ ModelGen::ModelGen(Json js):
     begin(_cptclasses), end(_cptclasses), 
     [](CptClasses::value_type v) {return v.second.name() == konst::end_cond_name;}
   );
-  assert(itc == end(_cptclasses) && "end component already defined");
+  ASSERT_(itc == end(_cptclasses), "end component already defined");
     
   auto cpid = make_cpt(konst::end_cond_name, dtype::ty_bool);
   _switch_cptid = cpid;

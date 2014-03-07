@@ -24,15 +24,23 @@ ControlCtx::ControlCtx(ModelGen* mg):
     auto sh = c.second->system_handle();
     if (sh) _systems.emplace(c.first, sh);
   }
+
   auto swid = _modelgen->switch_cpt();
-
-  // // conditions
-  // for (auto&& cnd: )
-
-  // auto& swsys = _systems.at(swid);
-  // 
   _ctrl_ent.reset(new Entity(this, {swid}));
-  _end_cond.reset(new Condition("!", {{_ctrl_ent.get(), swid}}));
+  
+  Compt_addr cent_ref{_ctrl_ent.get(), swid};
+  auto end_expr = new expr::EFun("!", {
+      new expr::ERef(cent_ref)
+    });
+  // auto end_ekl = EvtSpec(konst::gameover_evtspec, EventKind::destroy);
+
+  // auto end_stmt = stmt::Statement(
+  //   konst::gameover_evtspec,    // name "game over"
+  //   EventKind::destroy,         // destroy condition entity
+  //   _ctrl_ent.get());
+  auto end_stmt = new stmt::EndGame();
+
+  _end_cond.reset(new Condition(end_expr, end_stmt));
 
   _conditions.emplace(_end_cond.get());
 }

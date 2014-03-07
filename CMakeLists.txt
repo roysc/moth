@@ -13,30 +13,45 @@ project(Moth)
 # # lib/
 # link_directories()
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --std=c++11 -O0 -g")
-
 # Clang supports extensions
 if(${CMAKE_CXX_COMPILER} MATCHES "clang")
-  set_property(TARGET Main
-    PROPERTY COMPILE_DEFINITIONS USE_STDCPP14)
+  set_property(TARGET main
+    PROPERTY COMPILE_DEFINITIONS 
+    USE_STDCPP14
+    )
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-c++1y-extensions")
 endif()
-  
-# here we add definitions for any package if requred.
-# add_definitions()
+
+set(CFLAG_STD_ "--std=c++11")
+# error on non-returning fn., should be default
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror=return-type")
+
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CFLAG_STD_}")
+# if debug
+set(CFLAG_OPT_ "-O0 -g")
+# else
+set(CFLAG_OPT_ "-O2")
+# endif
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CFLAG_OPT_}")
 
 # main executable
-add_executable(Main
+add_executable(main
   main.cc
   entity.cc
   log.cc
   controlctx.cc
   mgen.cc
   component.cc
+  condition.cc
+  
   util/demangle.cc
 )
+add_dependencies(main Moth)
+
+# here we add definitions for any package if requred.
+# add_definitions()
 
 # -llibs
-target_link_libraries(Main
+target_link_libraries(main
   pthread
   )

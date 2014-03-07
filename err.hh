@@ -2,10 +2,13 @@
 // entity.hh
 #pragma once
 
-#include "typedefs.hh"
-
 #include <stdexcept>
-// #include "util/io.hh"
+#include <string>
+
+#include "typedefs.hh"
+#include "util/io.hh"
+
+#define USE_ERR_DIAGNOSTICS 1
 
 #define ERR_THROWLINE_P 1
 #define ERR_THROWFUNC_P 1
@@ -24,50 +27,62 @@
 #define ERR_THROWFUNC_ARG_ ""
 #endif
 
-// messy. meh.
-#define THROW_BASIC_(Type_, a_)                                         \
-  throw (err::Type_(a_))
+// 
+#define THROW_BASIC_(Type_, w_)                 \
+  throw (err::Type_(w_))
 
-#define THROW_(Type_, a_) THROW_BASIC_(Type_, a_)
+#define THROW_DIAGS_(Type_, w_)                 \
+  throw (err::WrapDiagnostics<err::Type_>(      \
+           w_,                                  \
+           ERR_THROWFILE_ARG_,                  \
+           ERR_THROWLINE_ARG_,                  \
+           ERR_THROWFUNC_ARG_                   \
+         ))                                     \
+  
+// // throw with template arg
+// #define THROW_BASIC_ARG_(Type_, w_, a_)         \
+//   throw (err::WrapArg<err::Type_>(w_, a_))
+
+#ifdef USE_ERR_DIAGNOSTICS
+#define THROW_(Type_, w_) THROW_DIAGS_(Type_, w_)
+#else
+#define THROW_(Type_, w_) THROW_BASIC_(Type_, w_)
+#endif
 
 namespace err
 {
-struct ErrDiag
+// wrapper class including diagnostics
+template <class Err>
+struct WrapDiagnostics: public Err
 {
-//   string _file;
-//   int _line;
-//   string _func;
-}
-;
-// // setters...
-// ErrDiag& file(string f, ErrDiag& e) {e._file = f; return e;}
-// ErrDiag& line(int ln, ErrDiag& e) {e._line = ln; return e;}
-// ErrDiag& func(string f, ErrDiag& e) {e._func = f; return e;}
+  // keep these around for later
+  string _file; int _line; string _func;
+  WrapDiagnostics(string w, string fl, int l, string fn):
+    Err(util::concat("[", fl, ":", l, "] (", fn, "): ", w)),
+    _file(fl), _line(l), _func(fn) 
+  {}
+};
 
 // runtime
-struct Runtime: public std::runtime_error, public ErrDiag 
+struct Runtime: public std::runtime_error
 {using runtime_error::runtime_error;};
 
 struct Invalid: public Runtime {using Runtime::Runtime;};
 struct Not_found: public Runtime {using Runtime::Runtime;};
-// {Not_found(string s): Runtime("Not found"+ (s.empty()?"":": "+s)) {}};
-
-// template <class K>
-// struct Not_found: public Runtime
-// {
-//   K _key;
-//   Not_found(string s, ): Runtime("Not found"+ (s.empty()?"":": "+s)) {}
-// };
-
-// template <class T>
-// struct Not_found_ : public Not_found
-// {
-//   Not_found_(): Not_found(util::type_name<T>()) {}
-// };
 
 // Logic
-struct Logic: public std::logic_error, public ErrDiag {};
+struct Logic: public std::logic_error
+{using logic_error::logic_error;};
 struct Not_impl: public Logic {using Logic::Logic;};
 struct Internal: public Logic {using Logic::Logic;};
 struct Failed_assert: public Logic {using Logic::Logic;};
+
+// template <class Err>
+// struct WrapArg: public Err
+// {
+//   template <class T>
+//   WrapArg(string w, const T& a):
+//     Err(util::concat(w, ", arg: ", a)) 
+//   {}
+// };
 }

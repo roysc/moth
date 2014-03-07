@@ -11,6 +11,7 @@
 #include <memory>
 #include <thread>
 #include <utility>
+#include <functional>
 
 // convenience
 using std::string;
@@ -20,6 +21,7 @@ template <class K,class V> using m = std::map<K,V>;
 using std::pair;
 template <class K,class V> using table = std::unordered_map<K,V>;
 using std::thread;
+template <class F> using fn = std::function<F>;
 
 template <class T> using ptr = T*; // can write "T*" or "ptr<T>", maybe remove
 template <class T> using uptr = std::unique_ptr<T>;

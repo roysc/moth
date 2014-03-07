@@ -11,6 +11,7 @@
 namespace konst
 {
 const string end_cond_name = "_end_";
+const string gameover_evtspec = "_game_over_";
 }
 
 // """
