@@ -14,18 +14,6 @@
 #include "cptclass.hh"
 #include "controlctx.hh"
 
-// Model interface
-// class ModelRun
-// {
-// public:
-//   virtual
-//   ControlCtx* run() = 0;
-
-// protected:        
-//   virtual
-//   void _run_events(ControlCtx*) = 0;
-// };
-
 // "Runnable model."
 // # 1. instantiate systems
 // # 2. start iterating:

@@ -8,10 +8,6 @@
 #include "log.hh"
 
 #include "mgen.hh"
-#include "component.hh"
-#include "entity.hh"
-#include "event.hh"
-#include "condition.hh"
 #include "mrun.hh"
 
 int main(int argc, const char* argv[])

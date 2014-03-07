@@ -2,7 +2,9 @@
 // mrun.hh
 #pragma once
 
-// struct SystemHandle: public CptClass {};
+#include "cptclass.hh"
+
+struct CptClass;
 
 struct SystemHandle
 {

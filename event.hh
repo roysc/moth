@@ -8,7 +8,6 @@
 #include "basic.hh"
 #include "statement.hh"
 #include "component.hh"
-#include "entity.hh"
 
 // Event
 // represents a statement to be evaluated

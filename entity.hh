@@ -2,12 +2,16 @@
 // entity.hh
 #pragma once
 
-#include "basic.hh"
+#include "controlctx.hh"
 #include "component.hh"
+
+struct ControlCtx;
+
+// An object instance in the running model
+struct Entity;
 
 // 
 using Compt_data = m<Compt_id, Component>;
-// 
 struct Entity
 {
 protected:

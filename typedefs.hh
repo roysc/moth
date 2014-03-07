@@ -13,6 +13,8 @@
 #include <utility>
 #include <functional>
 
+#include <cstdint>
+
 // convenience
 using std::string;
 using std::set;

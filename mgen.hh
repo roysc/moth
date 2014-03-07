@@ -2,7 +2,6 @@
 // mgen.hh
 #pragma once
 
-#include "basic.hh"
 #include "cptclass.hh" 
 
 #include "err.hh"

@@ -2,7 +2,7 @@
 // cptclass.hh
 #pragma once
 
-#include "basic.hh"
+// #include "basic.hh"
 #include "system.hh"
 #include "log.hh"
 #include "component.hh"
@@ -12,6 +12,7 @@
 // # hence, instantiate once. no need for special ctor.
 // # def __init__(self, Cs):
 // struct Entity;
+struct ModelGen;
 
 struct CptClass
 {

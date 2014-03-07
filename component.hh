@@ -2,17 +2,22 @@
 // component.hh
 #pragma once
 
-#include "log.hh"
-#include "assert.hh"
-#include "err.hh"
 #include "basic.hh"
+#include "log.hh"
+#include "err.hh"
+#include "assert.hh"
 
 // the idea is that a component is only accessed through Compt_addr keys
 // using Compt_addr = pair<Entity_ptr, Compt_id>;
 
 // Kind of like a "a trait of a (specific) entity"
+// a data instance, or Value
 struct Data;
 using Data_ptr = Data*;
+using Component = Data;
+
+using Compt_ptr = Component*;
+using Compt_ptr_k = Component const*;
 
 namespace dtype
 {

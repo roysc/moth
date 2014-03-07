@@ -2,8 +2,6 @@
 // assert.hh
 #pragma once
 
-#include <cassert>
-
 #include "err.hh"
 #include "log.hh"
 
