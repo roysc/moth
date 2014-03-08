@@ -80,8 +80,6 @@ public:
     LOG_TO_(info, lrun)("setting end condition");
     auto end_cond = _controlctx->end_cond();
 
-    // Create a thread pool, and array of event results, same size as condv
-
     LOG_TO_(info, lrun)("setting conditions");
     auto conds = _controlctx->conditions();
 
@@ -91,10 +89,11 @@ public:
               [](Cond_ptr c) {return util::concat(*c);});
     LOG_TO_(debug, lrun)("conditions: ", condstrs);
 
-    // Threadpool evalpool..?
+    // Create a thread pool, and array of event results, same size as condv
+    // for now just a thread vector
     LOG_TO_(info, lrun)("starting eval");
-    v<thread> evaljobs;
-    v<uptr<Event>> evtv(conds.size());
+    // v<thread> evaljobs;
+    v<uptr<Event> > evtv(conds.size());
 
     // iterate on conditions... read-only here.
     for (auto itc = begin(conds), last = end(conds); itc != last; ++itc)
@@ -102,16 +101,15 @@ public:
     {
       LOG_TO_(debug, lrun)("placing condn. for eval");
 
-      auto ite = end(evtv) - LOG_SHOW_(distance(itc, last));
-      evaljobs.emplace_back([=]{
+      auto ite = end(evtv) - LOG_EVAL_(distance(itc, last));
+      // evaljobs.emplace_back([=]{
       // evaluate condition, place result in array
           *ite = (**itc)();
-      });
+      // });
     }
     // TODO: threadpool or scheduling here
-    for (auto&& th: evaljobs)
-      th.join();
-
+    // for (auto&& th: evaljobs)
+    //   th.join();
     LOG_TO_(debug, lrun)("condition eval finished");
 
     LOG_TO_(debug, lrun)("queueing events");

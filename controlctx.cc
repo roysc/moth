@@ -32,7 +32,6 @@ ControlCtx::ControlCtx(ModelGen* mg):
   auto end_expr = new expr::EFun("!", {
       new expr::ERef(cent_ref)
     });
-  // auto end_ekl = EvtSpec(konst::gameover_evtspec, EventKind::destroy);
 
   // auto end_stmt = stmt::Statement(
   //   konst::gameover_evtspec,    // name "game over"

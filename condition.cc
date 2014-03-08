@@ -2,6 +2,7 @@
 // condition.cc
 
 #include "condition.hh"
+#include "log.hh"
 
 namespace expr
 {
@@ -20,7 +21,10 @@ dtype::Tag ERef::result_of() const
   auto dptr = addr.first->get(addr.second);
   return dtype::tag_of(dptr->dtype());
 }
-string ERef::to_string() const {return util::concat(addr);}
+string ERef::to_string() const 
+{
+  return util::concat('(', addr, " -> ", eval().to_string(), ')');
+}
 
 // function/op
 EFun::EFun(Operation o, Args as):
