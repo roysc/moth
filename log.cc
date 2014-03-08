@@ -7,7 +7,6 @@
 #include "log.hh"
 #include "typedefs.hh"
 
-inline
 namespace logging
 {
 Log& get_global_log() 

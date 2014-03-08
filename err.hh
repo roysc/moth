@@ -1,3 +1,4 @@
+
 // -*- coding: utf-8 -*-
 // entity.hh
 #pragma once
@@ -33,7 +34,7 @@
 
 #define THROW_DIAGS_(Type_, w_)                 \
   throw (err::WrapDiagnostics<err::Type_>(      \
-           w_,                                  \
+           (w_),                                \
            ERR_THROWFILE_ARG_,                  \
            ERR_THROWLINE_ARG_,                  \
            ERR_THROWFUNC_ARG_                   \

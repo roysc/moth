@@ -10,8 +10,14 @@
 #include "util/io.hh"
 #include "util/demangle.hh"
 
+#define LOG_USE_FILE_INFO 0
+
 // 
+#if LOG_USE_FILE_INF0 > 0
+#define LOG_TO_(chan_, log_) ((log_).file(__FILE__).line(__LINE__))
+#else
 #define LOG_TO_(chan_, log_) (log_)
+#endif
 
 // static & thread macros
 #define LOG_(chan_) LOG_TO_(chan_, ::logging::get_global_log())
@@ -19,7 +25,7 @@
 
 // scope a log by "pushing" to (global, or specific) log
 #define LOG_PUSH_TO_(logpush_, logtop_)             \
-  ::logging::Log logpush_(#logpush_, &(logtop_)); (logpush_)
+  ::logging::Log logpush_(#logpush_, &(logtop_)); LOG_TO_(info, logpush_)
 
 #define LOG_PUSH_(logpush_)                         \
   LOG_PUSH_TO_(logpush_, ::logging::get_global_log())
@@ -47,28 +53,34 @@
 #define LOG_TYPE_(x_) (x_)
 #endif
 
-inline
 namespace logging
 {
 using std::string;
 using std::ostream;
+
+const string _base_prelude = "  ";
 
 struct Log
 {
 protected:
   string _name;
   ostream& _out;
-  unsigned _indent;
+  unsigned _indent = 0;
+  // "parent" log
   Log* _base;
-  const string _base_prelude = "  ";
-  // const string _suffix = "\n";
+  // diagnostics
+  string _file;
+  unsigned _line = 0;
+  // options
+  // truncate long [file:num] sections in prelude. TODO
+  unsigned _truncate_file;
+  // string _suffix = "\n";
 
 public:
   Log(string nm, ostream& o):
-    _name(nm), _out(o), _indent(0), _base(0) {}
+    _name(nm), _out(o), _indent{}, _base{} {}
   Log(string nm, Log* l):
-    _name(nm), _out(l->_out),
-    _indent(++l->_indent), _base(l) {}
+    _name(nm), _out(l->_out), _indent(++l->_indent), _base(l) {}
   ~Log() 
   {
     if (!_base) return;
@@ -78,19 +90,26 @@ public:
 
   string name() const {return _name;}
   ostream& stream() {return _out;}
-  // return indent depth for any stacked logs
-  string prelude()
+  Log& file(string f) {_file = f; return *this;}
+  string file() {return _file;}
+  Log& line(unsigned l) {_line = l; return *this;}
+  unsigned line() {return _line;}
+  
+  // return indent depth for any stacked logs, and diagnostics
+  void prelude()
   {
-    string rv;
+#if LOG_USE_FILE_INFO > 0
+    _out << "[" << _file << ":" << _line << "] ";
+#endif
     for (auto ct = _indent; ct; --ct) 
-      rv += _base_prelude; 
-    return rv;
+      _out << _base_prelude;
   }
   
   template <class... Ts>
   Log& operator()(Ts&&... args) 
   {
-    util::print_to(_out, prelude(), std::forward<Ts>(args)..., '\n');
+    prelude();
+    util::print_to(_out, std::forward<Ts>(args)..., '\n');
     return *this;
   }
 };
