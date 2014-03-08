@@ -89,7 +89,6 @@ Data EFun::eval() const
     return it->second(evalled);
   } else {
     LOG_(warning)("No operation implemented for ", k);
-    // return nil
     return {};
   }
 }
@@ -103,7 +102,6 @@ const m<Tbl_key, Eval_fn>& eval_fn_tbl()
     {{OpType::op_not, dtype::ty_bool},
      [](v<Data> as) {
        LOG_(debug)(OpType::op_not, ": bool -> bool");
-       // get
        data::Bool res;
        as.at(0).get(res);
        // return

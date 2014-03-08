@@ -7,12 +7,13 @@
 
 #include "mgen.hh"
 
-// """
-// The generation context for a generator;
-// Namespace of Generation implementation
-// """
+const m<string, dtype::T> ModelGen::builtins = {
+  {"_end_", dtype::ty_bool},
+  {"_time_", dtype::ty_int},
+};
+
 ModelGen::ModelGen(Json js):
-  _next_id(0), _switch_cptid(0)
+  _next_id{}
 {
   LOG_PUSH_(l)(__PRETTY_FUNCTION__);
 
@@ -96,26 +97,24 @@ ModelGen::ModelGen(Json js):
     } // get types
   } // process components
 
-  // set switch component (end condition result)
-  auto itc = find_if(
-    begin(_cptclasses), end(_cptclasses), 
-    [](CptClasses::value_type v) {return v.second.name() == konst::end_cond_name;}
-  );
-  if (itc != end(_cptclasses))
-    LOG_(warning)("end component redefined");
-
-  // make builtins
-
+  // make builtins:
+  //  switch component (end condition result)
+  //  time counter
+  for (auto&& builtin: builtins) {
+    auto nm = builtin.first;
+    auto itc = find_if(
+      begin(_cptclasses), end(_cptclasses), 
+      [=](CptClasses::value_type v) {return v.second.name() == nm;}
+    );
+    if (itc != end(_cptclasses))
+      LOG_(warning)("builtin ", builtin, " redefined (ignoring)");
   
-  auto swid = make_cpt(konst::end_cond_name, dtype::ty_bool);
-  _switch_cptid = swid;
-
-  auto tmid = make_cpt("_time_", dtype::ty_int);
-  _time_cpid = tmid;
+    _ctrl_cpts.emplace(nm, make_cpt(nm, builtin.second));
+  }
 
   // entities
   for (auto&& c: ents_js? *ents_js : Json()) {
-    
+    // TODO
   }
 }
 

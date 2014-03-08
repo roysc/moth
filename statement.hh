@@ -69,10 +69,10 @@ struct Spawn: Statement
 // signals
 struct Signal: Statement {using Statement::Statement;};
 
-struct EndGame: Signal
+struct Halt: Signal
 {
 public:
-  EndGame(): Signal("_game_over_") {}
+  Halt(): Signal("_halt_") {}
   void execute(ControlCtx* ctx) const override
   {
     LOG_(debug)(__PRETTY_FUNCTION__);

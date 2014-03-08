@@ -7,12 +7,6 @@
 #include "err.hh"
 #include "json.hh"
 
-namespace konst
-{
-const string end_cond_name = "_end_";
-const string gameover_evtspec = "_game_over_";
-}
-
 // """
 // The generation context for a generator;
 // Namespace of Generation implementation
@@ -26,8 +20,8 @@ protected:
   // Types
   CptClasses _cptclasses;
   CptIDs _cpt_ids;
-  Compt_id _switch_cptid;
-  Compt_id _time_cpid;
+  m<string, Compt_id> _ctrl_cpts;
+  static const m<string, dtype::T> builtins;
   
 public:
   ModelGen(Json js);
@@ -39,8 +33,7 @@ public:
     for (auto&& c: _cptclasses) ret.emplace(c.first, &c.second);
     return ret;
   }
-  Compt_id switch_cpt() const {return _switch_cptid;}
-  Compt_id time_cpt() const {return _time_cpid;}
+  Compt_id control_cpt(string nm) const {return _ctrl_cpts.at(nm);}
 
   const CptClass* get_class(Compt_id cpid) 
   {

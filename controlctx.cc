@@ -25,8 +25,12 @@ ControlCtx::ControlCtx(ModelGen* mg):
     if (sh) _systems.emplace(c.first, sh);
   }
 
-  auto swid = _modelgen->switch_cpt();
-  auto tmid = _modelgen->time_cpt();
+  // The condition, which when evaluated as true, ends the game;
+  // eg. run ends after 4 "days"
+  // Condition(= time.n_day 4) -> Halt()
+  // Cond_ptr end_cond() const {return _end_cond.get();}
+  auto swid = _modelgen->control_cpt("_end_");
+  auto tmid = _modelgen->control_cpt("_time_");
   _ctrl_ent.reset(new Entity(this, {swid, tmid}));
   
   // auto end_expr = new expr::EFun(
@@ -44,7 +48,7 @@ ControlCtx::ControlCtx(ModelGen* mg):
   //   konst::gameover_evtspec,    // name "game over"
   //   EventKind::destroy,         // destroy condition entity
   //   _ctrl_ent.get());
-  auto end_stmt = new stmt::EndGame;
+  auto end_stmt = new stmt::Halt;
   auto tm_stmt = new stmt::Spawn("_tick_");
 
   auto end_cond = new Condition(end_expr, end_stmt);
