@@ -5,6 +5,9 @@
 #include "log.hh"
 #include "typedefs.hh"
 #include "expression.hh"
+// #include "controlctx.hh"
+
+struct ControlCtx;
 
 namespace stmt
 {
@@ -26,32 +29,33 @@ public:
   {}
 
   string name() const {return _name;};
-
-  virtual void execute() = 0;
+  virtual string to_string() const = 0;
+  virtual void execute(ControlCtx* ctx) const = 0;
 
   template <class Ch,class Tr>
   friend std::basic_ostream<Ch,Tr>& operator<<(
     std::basic_ostream<Ch,Tr>& out, 
     const Statement& c)
-  {
-    out << "Statement(TODO)";
-    return out;
-  }
+  {return out << c.to_string();}
 };
 
 struct Update: Statement
 {
   Compt_addr _cpadr;
-  expr::Expr* _expr;
+  uptr<expr::Expr> _expr;
 public:
   Update(string n, Compt_addr ca, expr::Expr* e):
     Statement(n), _cpadr(ca), _expr(e) {}
-  void execute() override
+  void execute(ControlCtx* ctx) const override
   {
     LOG_(debug)(__PRETTY_FUNCTION__);
     // set target data
     auto res = _expr->eval();
     _cpadr()->set(res);
+  }
+  string to_string() const
+  {
+    return _name + util::concat_pair(_cpadr, *_expr);
   }
 };
 
@@ -62,7 +66,7 @@ struct EndGame: Signal
 {
 public:
   EndGame(): Signal("_game_over_") {}
-  void execute() override
+  void execute(ControlCtx* ctx) const override
   {
     LOG_(debug)(__PRETTY_FUNCTION__);
     // create warning entity?
@@ -71,5 +75,6 @@ public:
     
     // 
   }
+  string to_string() const {return _name;}
 };
 }

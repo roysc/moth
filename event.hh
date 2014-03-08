@@ -28,9 +28,15 @@ struct Event
 {
   using Stmt = stmt::Statement;
 protected:
+  const Stmt* _stmt;
   uptr<Event> _next;
-
 public:
   Event(const Stmt* st, Event* n = {}):
-    _next(n) {}
+    _stmt(st), _next(n) {}
+
+  void happen(ControlCtx* ctx)
+  {
+    _stmt->execute(ctx);
+    if (_next) _next->happen(ctx);
+  }
 };

@@ -2,7 +2,6 @@
 // controlctx.hh
 #pragma once
 
-#include "event.hh"
 #include "condition.hh"
 #include "cptclass.hh"
 #include "entity.hh"
@@ -29,7 +28,7 @@ protected:
 
 public:
   ControlCtx(ModelGen* mg);
-  virtual ~ControlCtx() {};
+  virtual ~ControlCtx() {}
 
   set<Entity_ptr> entities() const {return _entities;}
   set<Cond_ptr> conditions() const {return _conditions;}

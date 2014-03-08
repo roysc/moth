@@ -76,7 +76,8 @@ public:
       // If threading, scheduling events is the tricky part
       // queue or some structure that is friendly to concurrency
       
-      // e->execute()
+      e->happen(_controlctx);
+      
     }
 
     // # State at end
