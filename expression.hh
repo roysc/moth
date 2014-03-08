@@ -10,21 +10,16 @@
 
 #include "basic.hh"
 #include "operation.hh"
-
-struct Compt_addr: pair<Entity_ptr, Compt_id>
-{
-  using pair::pair;
-  Data_ptr operator()() const;
-};
+#include "entity.hh"
 
 namespace expr
 {
 // using Cptrs = v<Compt_ptr>;
 // using Cptaddrs = v<Compt_addr>;
 // using DataIndex = pair<Data, Compt_addr>;
-using Tbl_key = pair<OpType, dtype::T>;
+using FnTbl_key = pair<OpType, dtype::T>;
 using Eval_fn = fn<Data(v<Data>)>;
-const m<Tbl_key, Eval_fn>& eval_fn_tbl();
+const m<FnTbl_key, Eval_fn>& eval_fn_tbl();
 
 // expression types
 struct Expr {

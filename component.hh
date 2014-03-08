@@ -2,9 +2,8 @@
 // component.hh
 #pragma once
 
-#include "basic.hh"
-#include "log.hh"
 #include "err.hh"
+#include "basic.hh"
 #include "assert.hh"
 
 // the idea is that a component is only accessed through Compt_addr keys
@@ -119,6 +118,7 @@ public:
   static Data make(V&& v)
   {
     Data ret(D::dtype());
+    // return ret.template get<D>()
     D dret{v};
     ret.set(dret);
     return ret;

@@ -2,9 +2,9 @@
 // cptclass.hh
 #pragma once
 
+#include "log.hh"
 // #include "basic.hh"
 #include "system.hh"
-#include "log.hh"
 #include "component.hh"
 
 // # each CptClass C

@@ -2,10 +2,9 @@
 // mgen.hh
 #pragma once
 
-#include "cptclass.hh" 
-
-#include "err.hh"
 #include "json.hh"
+#include "err.hh"
+#include "cptclass.hh" 
 
 // """
 // The generation context for a generator;
@@ -41,11 +40,18 @@ public:
     return it != end(_cptclasses) ? &it->second : nullptr;
   }
 
+  const CptClass* find_class(string nm) 
+  {
+    auto it = find_if(begin(_cptclasses), end(_cptclasses),
+                      [=](CptClasses::value_type p) {return p.second.name() == nm;});
+    return it != end(_cptclasses) ? &it->second : nullptr;
+  }
+  
+  // stupid
   Compt_id unget_class(const CptClass* cp)
   {
-    // auto it = find_if(begin(_cptclasses), end(cp), [])
     auto it = _cpt_ids.find(cp);
-    return it != end(_cpt_ids)? it->second : throw err::Not_found(util::concat(cp));
+    return it != end(_cpt_ids)? it->second : THROW_(Not_found, util::concat(cp));
   }
 };
 

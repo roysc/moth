@@ -7,8 +7,6 @@
 
 #include "expression.hh"
 
-Data_ptr Compt_addr::operator()() const {return first->get(second);}
-
 namespace expr
 {
 // literal
@@ -82,21 +80,21 @@ Data EFun::eval() const
   }
   LOG_SHOW_(evalled);
 
-  Tbl_key k{oper.optype(), dt_call};
+  FnTbl_key k{oper.optype(), dt_call};
   auto it = eval_fn_tbl().find(k);
   if (it != end(eval_fn_tbl())) {
     // call function
     return it->second(evalled);
   } else {
-    LOG_(warning)("No operation implemented for ", k);
+    LOG_(warning)("No function defined for ", k);
     return {};
   }
 }
 
 // eval functions
-const m<Tbl_key, Eval_fn>& eval_fn_tbl()
+const m<FnTbl_key, Eval_fn>& eval_fn_tbl()
 {
-  static const m<Tbl_key, Eval_fn>
+  static const m<FnTbl_key, Eval_fn>
     _eval_fn_tbl = {
     // not: bool -> bool
     {{OpType::op_not, dtype::ty_bool},

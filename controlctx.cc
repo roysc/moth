@@ -2,6 +2,9 @@
 // controlctx.cc
 
 #include "controlctx.hh"
+#include "expression.hh"
+#include "statement.hh"
+#include "condition.hh"
 
 // "Contexts" for components needing centralized control
 // eg. Location/coordinates

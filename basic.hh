@@ -24,9 +24,9 @@
 struct Entity;
 using Entity_ptr = Entity*;
 
-// the idea is that a component is only accessed through Compt_addr keys
-using Compt_id = unsigned;
-
 // a trigger: (expr(:bool), statement)
 struct Condition;
 using Cond_ptr = Condition*;
+
+// unique identifier for component class
+using Compt_id = unsigned;

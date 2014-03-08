@@ -2,7 +2,7 @@
 // mrun.hh
 #pragma once
 
-#include "cptclass.hh"
+// #include "cptclass.hh"
 
 struct CptClass;
 

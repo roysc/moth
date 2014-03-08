@@ -5,14 +5,15 @@
 #include <functional>
 #include "util/io.hh"
 
-#include "statement.hh"
 #include "event.hh"
 #include "expression.hh"
+namespace stmt
+{
+struct Statement;
+}
 
 // TODO: rename to Trigger
-
 // Condition:
-// 
 // c = Condition()
 // r = c()
 //   => Event(...) -- condition is satisfied

@@ -26,7 +26,7 @@
     ASSERT_WHAT_(                                                       \
       aval_ op_ bval_,                                                  \
       #a_ " " #op_ " " #b_,                                             \
-      "[" #a_ " = ", aval_, ", " #b_ " = ", bval_, "]: ",               \
+      "[" #a_ " = ", aval_, " ; " #b_ " = ", bval_, "]: ",               \
       __VA_ARGS__                                                       \
     );                                                                  \
   } while (0)

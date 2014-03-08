@@ -4,6 +4,9 @@
 #include "entity.hh"
 #include "controlctx.hh"
 
+// dereference
+Data_ptr Compt_addr::operator()() const {return first->get(second);}
+
 // constructed with set of classes
 Entity::Entity(ControlCtx* cx, v<Compt_id> cpts):
   _ctx(cx)

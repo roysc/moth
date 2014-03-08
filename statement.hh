@@ -5,9 +5,9 @@
 #include "log.hh"
 #include "typedefs.hh"
 #include "expression.hh"
-// #include "controlctx.hh"
+#include "controlctx.hh"
 
-struct ControlCtx;
+// struct ControlCtx;
 
 namespace stmt
 {
@@ -80,6 +80,7 @@ public:
     // delete everything?
 
     
+    auto alert = ctx->create_entity({});
     // 
   }
   string to_string() const {return _name;}

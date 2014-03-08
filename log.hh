@@ -37,9 +37,14 @@
 //  => "(z + 1) = 4", "(x) = 4"
 // for generic lambda captures
 #ifdef USE_STDCPP14
+#define LOG_EVALN_(x_, ...) (([res_(x_)] {                             \
+        LOG_(debug)("(eval): (" #x_ ") = ", res_, "; ", __VA_ARGS__);  \
+        return res_;                                                   \
+      })()                                                             \
+  )
 #define LOG_EVAL_(x_) (([res_(x_)] {                                   \
-        LOG_(debug)("(show): (" #x_ ") = ", res_);                     \
-        return std::forward<std::decay_t<decltype(res_)> const>(res_); \
+        LOG_(debug)("(eval): (" #x_ ") = ", res_);                     \
+        return res_;                                                   \
       })()                                                             \
   )
 
@@ -118,4 +123,13 @@ public:
 
 Log& get_global_log();
 Log& get_thread_log();
+}
+
+// needed for ambiguity of nullptr
+namespace std
+{
+template <class Ch, class Tr>
+std::basic_ostream<Ch, Tr>&
+operator<<(std::basic_ostream<Ch, Tr>& out, const std::nullptr_t)
+{return out << "<null>";}
 }

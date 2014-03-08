@@ -2,10 +2,15 @@
 // entity.hh
 #pragma once
 
-#include "controlctx.hh"
 #include "component.hh"
-
 struct ControlCtx;
+
+// struct ControlCtx;
+struct Compt_addr: pair<Entity_ptr, Compt_id>
+{
+  using pair::pair;
+  Data_ptr operator()() const;
+};
 
 // An object instance in the running model
 struct Entity;
