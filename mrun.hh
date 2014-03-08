@@ -43,17 +43,16 @@ public:
 
     // # The 0-condition
     // # meet this to end the game (just a bool in primary System)
-    LOG_TO_(info, lrun)("setting end condition");
-    auto end_cond = _controlctx->end_cond();
+    // LOG_TO_(info, lrun)("setting end condition");
+    // auto end_cond = _controlctx->end_cond();
 
     LOG_TO_(info, lrun)("setting conditions");
     auto conds = _controlctx->conditions();
 
     // show initial conditions
-    v<string> condstrs;
-    transform(begin(conds), end(conds), back_inserter(condstrs),
-              [](Cond_ptr c) {return util::concat(*c);});
-    LOG_TO_(debug, lrun)("conditions: ", condstrs);
+    LOG_TO_(debug, lrun)("conditions:");
+    for (auto&& c: conds) 
+      LOG_TO_(debug, lrun)('\t', *c);
 
     // Create a thread pool, and array of event results, same size as condv
     // for now just a thread vector

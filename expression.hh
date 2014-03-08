@@ -44,7 +44,9 @@ struct Expr {
 
 // literal
 struct ELit: Expr {
-  Data value; 
+  Data value;
+public:
+  ELit(Data v): value(v) {}
   Data eval() const override;
   dtype::Tag result_of() const override;
   string to_string() const override {return value.to_string();}

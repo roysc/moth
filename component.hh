@@ -39,6 +39,25 @@ enum T: unsigned
 
 enum class Tag: unsigned
 { boolean, number, realm, expr, any, N };
+
+template <class Ch,class Tr>
+std::basic_ostream<Ch,Tr>& 
+operator<<(std::basic_ostream<Ch,Tr>& out, Tag tag)
+{
+  static const m<Tag, string> tbl = {
+    {Tag::boolean, "Tag::boolean"},
+    {Tag::number, "Tag::number"},
+    {Tag::realm, "Tag::realm"},
+    {Tag::expr, "Tag::expr"},
+    {Tag::any, "Tag::any"},
+  };
+  auto it = tbl.find(tag);
+  if (it != end(tbl))
+    out << it->second;
+  else 
+    THROW_(Not_found, __PRETTY_FUNCTION__);
+  return out;
+}
 }
 
 namespace data
@@ -47,13 +66,31 @@ namespace data
 // struct DT_label {static const dtype::T dt = DT;};
 
 // Layout of data objects
-struct Bool {int32_t value;};
+struct Bool {
+  int32_t value;
+  static dtype::T dtype() {return dtype::ty_bool;}
+};
 // struct Bool: DT_label<dtype::ty_bool> {int32_t value;};
-struct Int {int32_t value;};
-struct Float {float value;};
-struct RlmDisc {uint32_t index; uint32_t realm_max; uint32_t offset;};
-struct RlmCont {float index; float realm_max; float offset;};
-struct Str {int _;};
+struct Int {
+  int32_t value;
+  static dtype::T dtype() {return dtype::ty_int;}
+};
+struct Float {
+  float value;
+  static dtype::T dtype() {return dtype::ty_float;}
+};
+struct RlmDisc {
+  uint32_t index;
+  uint32_t realm_max; uint32_t offset; static dtype
+  ::T dtype() {return dtype::ty_rdisc;}};
+struct RlmCont {
+  float index;
+  float realm_max; float offset; static dtype
+  ::T dtype() {return dtype::ty_rcont;}};
+struct Str {
+  int _;
+  static dtype::T dtype() {return dtype::ty_str;}
+};
 }
 
 namespace dtype 
@@ -78,6 +115,15 @@ public:
   // Data(dtype::T dt): _dtype(dt), _bytes(dtype::size(dt)) {}
   Data(const Data&) = default;
 
+  template <class D, class V>
+  static Data make(V&& v)
+  {
+    Data ret(D::dtype());
+    D dret{v};
+    ret.set(dret);
+    return ret;
+  }
+  
   void set(const Data& that)
   {
     ASSERT_EQ_(_dtype, that._dtype, "Data::set(Data): wrong dtype");

@@ -13,20 +13,6 @@ project(Moth)
 # # lib/
 # link_directories()
 
-# Clang supports extensions
-if(${CMAKE_CXX_COMPILER} MATCHES "clang")
-  set_property(TARGET main
-    PROPERTY COMPILE_DEFINITIONS 
-    USE_STDCPP14
-  )
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-c++1y-extensions")
-endif()
-
-# if blah
-set(CFLAG_STD_ "--std=c++11")
-# endif
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CFLAG_STD_}")
-
 # error on non-returning fn., should be default
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror=return-type")
 
@@ -42,6 +28,11 @@ endif()
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CFLAG_OPT_}")
 
+# if blah
+set(CFLAG_STD_ "--std=c++11")
+# endif
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CFLAG_STD_}")
+
 # main executable
 add_executable(main
   main.cc
@@ -56,6 +47,15 @@ add_executable(main
   util/demangle.cc
 )
 add_dependencies(main Moth)
+
+# Clang supports extensions
+if(${CMAKE_CXX_COMPILER} MATCHES "clang")
+  set_property(TARGET main
+    PROPERTY COMPILE_DEFINITIONS 
+    USE_STDCPP14
+  )
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-c++1y-extensions")
+endif()
 
 # here we add definitions for any package if requred.
 # add_definitions()

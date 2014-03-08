@@ -9,14 +9,14 @@
 #include "event.hh"
 #include "expression.hh"
 
+// TODO: rename to Trigger
+
 // Condition:
-// """Trigger object
 // 
 // c = Condition()
 // r = c()
 //   => Event(...) -- condition is satisfied
 //   => None       -- not
-// """
 struct Condition
 {
   using Expr = expr::Expr;
@@ -61,7 +61,7 @@ public:
     std::basic_ostream<Ch,Tr>& out, 
     const Condition& c)
   {
-    out << util::concat("Cond[if(", *c._expr, "): ", *c._stmt, ']');
+    out << util::concat("Cond[", *c._expr, ':', *c._stmt, ']');
     return out;
   }
 

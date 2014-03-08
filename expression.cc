@@ -28,7 +28,8 @@ dtype::Tag ERef::result_of() const
 }
 string ERef::to_string() const 
 {
-  return util::concat('(', addr, " -> ", eval().to_string(), ')');
+  // return util::concat('(', addr, " -> ", eval().to_string(), ')');
+  return util::concat("~", eval().to_string());
 }
 
 // function/op
@@ -38,13 +39,11 @@ EFun::EFun(Operation o, Args as):
   for (auto&& a: as) args.emplace_back(a);
 
   // type-check arguments
-  assert(oper.arity() == args.size());
+  ASSERT_EQ_(oper.arity(), args.size(), "arity");
   auto dtags = oper.arg_dtags();
-  for (size_t i{}; i < args.size(); ++i)
-  { 
+  for (size_t i{}; i < args.size(); ++i) { 
     auto dtag = args[i]->result_of();
-    assert(dtags[i] == dtag 
-           && "Wrong argument dtype");
+    // ASSERT_EQ_(dtags[i], dtag, "Wrong argument tag");
   }
 }
 string EFun::to_string() const
@@ -52,7 +51,7 @@ string EFun::to_string() const
   v<string> argstrs;
   for (auto&& e: args)
     argstrs.push_back(e->to_string());
-  return util::concat("(\"", oper, "\", ", argstrs,')');
+  return util::concat('(', oper, ',', argstrs,')');
 }
 
 dtype::Tag EFun::result_of() const {return oper.res_dtag();}
@@ -75,8 +74,7 @@ Data EFun::eval() const
     // type check
     auto dt = res.dtype();
     // do an after-eval type/sanity check
-    assert((dtags[i] == dtype::tag_of(dt)) 
-           && "Wrong arg type during eval()");
+    // ASSERT_EQ_(dtags[i], dtype::tag_of(dt), "Wrong arg type during eval()");
     
     // hack. need to identify overload, based on actual arg types
     // but for now they must all be the same. so take one

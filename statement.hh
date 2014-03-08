@@ -59,6 +59,13 @@ public:
   }
 };
 
+struct Spawn: Statement
+{
+  using Statement::Statement;
+  void execute(ControlCtx*) const override {}
+  string to_string() const {return _name;}
+};
+
 // signals
 struct Signal: Statement {using Statement::Statement;};
 

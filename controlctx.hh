@@ -23,7 +23,7 @@ protected:
   set<Cond_ptr> _conditions;
   set<Entity_ptr> _entities;
   // control 
-  uptr<Condition> _end_cond;
+  // uptr<Condition> _end_cond;
   uptr<Entity> _ctrl_ent;
 
 public:
@@ -41,7 +41,7 @@ public:
   // eg. run ends after 4 "days"
   // Condition(= time.n_day 4)
   // -> Halt()
-  Cond_ptr end_cond() const {return _end_cond.get();}
+  // Cond_ptr end_cond() const {return _end_cond.get();}
 
   // class lookup, fwd to modelgen
   const CptClass* get_class(Compt_id cpid) {return _modelgen->get_class(cpid);}
