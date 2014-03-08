@@ -113,7 +113,7 @@ public:
   Data(dtype::T dt = dtype::ty_N): _dtype(dt), _bytes(dtype::size(dt)) {}
   // Data(dtype::T dt): _dtype(dt), _bytes(dtype::size(dt)) {}
   Data(const Data&) = default;
-
+  
   template <class D, class V>
   static Data make(V&& v)
   {
@@ -129,76 +129,18 @@ public:
     ASSERT_EQ_(_dtype, that._dtype, "Data::set(Data): wrong dtype");
     _bytes = that._bytes;
   }
-
+  Data& operator=(Data const& that) {set(that); return *this;}
+  
   dtype::T dtype() const {return _dtype;}
   const void* raw() const
   {
     assert(!_bytes.empty() && "data not initialized");
     return static_cast<const void*>(&_bytes[0]);
   }
-
-  string to_string() const
-  {
-    string ret;
-
-    // `val_' for value
-#define DATA_TO_STRING_CASE_(dt_, Type_, str_expr_) \
-    case dtype::dt_: {                              \
-      data::Type_ val_; get(val_);                  \
-      ret = ("{" #Type_ ", ") + (str_expr_) + '}';  \
-    } break
-    
-    switch (_dtype)
-    {
-      DATA_TO_STRING_CASE_(ty_bool, Bool, util::concat(val_.value));
-      DATA_TO_STRING_CASE_(ty_int, Int, util::concat(val_.value));
-      DATA_TO_STRING_CASE_(ty_float, Float, util::concat(val_.value));
-      DATA_TO_STRING_CASE_(ty_rdisc, RlmDisc, util::concat(
-                             '(', val_.index,
-                             ',', val_.realm_max, 
-                             ',', val_.offset, 
-                             ')'));
-      DATA_TO_STRING_CASE_(ty_rcont, RlmCont, util::concat(
-                             '(', val_.index,
-                             ',', val_.realm_max, 
-                             ',', val_.offset, 
-                             ')'));
-      DATA_TO_STRING_CASE_(ty_str, Str, string("\"\""));
-    default:
-      THROW_(Invalid, __PRETTY_FUNCTION__);
-    }
-    return ret;
-  }
-
-  // Data& operator=(Data const& that) 
-  // {
-  //   _dtype = that._dtype; 
-  //   _bytes = that._bytes;
-  //   return *this;
-  // }
+  string to_string() const;
   
-#define DATA_DEFINE_GET_SET_(Type_, dt_)                                \
-  void get(data::Type_& dat_out_) const                                 \
-  {                                                                     \
-    ASSERT_EQ_(_dtype, (dtype::dt_),                                    \
-                "Data::get(" #Type_ "): wrong dtype");                  \
-    dat_out_ = *static_cast<const data::Type_*>(raw());                 \
-  }                                                                     \
-  void set(data::Type_ dat_in_)                                         \
-  {                                                                     \
-    ASSERT_EQ_(_dtype, (dtype::dt_),                                    \
-               "Data::set(" #Type_ "): wrong dtype");                   \
-    *reinterpret_cast<data::Type_*>(&_bytes[0]) = dat_in_;              \
-  }
-  
-  // per-type getters
-  DATA_DEFINE_GET_SET_(Bool, ty_bool)
-  DATA_DEFINE_GET_SET_(Int, ty_int)
-  DATA_DEFINE_GET_SET_(Float, ty_float)
-  DATA_DEFINE_GET_SET_(RlmDisc, ty_rdisc)
-  DATA_DEFINE_GET_SET_(RlmCont, ty_rcont)
-  DATA_DEFINE_GET_SET_(Str, ty_str)
-#undef DATA_DEFINE_GET_SET_
+  template <class D> D get() const;
+  template <class D> void set(D);
   
   template <class Ch,class Tr>
   friend std::basic_ostream<Ch,Tr>& 
@@ -206,3 +148,27 @@ public:
   {return out << e.to_string();}
 }; // struct Data
 
+#define DATA_DEFINE_GET_SET_(Type_, dt_)                                \
+  template <>                                                           \
+  inline data::Type_ Data::get<data::Type_>() const                     \
+  {                                                                     \
+    ASSERT_EQ_(_dtype, (dtype::dt_),                                    \
+                "Data::get(" #Type_ "): wrong dtype");                  \
+    return *static_cast<const data::Type_*>(raw());                     \
+  }                                                                     \
+  template <>                                                           \
+  inline void Data::set<data::Type_>(data::Type_ dat_in_)               \
+  {                                                                     \
+    ASSERT_EQ_(_dtype, (dtype::dt_),                                    \
+               "Data::set(" #Type_ "): wrong dtype");                   \
+    *reinterpret_cast<data::Type_*>(&_bytes[0]) = dat_in_;              \
+  }
+
+// per-type getters
+DATA_DEFINE_GET_SET_(Bool, ty_bool)
+DATA_DEFINE_GET_SET_(Int, ty_int)
+DATA_DEFINE_GET_SET_(Float, ty_float)
+DATA_DEFINE_GET_SET_(RlmDisc, ty_rdisc)
+DATA_DEFINE_GET_SET_(RlmCont, ty_rcont)
+DATA_DEFINE_GET_SET_(Str, ty_str)
+#undef DATA_DEFINE_GET_SET_

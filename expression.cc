@@ -94,14 +94,12 @@ Data EFun::eval() const
 // eval functions
 const m<FnTbl_key, Eval_fn>& eval_fn_tbl()
 {
-  static const m<FnTbl_key, Eval_fn>
-    _eval_fn_tbl = {
+  static const m<FnTbl_key, Eval_fn> _eval_fn_tbl = {
     // not: bool -> bool
     {{OpType::op_not, dtype::ty_bool},
      [](v<Data> as) {
        LOG_(debug)(OpType::op_not, ": bool -> bool");
-       data::Bool res;
-       as.at(0).get(res);
+       auto res = as.at(0).get<data::Bool>();
        // return
        Data rd(dtype::ty_bool);
        rd.set(data::Bool{!res.value});
