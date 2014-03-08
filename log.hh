@@ -5,8 +5,9 @@
 #include <functional>
 #include <iostream>
 #include <cassert>
-#include "util/io.hh"
 #include "util/std/type_traits"
+
+#include "util/io.hh"
 #include "util/demangle.hh"
 
 // 
@@ -26,8 +27,8 @@
 #define LOG_SHOW_(x_) LOG_(debug)("(" #x_ ") = ", (x_))
 
 // log, eval; like
-//  x = 1 + LOG_EVAL_(z); LOG_SHOW_(x);
-//  => "(z) = 3", "(x) = 4"
+//  x = LOG_EVAL_(z + 1); LOG_SHOW_(x);
+//  => "(z + 1) = 4", "(x) = 4"
 // for generic lambda captures
 #ifdef USE_STDCPP14
 #define LOG_EVAL_(x_) (([res_(x_)] {                                   \
@@ -85,11 +86,12 @@ public:
       rv += _base_prelude; 
     return rv;
   }
-
+  
   template <class... Ts>
-  void operator()(Ts&&... args) 
+  Log& operator()(Ts&&... args) 
   {
     util::print_to(_out, prelude(), std::forward<Ts>(args)..., '\n');
+    return *this;
   }
 };
 

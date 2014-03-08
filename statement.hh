@@ -4,9 +4,17 @@
 
 #include "log.hh"
 #include "typedefs.hh"
+#include "expression.hh"
 
 namespace stmt
 {
+// it's important that the Statement logic be easily expressable
+// however, it also need to be clear
+// so, expressions should be short to make both goals easier
+// So a statement is thought of as always:
+// spawning an entity, changing one, or destroying one
+//
+// can chain them together in events
 struct Statement
 {
 protected:
@@ -18,7 +26,6 @@ public:
   {}
 
   string name() const {return _name;};
-  // EventKind kind() const {return _kind;};
 
   virtual void execute() = 0;
 
@@ -34,23 +41,35 @@ public:
 
 struct Update: Statement
 {
+  Compt_addr _cpadr;
+  expr::Expr* _expr;
+public:
+  Update(string n, Compt_addr ca, expr::Expr* e):
+    Statement(n), _cpadr(ca), _expr(e) {}
   void execute() override
   {
-    // set target data
     LOG_(debug)(__PRETTY_FUNCTION__);
-    // auto cp = _cpadr.first->get(_cpadr.second);
-    // *cp = _data;
-    
+    // set target data
+    auto res = _expr->eval();
+    _cpadr()->set(res);
   }
 };
 
-struct EndGame: Statement
+// signals
+struct Signal: Statement {using Statement::Statement;};
+
+struct EndGame: Signal
 {
 public:
-  EndGame(): Statement("_game_over_") {}
+  EndGame(): Signal("_game_over_") {}
   void execute() override
   {
-    /* delete everything? */
+    LOG_(debug)(__PRETTY_FUNCTION__);
+    // create warning entity?
+    // delete everything?
+
+    
+    // 
   }
 };
 }

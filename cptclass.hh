@@ -41,6 +41,6 @@ public:
   //                  | nullptr   -- no
   SystemHandle* system_handle() const {return {};}
 
-  Component create() const {return Component(_dtype);}
+  Data create() const {return {_dtype};}
   // bool operator<(const CptClass& that) {return _id }
 };

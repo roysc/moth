@@ -2,7 +2,6 @@
 // mrun.hh
 #pragma once
 
-#include <queue>
 #include <utility>
 #include <algorithm>
 
@@ -31,38 +30,6 @@ class ModelRun
 
 public:
   ModelRun(ControlCtx* ctx): _controlctx(ctx) {}
-
-  // Processing this queue
-  // yields mutation
-  // each event contains instructions to mutate their associated components
-  // struct EventQueue : private std::queue<Event_ptr>
-  // {
-  //   ControlCtx* _controlctx;
-  //   void push(Event_ptr e);
-  // };
-  // using EventQueue = std::queue<Event_ptr>;
-  using EventQueue = std::queue<uptr<Event>>;
-
-  // what does event handle?
-  // Types:
-  //   Evt(Force, Body -> BodyState)
-  //   force: sys. component
-  //   obj.: sys. entity
-  //
-  //   c= Cond(Body.pain > _)
-  //   => e= Evt(Agent.Senses -> Agent.Senses)
-  //   r = e() = (s > s.alarmed; s)
-  // 
-  //   Cond(Agent.decision ~ go(_))
-  //   => Evt(Loc -> Loc)
-  //   r = e();
-  //   r should produce a follow-up condition checking arrival,
-  //     and checking path
-  //
-  //   Cond(Agent.smell ~ meat)
-  //   => Evt(Agent -> Go)
-  //   Cond(Agent.)
-  //   Evt(Agent -> Agent)
     
   //   # An event need only see its operands
   //   # It represents an expression, symbolically
@@ -74,7 +41,6 @@ public:
   {
     LOG_PUSH_(lrun)(__PRETTY_FUNCTION__);
 
-    EventQueue evtq;
     // # The 0-condition
     // # meet this to end the game (just a bool in primary System)
     LOG_TO_(info, lrun)("setting end condition");
@@ -92,38 +58,25 @@ public:
     // Create a thread pool, and array of event results, same size as condv
     // for now just a thread vector
     LOG_TO_(info, lrun)("starting eval");
-    // v<thread> evaljobs;
-    v<uptr<Event> > evtv(conds.size());
 
-    // iterate on conditions... read-only here.
-    for (auto itc = begin(conds), last = end(conds); itc != last; ++itc)
-    // for (auto&& cond: conds)
-    {
+    // transform conditions... read-only here.
+    v<uptr<Event> > evtv;
+    for (auto&& cond: conds) {
       LOG_TO_(debug, lrun)("placing condn. for eval");
-
-      auto ite = end(evtv) - LOG_EVAL_(distance(itc, last));
-      // evaljobs.emplace_back([=]{
-      // evaluate condition, place result in array
-          *ite = (**itc)();
-      // });
+      evtv.push_back((*cond)());
     }
-    // TODO: threadpool or scheduling here
-    // for (auto&& th: evaljobs)
-    //   th.join();
+    
     LOG_TO_(debug, lrun)("condition eval finished");
 
     LOG_TO_(debug, lrun)("queueing events");
     // queue event results, skip duds
-    for (auto&& e: evtv)
-    {
+    for (auto&& e: evtv) {
       if (!e) continue;
-      evtq.push(move(e));
-    }
 
-    // Scheduling events is the tricky part
-    {
-      // TaskSchedule sched{evtq};
-      // ...?
+      // If threading, scheduling events is the tricky part
+      // queue or some structure that is friendly to concurrency
+      
+      // e->execute()
     }
 
     // # State at end

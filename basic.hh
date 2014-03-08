@@ -26,7 +26,6 @@ using Entity_ptr = Entity*;
 
 // the idea is that a component is only accessed through Compt_addr keys
 using Compt_id = unsigned;
-using Compt_addr = pair<Entity_ptr, Compt_id>;
 
 // a trigger: (expr(:bool), statement)
 struct Condition;

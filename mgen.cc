@@ -74,9 +74,18 @@ ModelGen::ModelGen(Json js):
         for (auto&& child: tp)
         {
           auto ch_name = child.first;
+          // ptree sets this to "" for json arrays
+          // handle using the type name as data name
+          
           auto ch_val = child.second.get_value<string>();
           // LOG_TO_(info, l)("type node: \"", ch_val, '"');
-
+          if (ch_name.empty())
+          {
+            // LOG_(debug)("");
+            // needs to be unique this way
+            ch_name = ch_val;
+          }
+          
           auto dt = dtype::from_string(ch_val);
           // LOG_TO_(info, l)(name, " child: ", ch_name);
 
@@ -92,10 +101,17 @@ ModelGen::ModelGen(Json js):
     begin(_cptclasses), end(_cptclasses), 
     [](CptClasses::value_type v) {return v.second.name() == konst::end_cond_name;}
   );
-  ASSERT_(itc == end(_cptclasses), "end component already defined");
-    
-  auto cpid = make_cpt(konst::end_cond_name, dtype::ty_bool);
-  _switch_cptid = cpid;
+  if (itc != end(_cptclasses))
+    LOG_(warning)("end component redefined");
+
+  // make builtins
+
+  
+  auto swid = make_cpt(konst::end_cond_name, dtype::ty_bool);
+  _switch_cptid = swid;
+
+  auto tmid = make_cpt("_time_", dtype::ty_int);
+  _time_cpid = tmid;
 
   // entities
   for (auto&& c: ents_js? *ents_js : Json()) {

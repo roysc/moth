@@ -11,7 +11,7 @@ struct ControlCtx;
 struct Entity;
 
 // 
-using Compt_data = m<Compt_id, Component>;
+using Compt_data = m<Compt_id, Data>;
 struct Entity
 {
 protected:

@@ -27,7 +27,8 @@ protected:
   CptClasses _cptclasses;
   CptIDs _cpt_ids;
   Compt_id _switch_cptid;
-
+  Compt_id _time_cpid;
+  
 public:
   ModelGen(Json js);
 
@@ -39,6 +40,7 @@ public:
     return ret;
   }
   Compt_id switch_cpt() const {return _switch_cptid;}
+  Compt_id time_cpt() const {return _time_cpid;}
 
   const CptClass* get_class(Compt_id cpid) 
   {

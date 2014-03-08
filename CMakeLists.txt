@@ -45,12 +45,12 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CFLAG_OPT_}")
 # main executable
 add_executable(main
   main.cc
-  entity.cc
   log.cc
+  entity.cc
+  component.cc
+  expression.cc
   controlctx.cc
   mgen.cc
-  component.cc
-  condition.cc
 
   # should be in sep. library
   util/demangle.cc

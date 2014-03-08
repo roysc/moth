@@ -1,8 +1,13 @@
 // -*- coding: utf-8 -*-
 // condition.cc
 
-#include "condition.hh"
 #include "log.hh"
+#include "basic.hh"
+#include "entity.hh"
+
+#include "expression.hh"
+
+Data_ptr Compt_addr::operator()() const {return first->get(second);}
 
 namespace expr
 {
@@ -13,12 +18,12 @@ dtype::Tag ELit::result_of() const {return dtype::tag_of(value.dtype());}
 // reference
 Data ERef::eval() const
 { // data ptr
-  auto dptr = addr.first->get(addr.second);
+  auto dptr = addr();
   return *dptr;
 }
 dtype::Tag ERef::result_of() const
 {
-  auto dptr = addr.first->get(addr.second);
+  auto dptr = addr();
   return dtype::tag_of(dptr->dtype());
 }
 string ERef::to_string() const 

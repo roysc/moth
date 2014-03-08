@@ -14,10 +14,9 @@
 // a data instance, or Value
 struct Data;
 using Data_ptr = Data*;
-using Component = Data;
 
-using Compt_ptr = Component*;
-using Compt_ptr_k = Component const*;
+using Compt_ptr = Data*;
+using Compt_ptr_k = Data const*;
 
 namespace dtype
 {
@@ -77,7 +76,13 @@ protected:
 public:
   Data(dtype::T dt = dtype::ty_N): _dtype(dt), _bytes(dtype::size(dt)) {}
   // Data(dtype::T dt): _dtype(dt), _bytes(dtype::size(dt)) {}
-  Data(Data const&) = default;
+  Data(const Data&) = default;
+
+  void set(const Data& that)
+  {
+    ASSERT_EQ_(_dtype, that._dtype, "Data::set(Data): wrong dtype");
+    _bytes = that._bytes;
+  }
 
   dtype::T dtype() const {return _dtype;}
   const void* raw() const
