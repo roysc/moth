@@ -163,25 +163,24 @@ public:
   }
 
   // function result types
-  dtype::Tag res_dtag() const
+  dtype::T res_dtag() const
   {
-    using dtype::Tag;
-    static const m<OpType, Tag> tbl = {
-      {OpType::op_gt, Tag::boolean},
-      {OpType::op_lt, Tag::boolean},
-      {OpType::op_ge, Tag::boolean},
-      {OpType::op_le, Tag::boolean},
-      {OpType::op_eq, Tag::boolean},
-      {OpType::op_ne, Tag::boolean},
+    static const m<OpType, dtype::T> tbl = {
+      {OpType::op_gt, dtype::ty_bool},
+      {OpType::op_lt, dtype::ty_bool},
+      {OpType::op_ge, dtype::ty_bool},
+      {OpType::op_le, dtype::ty_bool},
+      {OpType::op_eq, dtype::ty_bool},
+      {OpType::op_ne, dtype::ty_bool},
       // maybe want to rethink non-predicate expr's
       // {OpType::op_add, Tag::number},
       // {OpType::op_sub, Tag::number},
       // {OpType::op_mul, Tag::number},
       // {OpType::op_div, Tag::number},
-      {OpType::op_eof, Tag::boolean},
-      {OpType::op_nof, Tag::boolean},
-      {OpType::op_match, Tag::boolean},
-      {OpType::op_not, Tag::boolean},
+      {OpType::op_eof, dtype::ty_bool},
+      {OpType::op_nof, dtype::ty_bool},
+      {OpType::op_match, dtype::ty_bool},
+      {OpType::op_not, dtype::ty_bool},
     };
     auto it = tbl.find(_opn);
     return it != end(tbl)? it->second : THROW_(Not_found, __func__);

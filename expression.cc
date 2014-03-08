@@ -11,7 +11,7 @@ namespace expr
 {
 // literal
 Data ELit::eval() const {return value;}
-dtype::Tag ELit::result_of() const {return dtype::tag_of(value.dtype());}
+dtype::T ELit::result_of() const {return value.dtype();}
 
 // reference
 Data ERef::eval() const
@@ -19,10 +19,10 @@ Data ERef::eval() const
   auto dptr = addr();
   return *dptr;
 }
-dtype::Tag ERef::result_of() const
+dtype::T ERef::result_of() const
 {
   auto dptr = addr();
-  return dtype::tag_of(dptr->dtype());
+  return dptr->dtype();
 }
 string ERef::to_string() const 
 {
@@ -52,7 +52,7 @@ string EFun::to_string() const
   return util::concat('(', oper, ',', argstrs,')');
 }
 
-dtype::Tag EFun::result_of() const {return oper.res_dtag();}
+dtype::T EFun::result_of() const {return oper.res_dtag();}
 
 // implementing overloads makes this messy. semantics will need
 // more careful planning
@@ -83,11 +83,13 @@ Data EFun::eval() const
   FnTbl_key k{oper.optype(), dt_call};
   auto it = eval_fn_tbl().find(k);
   if (it != end(eval_fn_tbl())) {
-    // call function
+
+    // *** call function ***
     return it->second(evalled);
   } else {
     LOG_(warning)("No function defined for ", k);
-    return {};
+    // return nil for dtype
+    return {result_of()};
   }
 }
 

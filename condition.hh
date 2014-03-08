@@ -35,18 +35,16 @@ public:
   // ~~~ m a g i c ~~~
   // Here shall happen the magic
   // Conditions ideally are evaluated in as isolated a context as possible
-  // Condition works as a closure of several (two?) instance (Field)
-  // references, and a (binary?) relationship between them
+  // Condition works as a closure of several Component instances (fields)
+  // references, and a (unary or binary|TODO: N-ary) relationship between them
   // * perhaps analogous to an entity whose components are field references.
   // 
   uptr<Event> operator()()
   {
     uptr<Event> evtp;
 
-    // One way to do this:
     // result data refers to child expression
     // recursively evaluate
-
     auto result = _expr->eval();
     data::Bool res_bool;
     result.set(res_bool);

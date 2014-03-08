@@ -24,7 +24,7 @@ const m<FnTbl_key, Eval_fn>& eval_fn_tbl();
 // expression types
 struct Expr {
   virtual Data eval() const = 0; 
-  virtual dtype::Tag result_of() const = 0;
+  virtual dtype::T result_of() const = 0;
   virtual string to_string() const = 0;
 
   template <class Ch,class Tr>
@@ -43,20 +43,23 @@ struct ELit: Expr {
 public:
   ELit(Data v): value(v) {}
   Data eval() const override;
-  dtype::Tag result_of() const override;
+  dtype::T result_of() const override;
   string to_string() const override {return value.to_string();}
 };
+
 // function/operator
-using Args_own = v<uptr<Expr> >;
-using Args = v<Expr*>;
 struct EFun: Expr {
+  using Args_own = v<uptr<Expr> >;
+  using Args = v<Expr*>;
+
   Operation oper; 
   dtype::Tag dt_res;
   Args_own args;
+
 public:
   EFun(Operation, Args);
   Data eval() const override;
-  dtype::Tag result_of() const override;
+  dtype::T result_of() const override;
   string to_string() const override;
 };
 // compt. value reference
@@ -65,7 +68,7 @@ struct ERef: Expr {
 public:
   ERef(Compt_addr ca): addr(ca) {}
   Data eval() const override;
-  dtype::Tag result_of() const override;
+  dtype::T result_of() const override;
   string to_string() const override;
 };
 } // namespace expr
