@@ -52,7 +52,7 @@ protected:
 public:
   Event(const Stmt* st,
         Compt_addr cpa = {},
-        Data data = {},
+        Data data = {dtype::ty_N},
         Event_ptr n = {}):
     // _kind(k), 
     _data(data), 

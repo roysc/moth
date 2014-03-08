@@ -23,9 +23,14 @@
 #define LOG_PUSH_(logpush_)                         \
   LOG_PUSH_TO_(logpush_, ::logging::get_global_log())
 
-// for gen. lambda captures
+#define LOG_SHOW_(x_) LOG_(debug)("(" #x_ ") = ", (x_))
+
+// log, eval; like
+//  x = 1 + LOG_EVAL_(z); LOG_SHOW_(x);
+//  => "(z) = 3", "(x) = 4"
+// for generic lambda captures
 #ifdef USE_STDCPP14
-#define LOG_SHOW_(x_) (([res_(x_)] {                                   \
+#define LOG_EVAL_(x_) (([res_(x_)] {                                   \
         LOG_(debug)("(show): (" #x_ ") = ", res_);                     \
         return std::forward<std::decay_t<decltype(res_)> const>(res_); \
       })()                                                             \
@@ -37,7 +42,7 @@
   )
 
 #else
-#define LOG_SHOW_(x_) (x_)
+#define LOG_EVAL_(x_) (x_)
 #define LOG_TYPE_(x_) (x_)
 #endif
 

@@ -53,23 +53,28 @@ dtype::Tag EFun::result_of() const {return oper.res_dtag();}
 Data EFun::eval() const
 {
   // recursively evaluate args
+  // args: v<Expr*>
+  // dtags: v<DTag>
   auto dtags = oper.arg_dtags();
   dtype::T dt_call{dtype::ty_N}; // dtype to find overload
-  v<Data> evalled(args.size());
+
+  v<Data> evalled;
   for (size_t i{}; i < args.size(); ++i)
-  { 
+  {
     Data res = args.at(i)->eval();
+    evalled.push_back(res);
     // type check
     auto dt = res.dtype();
     // do an after-eval type/sanity check
     assert((dtags[i] == dtype::tag_of(dt)) 
            && "Wrong arg type during eval()");
-
+    
     // hack. need to identify overload, based on actual arg types
     // but for now they must all be the same. so take one
     if (i==0) dt_call = dt;
   }
-    
+  LOG_SHOW_(evalled);
+
   Tbl_key k{oper.optype(), dt_call};
   auto it = eval_fn_tbl().find(k);
   if (it != end(eval_fn_tbl())) {
@@ -79,7 +84,6 @@ Data EFun::eval() const
     LOG_(warning)("No operation implemented for ", k);
     // return nil
     return {};
-    // return Data(dtype::ty_N);
   }
 }
 

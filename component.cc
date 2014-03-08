@@ -28,7 +28,7 @@ Tag tag_of(T dt)
     // {dtype::ty_tuple, ...},
     // {dtype::ty_expr, sizeof(unsigned*)},
 
-    {dtype::ty_N, Tag::N}
+    // {dtype::ty_N, Tag::N}
   };
   return map.at(dt);
 }

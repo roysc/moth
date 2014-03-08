@@ -76,6 +76,7 @@ protected:
 
 public:
   Data(dtype::T dt = dtype::ty_N): _dtype(dt), _bytes(dtype::size(dt)) {}
+  // Data(dtype::T dt): _dtype(dt), _bytes(dtype::size(dt)) {}
   Data(Data const&) = default;
 
   dtype::T dtype() const {return _dtype;}
@@ -136,7 +137,7 @@ public:
   {                                                                     \
     ASSERT_EQ_(_dtype, (dtype::dt_),                                    \
                "Data::set(" #Type_ "): wrong dtype");                   \
-    *static_cast<data::Type_*>(const_cast<void*>(raw())) = dat_in_;     \
+    *reinterpret_cast<data::Type_*>(&_bytes[0]) = dat_in_;              \
   }
   
   // per-type getters
@@ -146,7 +147,11 @@ public:
   DATA_DEFINE_GET_SET_(RlmDisc, ty_rdisc)
   DATA_DEFINE_GET_SET_(RlmCont, ty_rcont)
   DATA_DEFINE_GET_SET_(Str, ty_str)
-  
 #undef DATA_DEFINE_GET_SET_
-};
+  
+  template <class Ch,class Tr>
+  friend std::basic_ostream<Ch,Tr>& 
+  operator<<(std::basic_ostream<Ch,Tr>& out, const Data& e)
+  {return out << e.to_string();}
+}; // struct Data
 
