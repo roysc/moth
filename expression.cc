@@ -90,7 +90,7 @@ Data EFun::eval() const
     // *** call function ***
     return it->second(evalled);
   } else {
-    LOG_TO_(warning, leval)("No function defined for ", k);
+    LOG_TO_(warning, leval)("No operation defined for ", k);
     // return nil for dtype
     return {result_of()};
   }
@@ -104,7 +104,7 @@ const m<FnTbl_key, Eval_fn>& eval_fn_tbl()
       [](v<Data> as) {                                          \
         LOG_(debug)(OpType::op_, ": " #ATy_ " -> " #RTy_);      \
         auto r0 = as.at(0).get<data::ATy_>();                   \
-        auto r1 = as.at(0).get<data::ATy_>();                   \
+        auto r1 = as.at(1).get<data::ATy_>();                   \
         Data rd{data::RTy_::dtype()};                           \
         rd.set(data::RTy_{r0.value opsym_ r1.value});           \
         return rd;                                              \
@@ -119,7 +119,7 @@ const m<FnTbl_key, Eval_fn>& eval_fn_tbl()
     // not: bool -> bool
     {{OpType::op_not, dtype::ty_bool},
      [](v<Data> as) {
-       LOG_(debug)(OpType::op_not, ": bool -> bool");
+       LOG_(debug)(OpType::op_not, ": Bool -> Bool");
        auto res = as.at(0).get<data::Bool>();
        // return
        Data rd(dtype::ty_bool);
@@ -133,8 +133,6 @@ const m<FnTbl_key, Eval_fn>& eval_fn_tbl()
     EXPR_FNTBL_ENTRY_BINP_2X_(op_ge, >=),
     EXPR_FNTBL_ENTRY_BINP_2X_(op_lt, <),
     EXPR_FNTBL_ENTRY_BINP_2X_(op_le, <=),
-
-    
   };
   
 #undef EXPR_FNTBL_ENTRY_BINP_2X_

@@ -128,10 +128,11 @@ public:
   
   void set(const Data& that)
   {
+    // LOG_(debug)(__PRETTY_FUNCTION__);
     ASSERT_EQ_(_dtype, that._dtype, "Data::set(Data): wrong dtype");
     _bytes = that._bytes;
   }
-  Data& operator=(Data const& that) {set(that); return *this;}
+  // Data& operator=(const Data& that) {set(that); return *this;}
   
   dtype::T dtype() const {return _dtype;}
   const void* raw() const

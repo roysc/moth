@@ -16,17 +16,10 @@ project(Moth)
 # error on non-returning fn., should be default
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror=return-type")
 
-set(Moth_BUILD_KIND "debug")
-# or "release"?
-
 # opt flags
-if (${Moth_BUILD_KIND} MATCHES "debug")
-  set(CFLAG_OPT_ "-O0 -g")
-elseif(${Moth_BUILD_KIND} MATCHES "release")
-  set(CFLAG_OPT_ "-O2")
-endif()
-
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CFLAG_OPT_}")
+# maybe not necessary with cmake
+set(${CMAKE_CXX_FLAGS_DEBUG} "${CMAKE_CXX_FLAGS_DEBUG} -O0 -g")
+set(${CMAKE_CXX_FLAGS_RELEASE} "${CMAKE_CXX_FLAGS_RELEASE} -O2")
 
 # if blah
 set(CFLAG_STD_ "--std=c++11")

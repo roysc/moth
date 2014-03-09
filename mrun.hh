@@ -44,8 +44,9 @@ public:
     auto ctrl_ent = _controlctx->ctrl_entity();
     
     // The 0-condition, ends the game (bool in a builtin component)
-    Compt_addr end_cond = {ctrl_ent, _controlctx->find_class("_end_")};
-
+    Compt_addr end_flag = {ctrl_ent, _controlctx->find_class("_end_")};
+    Compt_addr tm_ctr = {ctrl_ent, _controlctx->find_class("_time_")};
+    
     // transform conditions... read-only here.
     // Create a thread pool, and array of event results, same size as condv
     // for now just in sequence
@@ -73,6 +74,10 @@ public:
     // entities: persist; erase triggered by end condn.
     // events: should all be evaluated, unless early terminated
 
-    return end_cond()->get<data::Bool>().value;
+    // tick
+    data::Int tmct{tm_ctr()->get<data::Int>().value + 1};
+    tm_ctr()->set(tmct);
+    
+    return end_flag()->get<data::Bool>().value;
   }
 };

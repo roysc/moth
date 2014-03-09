@@ -46,10 +46,9 @@ public:
     // result data refers to child expression
     // recursively evaluate
     auto result = _expr->eval();
-    data::Bool res_bool;
-    result.set(res_bool);
+    LOG_(debug)("=> ", result);
     
-    if (res_bool.value) {
+    if (result.get<data::Bool>().value) {
       evtp.reset(new Event(_stmt.get()));
     }
     return evtp;

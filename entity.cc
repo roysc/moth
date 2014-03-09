@@ -11,9 +11,11 @@ Data_ptr Compt_addr::operator()() const {return first->get(second);}
 Entity::Entity(ControlCtx* cx, v<Compt_id> cpts):
   _ctx(cx)
 {
+  LOG_PUSH_(lctor)(__PRETTY_FUNCTION__);
   // "Each C in Cpts represents a component meta-type"
   for (auto&& c : cpts)
     _compts.emplace(c, _ctx->get_class(c)->create());
+  LOG_SHOW_TO_(_compts, lctor);
 }
 
 // O(n)

@@ -79,8 +79,10 @@ public:
     // create warning entity?
     // delete everything?
 
+    Compt_addr end_flag = ctx->ctrl_component("_end_");
+    end_flag()->set(data::Bool{true});
     
-    auto alert = ctx->create_entity({});
+    // auto alert = ctx->create_entity({});
     // 
   }
   string to_string() const {return _name;}

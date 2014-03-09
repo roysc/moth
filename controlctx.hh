@@ -47,6 +47,14 @@ public:
   }
   
   // class lookup, fwd to modelgen
-  const CptClass* get_class(Compt_id cpid) {return _modelgen->get_class(cpid);}
+  const CptClass* get_class(Compt_id cpid) const {return _modelgen->get_class(cpid);}
   Compt_id find_class(string nm) {return _modelgen->find_class(nm);}
+
+  Compt_addr ctrl_component(string nm)
+  {
+    // check name is actual control component
+    auto cpid = find_class(nm);
+    ASSERT_(_ctrl_ent->has(cpid), "Control entity has no component for id = ", cpid);
+    return {_ctrl_ent.get(), cpid};
+  }
 };

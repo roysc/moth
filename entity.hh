@@ -33,6 +33,8 @@ public:
     auto it = _compts.find(id);
     return it != end(_compts) ? &it->second : THROW_(Not_found_T<Compt_id>, id);
   }
+  bool has(Compt_id id) const {return _compts.find(id) != end(_compts);}
+  
   // O(n)
   Compt_ptr find(const string& cn);
 };

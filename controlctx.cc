@@ -22,8 +22,7 @@ ControlCtx::ControlCtx(ModelGen* mg):
 { 
   // _systems:
   auto cpks = _modelgen->component_classes();
-  for (auto&& c : cpks)
-  {
+  for (auto&& c : cpks) {
     auto sh = c.second->system_handle();
     if (sh) _systems.emplace(c.first, sh);
   }
@@ -39,25 +38,21 @@ ControlCtx::ControlCtx(ModelGen* mg):
   // auto end_expr = new expr::EFun(
   //   "!", {new expr::ERef({_ctrl_ent.get(), swid})}
   // );
-  auto end_expr = new expr::ERef({_ctrl_ent.get(), swid});
+  // auto end_expr = new expr::ERef({_ctrl_ent.get(), swid});
   
-  Compt_addr cent_tm;
   auto tm_expr = new expr::EFun("=="_op, {
       new expr::ERef({_ctrl_ent.get(), tmid}),
       new expr::ELit(Data::make<data::Int>(5))
     });
-
-  // auto end_stmt = stmt::Statement(
-  //   konst::gameover_evtspec,    // name "game over"
-  //   EventKind::destroy,         // destroy condition entity
-  //   _ctrl_ent.get());
   auto end_stmt = new stmt::Halt;
-  auto tm_stmt = new stmt::Spawn("_tick_");
+  
+  
+  // auto tm_stmt = new stmt::Spawn("_tick_");
 
-  auto end_cond = new Condition(end_expr, end_stmt);
-  auto tm_cond = new Condition(tm_expr, tm_stmt);
+  // auto end_cond = new Condition(end_expr, end_stmt);
+  auto tm_cond = new Condition(tm_expr, end_stmt);
 
-  _conditions.emplace(end_cond);
+  // _conditions.emplace(end_cond);
   _conditions.emplace(tm_cond);
 }
 
