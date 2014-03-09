@@ -34,11 +34,12 @@
 
 #define THROW_DIAGS_(Type_, w_)                 \
   throw (err::WrapDiagnostics<err::Type_>(      \
-           (w_),                                \
+           err::Type_{w_}                       \
+         ).set_diagnostics(                     \
            ERR_THROWFILE_ARG_,                  \
            ERR_THROWLINE_ARG_,                  \
            ERR_THROWFUNC_ARG_                   \
-         ))                                     \
+         ))
   
 // // throw with template arg
 // #define THROW_BASIC_ARG_(Type_, w_, a_)         \
@@ -56,12 +57,26 @@ namespace err
 template <class Err>
 struct WrapDiagnostics: public Err
 {
-  // keep these around for later
+  // to ensure validity of what() return value until destruction
+  string _what;
   string _file; int _line; string _func;
-  WrapDiagnostics(string w, string fl, int l, string fn):
-    Err(util::concat("[", fl, ":", l, "] (", fn, "): ", w)),
-    _file(fl), _line(l), _func(fn) 
+  WrapDiagnostics(Err e):
+    Err(e), _what(e.what()),
+    _file{}, _line{}, _func{}
   {}
+  WrapDiagnostics& set_diagnostics(string fl, int l, string fn)
+  {
+    _file = fl; _line = l; _func = fn;
+    // set string
+    _what.clear();
+    if (!_file.empty())
+      _what += util::concat("[", _file, _line? util::concat(":", _line) : "", "]");
+    if (!_func.empty())
+      _what += "(" + _func + "): ";
+    _what += Err::what();
+    return *this;
+  }
+  const char* what() const noexcept override {return _what.c_str();}
 };
 
 // runtime
@@ -69,7 +84,18 @@ struct Runtime: public std::runtime_error
 {using runtime_error::runtime_error;};
 
 struct Invalid: public Runtime {using Runtime::Runtime;};
-struct Not_found: public Runtime {using Runtime::Runtime;};
+template <class T>
+struct Not_found_T: public Runtime
+{
+  T _value;
+  // using Runtime::Runtime;
+  Not_found_T(const T& x):
+    Runtime(util::concat(x)),
+    _value(x) {}
+};
+template <>
+struct Not_found_T<void>: public Runtime {using Runtime::Runtime;};
+using Not_found = Not_found_T<void>;
 
 // Logic
 struct Logic: public std::logic_error

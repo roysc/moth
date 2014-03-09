@@ -28,7 +28,11 @@ public:
   Entity(ControlCtx* cx, v<Compt_id> cpts);  
 
   // O(log n)
-  Compt_ptr get(const Compt_id id) {return &_compts.at(id);}
+  Compt_ptr get(Compt_id id)
+  {
+    auto it = _compts.find(id);
+    return it != end(_compts) ? &it->second : THROW_(Not_found_T<unsigned>, id);
+  }
   // O(n)
   Compt_ptr find(const string& cn);
 };
