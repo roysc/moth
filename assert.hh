@@ -21,28 +21,29 @@
 // Show arguments, like gtest
 
 // operator-style
-#define ASSERT_BINOP_(a_, b_, op_, ...)                                  \
-  do {                                                                  \
-    const auto aval_ = (a_);                                            \
-    const auto bval_ = (b_);                                            \
-    ASSERT_WHAT_(                                                       \
-      aval_ op_ bval_,                                                  \
-      #a_ " " #op_ " " #b_,                                             \
-      "[" #a_ " = ", aval_, " ; " #b_ " = ", bval_, "]: ",               \
-      __VA_ARGS__                                                       \
-    );                                                                  \
+#define ASSERT_BINOP_(a_, b_, op_, ...)                     \
+  do {                                                      \
+    const auto aval_ = (a_);                                \
+    const auto bval_ = (b_);                                \
+    ASSERT_WHAT_(                                           \
+      aval_ op_ bval_,                                      \
+      #a_ " " #op_ " " #b_,                                 \
+      "[" #a_ " = ", aval_, " ; " #b_ " = ", bval_, "]: ",  \
+      __VA_ARGS__                                           \
+    );                                                      \
   } while (0)
+
 // function-pred
-#define ASSERT_PRED2_(a_, b_, pred_, ...)                                  \
-  do {                                                                  \
-    const auto aval_ = (a_);                                            \
-    const auto bval_ = (b_);                                            \
-    ASSERT_WHAT_(                                                       \
-      pred_(aval_, bval_),                                              \
-      #pred_ "(" #a_ ", " #b_ ")",                                      \
-      "[" #a_ " = ", aval_, " ; " #b_ " = ", bval_, "]: ",               \
-      __VA_ARGS__                                                       \
-    );                                                                  \
+#define ASSERT_PRED2_(a_, b_, pred_, ...)                   \
+  do {                                                      \
+    const auto aval_ = (a_);                                \
+    const auto bval_ = (b_);                                \
+    ASSERT_WHAT_(                                           \
+      pred_(aval_, bval_),                                  \
+      #pred_ "(" #a_ ", " #b_ ")",                          \
+      "[" #a_ " = ", aval_, " ; " #b_ " = ", bval_, "]: ",  \
+      __VA_ARGS__                                           \
+    );                                                      \
   } while (0)
 
 #define ASSERT_EQ_(a_, b_, ...)                 \

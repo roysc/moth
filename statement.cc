@@ -17,6 +17,6 @@ void Halt::execute(ControlCtx* ctx) const
     
   // auto alert = ctx->create_entity({});
   //
-  LOG_(info)("Halt was signalled");
+  LOG_(info)("Halt was triggered");
 }
 }

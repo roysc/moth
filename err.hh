@@ -84,6 +84,7 @@ struct Runtime: public std::runtime_error
 {using runtime_error::runtime_error;};
 
 struct Invalid: public Runtime {using Runtime::Runtime;};
+struct Not_found: public Runtime {using Runtime::Runtime;};
 template <class T>
 struct Not_found_T: public Runtime
 {
@@ -93,9 +94,6 @@ struct Not_found_T: public Runtime
     Runtime(util::concat(x)),
     _value(x) {}
 };
-template <>
-struct Not_found_T<void>: public Runtime {using Runtime::Runtime;};
-using Not_found = Not_found_T<void>;
 
 // Logic
 struct Logic: public std::logic_error

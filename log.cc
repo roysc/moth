@@ -16,14 +16,14 @@ Log& get_global_log()
   return *s_log;
 }
 
-// Log& get_thread_log() 
-// {
-//   auto tid = std::this_thread::get_id();
-//   thread_local uptr<Log> th_log(
-//     new Log(util::concat("thread(", tid, ')'), std::cout)
-//   );
-//   assert(th_log && "thread-local Log was deleted");
-//   return *th_log;
-// }
+Log& get_thread_log() 
+{
+  auto tid = std::this_thread::get_id();
+  thread_local uptr<Log> th_log(
+    new Log(util::concat("thread(", tid, ')'), std::cout)
+  );
+  assert(th_log && "thread-local Log was deleted");
+  return *th_log;
+}
 
 }
