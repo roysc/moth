@@ -30,6 +30,7 @@
 #define LOG_PUSH_(logpush_)                         \
   LOG_PUSH_TO_(logpush_, ::logging::get_global_log())
 
+#define LOG_SHOW_TO_(x_, log_) LOG_TO_(debug, log_)("(" #x_ ") = ", (x_))
 #define LOG_SHOW_(x_) LOG_(debug)("(" #x_ ") = ", (x_))
 
 // log, eval; like

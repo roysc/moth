@@ -40,11 +40,12 @@ public:
     return it != end(_cptclasses) ? &it->second : nullptr;
   }
 
-  const CptClass* find_class(string nm) 
+  Compt_id find_class(string nm) 
   {
-    auto it = find_if(begin(_cptclasses), end(_cptclasses),
-                      [=](CptClasses::value_type p) {return p.second.name() == nm;});
-    return it != end(_cptclasses) ? &it->second : nullptr;
+    auto it = find_if(
+      begin(_cptclasses), end(_cptclasses),
+      [=](CptClasses::value_type p) {return p.second.name() == nm;});
+    return it != end(_cptclasses) ? it->first : THROW_(Not_found, nm);
   }
   
   // stupid

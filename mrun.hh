@@ -41,31 +41,21 @@ public:
   {
     LOG_PUSH_(lrun)(__PRETTY_FUNCTION__);
 
-    // # The 0-condition
-    // # meet this to end the game (just a bool in primary System)
-    // LOG_TO_(info, lrun)("setting end condition");
-    // auto end_cond = _controlctx->end_cond();
-
-    LOG_TO_(info, lrun)("setting conditions");
-    auto conds = _controlctx->conditions();
-
-    // show initial conditions
-    LOG_TO_(debug, lrun)("conditions:");
-    for (auto&& c: conds) 
-      LOG_TO_(debug, lrun)('\t', *c);
-
-    // Create a thread pool, and array of event results, same size as condv
-    // for now just a thread vector
-    LOG_TO_(info, lrun)("starting eval");
+    auto ctrl_ent = _controlctx->ctrl_entity();
+    
+    // The 0-condition, ends the game (bool in a builtin component)
+    Compt_addr end_cond = {ctrl_ent, _controlctx->find_class("_end_")};
 
     // transform conditions... read-only here.
+    // Create a thread pool, and array of event results, same size as condv
+    // for now just in sequence
     v<uptr<Event> > evtv;
-    for (auto&& cond: conds) {
-      LOG_TO_(debug, lrun)("placing condn. for eval");
+    
+    LOG_PUSH_(lcond)("evaluating conditions:");
+    for (auto&& cond: _controlctx->conditions()) {    
+      LOG_TO_(debug, lcond)(*cond);
       evtv.push_back((*cond)());
     }
-    
-    LOG_TO_(debug, lrun)("condition eval finished");
 
     LOG_TO_(debug, lrun)("queueing events");
     // queue event results, skip duds
@@ -76,12 +66,11 @@ public:
       // queue or some structure that is friendly to concurrency
       
       e->happen(_controlctx);
-      
     }
 
-    // # State at end
-    // # self._conditions = uneval'd conditions (may be some met)
-    // # self._entities = 
-    // # events = last delivered events
+    // State at end:
+    // conditions: for next tick
+    // entities: persist; erase triggered by end condn.
+    // events: should all be evaluated, unless early terminated
   }
 };

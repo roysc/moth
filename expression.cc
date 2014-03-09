@@ -59,6 +59,8 @@ dtype::T EFun::result_of() const {return oper.res_dtag();}
 // more careful planning
 Data EFun::eval() const
 {
+  LOG_PUSH_(leval)(__PRETTY_FUNCTION__);
+  
   // recursively evaluate args
   // args: v<Expr*>
   // dtags: v<DTag>
@@ -79,7 +81,7 @@ Data EFun::eval() const
     // but for now they must all be the same. so take one
     if (i==0) dt_call = dt;
   }
-  LOG_SHOW_(evalled);
+  LOG_SHOW_TO_(evalled, leval);
 
   FnTbl_key k{oper.optype(), dt_call};
   auto it = eval_fn_tbl().find(k);
@@ -88,7 +90,7 @@ Data EFun::eval() const
     // *** call function ***
     return it->second(evalled);
   } else {
-    LOG_(warning)("No function defined for ", k);
+    LOG_TO_(warning, leval)("No function defined for ", k);
     // return nil for dtype
     return {result_of()};
   }
