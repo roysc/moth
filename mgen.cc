@@ -7,13 +7,12 @@
 
 #include "mgen.hh"
 
-const m<string, dtype::T> ModelGen::builtins = {
-  {"_end_", dtype::ty_bool},
-  {"_time_", dtype::ty_int},
-};
-
 ModelGen::ModelGen(Json js):
-  _next_id{}
+  _next_id{},
+  _builtins{
+    {"_end_", dtype::ty_bool},
+    {"_time_", dtype::ty_int}
+  }
 {
   LOG_PUSH_(l)(__PRETTY_FUNCTION__);
 
@@ -46,10 +45,22 @@ ModelGen::ModelGen(Json js):
     return cpid;
   };
 
+  // make builtins:
+  //  switch component (end condition result)
+  //  time counter
+  for (auto&& b: _builtins) {
+    _ctrl_cpts.emplace(b.first, make_cpt(b.first, b.second));
+  }
+
   // process components
   for (auto&& c: cpts_js? *cpts_js : Json()) {
     // name. easy.
     auto name = c.second.get<string>("name");
+    { // check for confusion
+      auto itc = _ctrl_cpts.find(name);
+      if (itc != end(_ctrl_cpts))
+        LOG_(warning)("builtin \"", name, "\" redefined (ignoring)");
+    }
 
     // get the system specs for the component
     // not sure how this works yet
@@ -100,21 +111,6 @@ ModelGen::ModelGen(Json js):
       }
     } // get types
   } // process components
-
-  // make builtins:
-  //  switch component (end condition result)
-  //  time counter
-  for (auto&& builtin: builtins) {
-    auto nm = builtin.first;
-    auto itc = find_if(
-      begin(_cptclasses), end(_cptclasses), 
-      [=](CptClasses::value_type v) {return v.second.name() == nm;}
-    );
-    if (itc != end(_cptclasses))
-      LOG_(warning)("builtin ", builtin, " redefined (ignoring)");
-  
-    _ctrl_cpts.emplace(nm, make_cpt(nm, builtin.second));
-  }
 
   // entities
   for (auto&& c: ents_js? *ents_js : Json()) {

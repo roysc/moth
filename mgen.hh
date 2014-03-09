@@ -20,7 +20,7 @@ protected:
   CptClasses _cptclasses;
   CptIDs _cpt_ids;
   m<string, Compt_id> _ctrl_cpts;
-  static const m<string, dtype::T> builtins;
+  const m<string, dtype::T> _builtins;
   
 public:
   ModelGen(Json js);
