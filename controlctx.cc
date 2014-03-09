@@ -42,7 +42,7 @@ ControlCtx::ControlCtx(ModelGen* mg):
   auto end_expr = new expr::ERef({_ctrl_ent.get(), swid});
   
   Compt_addr cent_tm;
-  auto tm_expr = new expr::EFun("==", {
+  auto tm_expr = new expr::EFun("=="_op, {
       new expr::ERef({_ctrl_ent.get(), tmid}),
       new expr::ELit(Data::make<data::Int>(5))
     });

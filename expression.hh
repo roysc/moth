@@ -14,9 +14,6 @@
 
 namespace expr
 {
-// using Cptrs = v<Compt_ptr>;
-// using Cptaddrs = v<Compt_addr>;
-// using DataIndex = pair<Data, Compt_addr>;
 using FnTbl_key = pair<OpType, dtype::T>;
 using Eval_fn = fn<Data(v<Data>)>;
 const m<FnTbl_key, Eval_fn>& eval_fn_tbl();

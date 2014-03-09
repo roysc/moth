@@ -125,8 +125,8 @@ protected:
 
 public:
   Operation(OpType op): _opn(op) {}
-  Operation(const string& e): Operation(to_operation(e)) {}
-  Operation(const char* e): Operation(string(e)) {}
+  explicit Operation(const string& e): Operation(to_operation(e)) {}
+  explicit Operation(const char* e): Operation(string(e)) {}
   // check validity of string
   // static bool valid(const string& e) {return true;}
 
@@ -189,3 +189,8 @@ public:
   std::size_t arity() const {return arg_dtags().size();}
 };
 }
+
+// allow "*"_op syntax
+inline expr::Operation
+operator"" _op(const char* str, size_t sz)
+{return expr::Operation{str};}
