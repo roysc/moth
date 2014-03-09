@@ -39,6 +39,12 @@ enum T: unsigned
 enum class Tag: unsigned
 { boolean, number, realm, expr, any, N };
 
+// subtyping relationships on Tags
+// "any term of type S can be safely used in a context where a
+//  term of type T is expected" -WP
+bool operator%(Tag s, Tag t);
+bool operator%(dtype::T s, Tag t);
+
 template <class Ch,class Tr>
 std::basic_ostream<Ch,Tr>& 
 operator<<(std::basic_ostream<Ch,Tr>& out, Tag tag)
@@ -57,6 +63,10 @@ operator<<(std::basic_ostream<Ch,Tr>& out, Tag tag)
     THROW_(Not_found, __PRETTY_FUNCTION__);
   return out;
 }
+
+unsigned size(T dt);
+T from_string(string s);
+string to_string(T dt);
 }
 
 namespace data
@@ -90,14 +100,6 @@ struct Str {
   int _;
   static dtype::T dtype() {return dtype::ty_str;}
 };
-}
-
-namespace dtype 
-{
-Tag tag_of(T dt);
-unsigned size(T dt);
-T from_string(string s);
-string to_string(T dt);
 }
 
 // Tagged union-ish type

@@ -138,7 +138,10 @@ public:
   OpType optype() const {return _opn;}
   // bool operator<(Operation const& that) {return _opn < that._opn;}
 
-  // function arg types
+  // function arg type "kinds"; like subtyping, but not sure about this yet.
+  // it's used now to "promote" results that can form valid C++
+  // expressions together (int, float for now)
+  // * see EFun::EFun type-check
   v<dtype::Tag> arg_dtags() const
   {
     using dtype::Tag;
@@ -167,8 +170,8 @@ public:
   {
     static const m<OpType, dtype::T> tbl = {
       {OpType::op_gt, dtype::ty_bool},
-      {OpType::op_lt, dtype::ty_bool},
       {OpType::op_ge, dtype::ty_bool},
+      {OpType::op_lt, dtype::ty_bool},
       {OpType::op_le, dtype::ty_bool},
       {OpType::op_eq, dtype::ty_bool},
       {OpType::op_ne, dtype::ty_bool},

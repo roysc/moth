@@ -5,7 +5,8 @@
 
 namespace dtype
 {
-
+namespace
+{
 Tag tag_of(T dt)
 {
   const m<T, Tag> map = {
@@ -32,6 +33,31 @@ Tag tag_of(T dt)
   };
   return map.at(dt);
 }
+}
+
+bool operator%(Tag s, Tag t)
+{
+  switch (t) {
+  case Tag::N: return false;
+  case Tag::any: return true;
+  case Tag::number:
+    return s == Tag::number
+      // s realm can be converted to a real number
+      || s == Tag::realm;
+  case Tag::boolean:
+    return s == Tag::boolean
+      || s == Tag::number;
+      // || s == Tag::realm;
+  case Tag::realm:
+    // actually realms only make sense if they are dealt with separately
+    return s == Tag::realm;
+  default:
+    LOG_(debug)(__PRETTY_FUNCTION__, ": default case; t = ", t);
+    return {};
+  }
+}
+
+bool operator%(dtype::T s, Tag t) {return tag_of(s) % t;};
 
 unsigned size(T dt) 
 {
