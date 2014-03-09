@@ -9,7 +9,7 @@
 
 #include "log.hh"
 #include "event.hh"
-#include "condition.hh"
+#include "trigger.hh"
 #include "cptclass.hh"
 #include "controlctx.hh"
 
@@ -52,8 +52,8 @@ public:
     // for now just in sequence
     v<uptr<Event> > evtv;
     
-    LOG_PUSH_(lcond)("evaluating conditions:");
-    for (auto&& cond: _controlctx->conditions()) {    
+    LOG_PUSH_(lcond)("evaluating triggers:");
+    for (auto&& cond: _controlctx->triggers()) {    
       LOG_TO_(debug, lcond)(*cond);
       evtv.push_back((*cond)());
     }
@@ -62,7 +62,7 @@ public:
     // queue event results, skip duds
     for (auto&& e: evtv) {
       if (!e) continue;
-
+      
       // If threading, scheduling events is the tricky part
       // queue or some structure that is friendly to concurrency
       
@@ -70,7 +70,7 @@ public:
     }
 
     // State at end:
-    // conditions: for next tick
+    // triggers: for next tick
     // entities: persist; erase triggered by end condn.
     // events: should all be evaluated, unless early terminated
 

@@ -33,6 +33,7 @@ add_executable(main
   entity.cc
   component.cc
   expression.cc
+  statement.cc
   controlctx.cc
   mgen.cc
 

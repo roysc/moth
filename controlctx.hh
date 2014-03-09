@@ -3,7 +3,7 @@
 #pragma once
 
 // #include "cptclass.hh"
-// #include "condition.hh"
+#include "trigger.hh"
 #include "entity.hh"
 #include "mgen.hh"
 
@@ -19,11 +19,11 @@ struct ControlCtx
 protected:
   ModelGen* _modelgen;
   m<Compt_id, SystemHandle*> _systems;
-  // entity and condition data
-  set<Cond_ptr> _conditions;
+  // entity and trigger data
+  set<uptr<Trigger> > _triggers;
   set<uptr<Entity> > _entities;
   // control 
-  // uptr<Condition> _end_cond;
+  // uptr<Trigger> _end_cond;
   uptr<Entity> _ctrl_ent;
 
 public:
@@ -36,7 +36,12 @@ public:
     for (auto&& e: _entities) ret.insert(e.get());
     return ret;
   }
-  set<Cond_ptr> conditions() const {return _conditions;}
+  set<Trigger*> triggers() const
+  {
+    set<Trigger*> ret;
+    for (auto&& t: _triggers) ret.insert(t.get());
+    return ret;
+  }
   m<Compt_id, SystemHandle*> systems() const {return _systems;}
   // The control entity. Possibly not useful directly
   Entity_ptr ctrl_entity() const {return _ctrl_ent.get();}

@@ -1,5 +1,5 @@
 // -*- coding: utf-8 -*-
-// condition.cc
+// trigger.cc
 
 #include "log.hh"
 #include "basic.hh"

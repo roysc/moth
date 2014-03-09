@@ -5,9 +5,6 @@
 #include "log.hh"
 #include "typedefs.hh"
 #include "expression.hh"
-#include "controlctx.hh"
-
-// struct ControlCtx;
 
 namespace stmt
 {
@@ -73,18 +70,7 @@ struct Halt: Signal
 {
 public:
   Halt(): Signal("_halt_") {}
-  void execute(ControlCtx* ctx) const override
-  {
-    LOG_(debug)(__PRETTY_FUNCTION__);
-    // create warning entity?
-    // delete everything?
-
-    Compt_addr end_flag = ctx->ctrl_component("_end_");
-    end_flag()->set(data::Bool{true});
-    
-    // auto alert = ctx->create_entity({});
-    // 
-  }
+  void execute(ControlCtx* ctx) const override;
   string to_string() const {return _name;}
 };
 }

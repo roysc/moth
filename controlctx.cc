@@ -4,7 +4,7 @@
 #include "controlctx.hh"
 #include "expression.hh"
 #include "statement.hh"
-#include "condition.hh"
+#include "trigger.hh"
 
 // "Contexts" for components needing centralized control
 // eg. Location/coordinates
@@ -17,7 +17,7 @@ struct ControlCtx;
 ControlCtx::ControlCtx(ModelGen* mg):
   _modelgen(mg),
   _systems(),
-  _conditions(),
+  _triggers(),
   _entities()
 { 
   // _systems:
@@ -27,9 +27,9 @@ ControlCtx::ControlCtx(ModelGen* mg):
     if (sh) _systems.emplace(c.first, sh);
   }
 
-  // The condition, which when evaluated as true, ends the game;
+  // The trigger, which when evaluated as true, ends the game;
   // eg. run ends after 4 "days"
-  // Condition(= time.n_day 4) -> Halt()
+  // Trigger(= time.n_day 4) -> Halt()
   // Cond_ptr end_cond() const {return _end_cond.get();}
   auto swid = _modelgen->control_cpt("_end_");
   auto tmid = _modelgen->control_cpt("_time_");
@@ -49,11 +49,11 @@ ControlCtx::ControlCtx(ModelGen* mg):
   
   // auto tm_stmt = new stmt::Spawn("_tick_");
 
-  // auto end_cond = new Condition(end_expr, end_stmt);
-  auto tm_cond = new Condition(tm_expr, end_stmt);
+  // auto end_cond = new Trigger(end_expr, end_stmt);
+  auto tm_cond = new Trigger(tm_expr, end_stmt);
 
-  // _conditions.emplace(end_cond);
-  _conditions.emplace(tm_cond);
+  // _triggers.emplace(end_cond);
+  _triggers.emplace(tm_cond);
 }
 
 // const CptClass* get_class(Compt_id cpid) {return _modelgen->get_class(cpid);}

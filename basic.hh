@@ -25,8 +25,8 @@ struct Entity;
 using Entity_ptr = Entity*;
 
 // a trigger: (expr(:bool), statement)
-struct Condition;
-using Cond_ptr = Condition*;
+struct Trigger;
+using Trig_ptr = Trigger*;
 
 // unique identifier for component class
 using Compt_id = unsigned;
