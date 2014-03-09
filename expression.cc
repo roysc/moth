@@ -40,8 +40,9 @@ EFun::EFun(Operation o, Args as):
   ASSERT_EQ_(oper.arity(), args.size(), "arity");
   auto dtags = oper.arg_dtags();
   for (size_t i{}; i < args.size(); ++i) { 
-    auto dtag = args[i]->result_of();
-    // ASSERT_EQ_(dtags[i], dtag, "Wrong argument tag");
+    auto dtr = args[i]->result_of();
+    // subtyping relationship, {dtr <: dtags}
+    ASSERT_BINOP_(dtr, dtags[i], %, "Invalid arg type");
   }
 }
 string EFun::to_string() const
@@ -96,6 +97,22 @@ Data EFun::eval() const
 // eval functions
 const m<FnTbl_key, Eval_fn>& eval_fn_tbl()
 {
+#define EXPR_FNTBL_ENTRY_BINP_(op_, opsym_, ATy_, RTy_)         \
+  {{OpType::op_, data::ATy_::dtype()},                          \
+      [](v<Data> as) {                                          \
+        LOG_(debug)(OpType::op_, ": " #ATy_ " -> " #RTy_);      \
+        auto r0 = as.at(0).get<data::ATy_>();                   \
+        auto r1 = as.at(0).get<data::ATy_>();                   \
+        Data rd{data::RTy_::dtype()};                           \
+        rd.set(data::RTy_{r0.value opsym_ r1.value});           \
+        return rd;                                              \
+      }                                                         \
+  }
+#define EXPR_FNTBL_ENTRY_BINP_2X_(op_, opsym_)          \
+  EXPR_FNTBL_ENTRY_BINP_(op_, opsym_, Int, Bool),       \
+  EXPR_FNTBL_ENTRY_BINP_(op_, opsym_, Float, Bool)
+
+  
   static const m<FnTbl_key, Eval_fn> _eval_fn_tbl = {
     // not: bool -> bool
     {{OpType::op_not, dtype::ty_bool},
@@ -108,7 +125,19 @@ const m<FnTbl_key, Eval_fn>& eval_fn_tbl()
        return rd;
      }
     },
+    EXPR_FNTBL_ENTRY_BINP_2X_(op_eq, ==),
+    EXPR_FNTBL_ENTRY_BINP_2X_(op_ne, !=),
+    EXPR_FNTBL_ENTRY_BINP_2X_(op_gt, >),
+    EXPR_FNTBL_ENTRY_BINP_2X_(op_ge, >=),
+    EXPR_FNTBL_ENTRY_BINP_2X_(op_lt, <),
+    EXPR_FNTBL_ENTRY_BINP_2X_(op_le, <=),
+
+    
   };
+  
+#undef EXPR_FNTBL_ENTRY_BINP_2X_
+#undef EXPR_FNTBL_ENTRY_BINP_
+  
   return _eval_fn_tbl;
 }
 
