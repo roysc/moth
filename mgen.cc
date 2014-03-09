@@ -25,9 +25,13 @@ ModelGen::ModelGen(Json js):
 
   // Create CptClass
   auto make_cpt = [&l, this](string n, dtype::T dt) -> Compt_id {
-    LOG_PUSH_TO_(lmk, l)("creating: ", n, ": ", dtype::to_string(dt));
 
     auto cpid = fresh_id();
+    LOG_PUSH_TO_(lmk, l)(
+      "creating: ", n,
+      " (id: ", cpid, ", type: ", dtype::to_string(dt), ')'
+    );
+    
     auto insr = _cptclasses.emplace(cpid, CptClass(this, n, dt));
     if (!insr.second)
       LOG_TO_(error, lmk)("CptClass insertion failed");

@@ -31,7 +31,7 @@ public:
   Compt_ptr get(Compt_id id)
   {
     auto it = _compts.find(id);
-    return it != end(_compts) ? &it->second : THROW_(Not_found_T<unsigned>, id);
+    return it != end(_compts) ? &it->second : THROW_(Not_found_T<Compt_id>, id);
   }
   // O(n)
   Compt_ptr find(const string& cn);

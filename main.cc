@@ -33,10 +33,13 @@ int main(int argc, const char* argv[])
   LOG_TO_(info, lmain)("creating ModelRun");
   ModelRun mr(&ctx);
 
-  LOG_TO_(info, lmain)("run_events");
-  mr.run_events();
-  // do stuff
-  // control sim.
-
+  // LOG_TO_(info, lmain)("run_events");
+  // mr.run_events();
+  
+  LOG_PUSH_TO_(lloop, lmain)("main loop");
+  bool end_cond{};
+  while (!(end_cond = mr.run_events()))
+  {}
+  
   return 0;
 }

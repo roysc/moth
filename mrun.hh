@@ -37,7 +37,7 @@ public:
   // #
   // # met conditions trigger events
   // # create set of Events
-  void run_events()
+  bool run_events()
   {
     LOG_PUSH_(lrun)(__PRETTY_FUNCTION__);
 
@@ -72,5 +72,7 @@ public:
     // conditions: for next tick
     // entities: persist; erase triggered by end condn.
     // events: should all be evaluated, unless early terminated
+
+    return end_cond()->get<data::Bool>().value;
   }
 };
