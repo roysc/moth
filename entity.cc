@@ -18,6 +18,8 @@ Entity::Entity(ControlCtx* cx, v<Compt_id> cpts):
   LOG_SHOW_TO_(_compts, lctor);
 }
 
+string Entity::get_name(Compt_id id) const {return _ctx->get_class(id)->name();}
+
 // O(n)
 Compt_ptr Entity::find(const string& cn) 
 {

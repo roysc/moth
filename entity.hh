@@ -20,7 +20,7 @@ using Compt_data = m<Compt_id, Data>;
 struct Entity
 {
 protected:
-  ControlCtx* _ctx;
+  const ControlCtx* _ctx;
   Compt_data _compts;
   
 public:
@@ -35,6 +35,8 @@ public:
   }
   bool has(Compt_id id) const {return _compts.find(id) != end(_compts);}
   Compt_addr ref(Compt_id id) {return {this, id};}
+  // string name of component
+  string get_name(Compt_id id) const;
   
   // O(n)
   Compt_ptr find(const string& cn);

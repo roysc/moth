@@ -14,25 +14,22 @@
 #include "controlctx.hh"
 
 // "Runnable model."
-// # 1. instantiate systems
-// # 2. start iterating:
-// #   x = end condition
-// #   until x()
-// #     k = new conditions met
-// #     e = yesterday's entities
-// #     v = new events(k)
-// #     e <- e + new entities(v)
-// #     c <- update(c, v)
-// #
+// 1. instantiate systems
+// 2. start iterating:
+//   x = end condition
+//   until x()
+//     k = new conditions met
+//     e = yesterday's entities
+//     v = new events(k)
+//     e <- e + new entities(v)
+//     c <- update(c, v)
 namespace run
 {
 // transform conditions... read-only here.
-// Create a thread pool, and array of event results, same size as condv
-// for now just in sequence
 v<uptr<Event> > eval_triggers(ControlCtx& ctx)
 {
   v<uptr<Event> > evtv;
-  LOG_PUSH_(ltrig)(__PRETTY_FUNCTION__);
+  LOG_PUSH_(ltrig)(__func__);
   for (auto&& cond: ctx.triggers()) {    
     LOG_TO_(debug, ltrig)(*cond);
     auto e = (*cond)();

@@ -3,6 +3,7 @@
 #pragma once
 
 // #include "cptclass.hh"
+#include "log.hh"
 #include "statement.hh"
 #include "trigger.hh"
 #include "entity.hh"
@@ -48,7 +49,7 @@ public:
   Entity_ptr create_entity(v<Compt_id> cs)
   {
     auto insr = _entities.emplace(new Entity(this, cs));
-    return insr.second? insr.first->get() : LOG_EVALN_(nullptr, __func__);
+    return insr.second? insr.first->get() : LOG_EVAL_(nullptr);
   }
   bool set_trigger(Trigger* t) {return _triggers.emplace(t).second;}
 
