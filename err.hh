@@ -72,7 +72,7 @@ struct WrapDiagnostics: public Err
     if (!_file.empty())
       _what += util::concat("[", _file, _line? util::concat(":", _line) : "", "]");
     if (!_func.empty())
-      _what += "(" + _func + "): ";
+      _what += "[" + _func + "]: ";
     _what += Err::what();
     return *this;
   }

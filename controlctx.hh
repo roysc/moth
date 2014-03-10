@@ -3,6 +3,7 @@
 #pragma once
 
 // #include "cptclass.hh"
+#include "statement.hh"
 #include "trigger.hh"
 #include "entity.hh"
 #include "mgen.hh"
@@ -42,24 +43,20 @@ public:
     for (auto&& t: _triggers) ret.insert(t.get());
     return ret;
   }
-  m<Compt_id, SystemHandle*> systems() const {return _systems;}
-  // The control entity. Possibly not useful directly
-  Entity_ptr ctrl_entity() const {return _ctrl_ent.get();}
+  // m<Compt_id, SystemHandle*> systems() const {return _systems;}
+  // create ents., triggers
   Entity_ptr create_entity(v<Compt_id> cs)
   {
     auto insr = _entities.emplace(new Entity(this, cs));
     return insr.second? insr.first->get() : LOG_EVALN_(nullptr, __func__);
   }
+  bool set_trigger(Trigger* t) {return _triggers.emplace(t).second;}
+
+  // handle a Signal object throw from event loop
+  // relies on dynamic type
+  bool handle_signal(const stmt::Signal& sig) {return !sig.fatal();}
   
   // class lookup, fwd to modelgen
   const CptClass* get_class(Compt_id cpid) const {return _modelgen->get_class(cpid);}
   Compt_id find_class(string nm) {return _modelgen->find_class(nm);}
-
-  Compt_addr ctrl_component(string nm)
-  {
-    // check name is actual control component
-    auto cpid = find_class(nm);
-    ASSERT_(_ctrl_ent->has(cpid), "Control entity has no component for id = ", cpid);
-    return {_ctrl_ent.get(), cpid};
-  }
 };

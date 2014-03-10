@@ -14,19 +14,19 @@ ModelGen::ModelGen(Json js):
     {"_time_", dtype::ty_int}
   }
 {
-  LOG_PUSH_(l)(__PRETTY_FUNCTION__);
+  LOG_PUSH_(lctor)(__PRETTY_FUNCTION__);
 
   // js = json.load(fp)
-  LOG_TO_(info, l)("loading JSON");
+  LOG_TO_(info, lctor)("loading JSON");
     
   auto cpts_js = js.get_child_optional("components");
   auto ents_js = js.get_child_optional("entities");
 
   // Create CptClass
-  auto make_cpt = [&l, this](string n, dtype::T dt) -> Compt_id {
-
+  auto make_cpt = [&lctor, this](string n, dtype::T dt) -> Compt_id
+    {
     auto cpid = fresh_id();
-    LOG_PUSH_TO_(lmk, l)(
+    LOG_PUSH_TO_(lmk, lctor)(
       "creating: ", n,
       " (id: ", cpid, ", type: ", dtype::to_string(dt), ')'
     );
@@ -73,19 +73,19 @@ ModelGen::ModelGen(Json js):
       // for value, define component
       auto val = tp.get_value<string>();
       if (!val.empty()) {
-        // LOG_TO_(trivial, l)("single-type");
+        // LOG_TO_(trivial, lctor)("single-type");
 
         auto dt = dtype::from_string(val);
         make_cpt(name, dt);
       }
       // no children; it's an empty {}
       else if (tp.empty()) {
-        // LOG_TO_(trivial, l)("empty-type");
+        // LOG_TO_(trivial, lctor)("empty-type");
         make_cpt(name, dtype::ty_N);
       }
       // has multiple child components
       else {
-        // LOG_TO_(trivial, l)("multi-type");
+        // LOG_TO_(trivial, lctor)("multi-type");
           
         for (auto&& child: tp)
         {
@@ -94,7 +94,7 @@ ModelGen::ModelGen(Json js):
           // handle using the type name as data name
           
           auto ch_val = child.second.get_value<string>();
-          // LOG_TO_(info, l)("type node: \"", ch_val, '"');
+          // LOG_TO_(info, lctor)("type node: \"", ch_val, '"');
           if (ch_name.empty())
           {
             // LOG_(debug)("");
@@ -103,7 +103,7 @@ ModelGen::ModelGen(Json js):
           }
           
           auto dt = dtype::from_string(ch_val);
-          // LOG_TO_(info, l)(name, " child: ", ch_name);
+          // LOG_TO_(info, lctor)(name, " child: ", ch_name);
 
           auto mkname = util::concat(name, '.', ch_name);
           make_cpt(mkname, dt);

@@ -8,6 +8,7 @@
 #include "log.hh"
 #include "event.hh"
 #include "expression.hh"
+#include "statement.hh"
 
 // TODO: rename to Trigger
 // Trigger:
@@ -21,11 +22,12 @@ struct Trigger
   using Stmt = stmt::Statement;
 protected:
   uptr<Expr> _expr;
+  Entity_ptr _ent;              // the "bound" entity
   uptr<Stmt> _stmt;
 
 public:
-  Trigger(Expr* ex, Stmt* st):
-    _expr(ex), _stmt(st) {}
+  Trigger(Expr* ex, Entity_ptr ent, Stmt* st):
+    _expr(ex), _ent(ent), _stmt(st) {}
   // Trigger(uptr<Expr> ex, uptr<Stmt> st):
   //   _expr(move(ex)), _stmt(move(st)) {}
 
@@ -46,7 +48,8 @@ public:
     LOG_(debug)("=> ", result);
     
     if (result.get<data::Bool>().value) {
-      evtp.reset(new Event(_stmt.get()));
+      // bind statement to entity
+      evtp.reset(new Event(_stmt.get(), _ent));
     }
     return evtp;
   }

@@ -27,7 +27,7 @@ public:
 
   string name() const {return _name;};
   virtual string to_string() const = 0;
-  virtual void execute(ControlCtx* ctx) const = 0;
+  virtual void execute(ControlCtx&, Entity_ptr) const = 0;
 
   template <class Ch,class Tr>
   friend std::basic_ostream<Ch,Tr>& operator<<(
@@ -38,39 +38,44 @@ public:
 
 struct Update: Statement
 {
-  Compt_addr _cpadr;
+  Compt_id _cpid;
   uptr<expr::Expr> _expr;
 public:
-  Update(string n, Compt_addr ca, expr::Expr* e):
-    Statement(n), _cpadr(ca), _expr(e) {}
-  void execute(ControlCtx* ctx) const override
+  Update(string n, Compt_id ci, expr::Expr* e):
+    Statement("update"), _cpid(ci), _expr(e) {}
+  void execute(ControlCtx& ctx, Entity_ptr ent) const override
   {
     LOG_(debug)(__PRETTY_FUNCTION__);
     // set target data
     auto res = _expr->eval();
-    _cpadr()->set(res);
+    ent->ref(_cpid)()->set(res);
   }
   string to_string() const
   {
-    return _name + util::concat_pair(_cpadr, *_expr);
+    return _name + util::concat_pair(_cpid, *_expr);
   }
 };
 
 struct Spawn: Statement
 {
   using Statement::Statement;
-  void execute(ControlCtx*) const override {}
+  void execute(ControlCtx&, Entity_ptr) const override {}
   string to_string() const {return _name;}
 };
 
 // signals
-struct Signal: Statement {using Statement::Statement;};
+struct Signal: Statement
+{
+  using Statement::Statement;
+  virtual bool fatal() const = 0;
+};
 
 struct Halt: Signal
 {
 public:
   Halt(): Signal("_halt_") {}
-  void execute(ControlCtx* ctx) const override;
+  void execute(ControlCtx& ctx, Entity_ptr) const override;
   string to_string() const {return _name;}
+  bool fatal() const override {return true;}
 };
 }

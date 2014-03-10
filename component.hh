@@ -77,28 +77,28 @@ namespace data
 // Layout of data objects
 struct Bool {
   int32_t value;
-  static dtype::T dtype() {return dtype::ty_bool;}
+  static dtype::T flag_type() {return dtype::ty_bool;}
 };
 // struct Bool: DT_label<dtype::ty_bool> {int32_t value;};
 struct Int {
   int32_t value;
-  static dtype::T dtype() {return dtype::ty_int;}
+  static dtype::T flag_type() {return dtype::ty_int;}
 };
 struct Float {
   float value;
-  static dtype::T dtype() {return dtype::ty_float;}
+  static dtype::T flag_type() {return dtype::ty_float;}
 };
 struct RlmDisc {
   uint32_t index;
   uint32_t realm_max; uint32_t offset; static dtype
-  ::T dtype() {return dtype::ty_rdisc;}};
+  ::T flag_type() {return dtype::ty_rdisc;}};
 struct RlmCont {
   float index;
   float realm_max; float offset; static dtype
-  ::T dtype() {return dtype::ty_rcont;}};
+  ::T flag_type() {return dtype::ty_rcont;}};
 struct Str {
   int _;
-  static dtype::T dtype() {return dtype::ty_str;}
+  static dtype::T flag_type() {return dtype::ty_str;}
 };
 }
 
@@ -115,14 +115,14 @@ public:
   Data(dtype::T dt = dtype::ty_N): _dtype(dt), _bytes(dtype::size(dt)) {}
   // Data(dtype::T dt): _dtype(dt), _bytes(dtype::size(dt)) {}
   Data(const Data&) = default;
-  
+  // template <class D>
+  // explicit Data(D&& dv): Data(typename std::decay<D>::type::flag_type()) {set(dv);}
+    
   template <class D, class V>
   static Data make(V&& v)
   {
-    Data ret(D::dtype());
-    // return ret.template get<D>()
-    D dret{v};
-    ret.set(dret);
+    Data ret(D::flag_type());
+    ret.set(D{v});
     return ret;
   }
   

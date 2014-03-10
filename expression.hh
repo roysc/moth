@@ -36,22 +36,20 @@ struct Expr {
 
 // literal
 struct ELit: Expr {
-  Data value;
+  Data _value;
 public:
-  ELit(Data v): value(v) {}
+  ELit(Data v): _value(v) {}
   Data eval() const override;
   dtype::T result_of() const override;
-  string to_string() const override {return value.to_string();}
+  string to_string() const override {return _value.to_string();}
 };
 
 // function/operator
 struct EFun: Expr {
   using Args_own = v<uptr<Expr> >;
   using Args = v<Expr*>;
-
-  Operation oper; 
-  dtype::Tag dt_res;
-  Args_own args;
+  Operation _oper; 
+  Args_own _args;
 
 public:
   EFun(Operation, Args);
@@ -59,11 +57,12 @@ public:
   dtype::T result_of() const override;
   string to_string() const override;
 };
+
 // compt. value reference
 struct ERef: Expr { 
-  Compt_addr addr;
+  Compt_addr _addr;
 public:
-  ERef(Compt_addr ca): addr(ca) {}
+  ERef(Compt_addr ca): _addr(ca) {}
   Data eval() const override;
   dtype::T result_of() const override;
   string to_string() const override;

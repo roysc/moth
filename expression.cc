@@ -1,46 +1,40 @@
 // -*- coding: utf-8 -*-
 // trigger.cc
 
-#include "log.hh"
-#include "basic.hh"
-#include "entity.hh"
-
 #include "expression.hh"
+#include "log.hh"
+#include "entity.hh"
 
 namespace expr
 {
 // literal
-Data ELit::eval() const {return value;}
-dtype::T ELit::result_of() const {return value.dtype();}
+Data ELit::eval() const {return _value;}
+dtype::T ELit::result_of() const {return _value.dtype();}
 
 // reference
 Data ERef::eval() const
 { // data ptr
-  auto dptr = addr();
+  auto dptr = _addr();
   return *dptr;
 }
-dtype::T ERef::result_of() const
-{
-  auto dptr = addr();
-  return dptr->dtype();
-}
+dtype::T ERef::result_of() const {return _addr()->dtype();}
 string ERef::to_string() const 
 {
-  // return util::concat('(', addr, " -> ", eval().to_string(), ')');
-  return util::concat("~", eval().to_string());
+  return util::concat("(#", _addr.second, ':', eval().to_string(), ')');
+  // return util::concat("~", eval().to_string());
 }
 
 // function/op
 EFun::EFun(Operation o, Args as):
-  oper(o)
+  _oper(o), _args{}
 {
-  for (auto&& a: as) args.emplace_back(a);
+  for (auto&& a: as) _args.emplace_back(a);
 
   // type-check arguments
-  ASSERT_EQ_(oper.arity(), args.size(), "arity");
-  auto dtags = oper.arg_dtags();
-  for (size_t i{}; i < args.size(); ++i) { 
-    auto dtr = args[i]->result_of();
+  ASSERT_EQ_(_oper.arity(), _args.size(), "arity");
+  auto dtags = _oper.arg_dtags();
+  for (size_t i{}; i < _args.size(); ++i) { 
+    auto dtr = _args[i]->result_of();
     // subtyping relationship, {dtr <: dtags}
     ASSERT_BINOP_(dtr, dtags[i], %, "Invalid arg type");
   }
@@ -48,12 +42,12 @@ EFun::EFun(Operation o, Args as):
 string EFun::to_string() const
 {
   v<string> argstrs;
-  for (auto&& e: args)
+  for (auto&& e: _args)
     argstrs.push_back(e->to_string());
-  return util::concat('(', oper, ',', argstrs,')');
+  return util::concat('(', _oper, ',', argstrs,')');
 }
 
-dtype::T EFun::result_of() const {return oper.res_dtag();}
+dtype::T EFun::result_of() const {return _oper.res_dtag();}
 
 // implementing overloads makes this messy. semantics will need
 // more careful planning
@@ -62,15 +56,15 @@ Data EFun::eval() const
   LOG_PUSH_(leval)(__PRETTY_FUNCTION__);
   
   // recursively evaluate args
-  // args: v<Expr*>
+  // _args: v<Expr*>
   // dtags: v<DTag>
-  auto dtags = oper.arg_dtags();
-  dtype::T dt_call{dtype::ty_N}; // dtype to find overload
+  auto dtags = _oper.arg_dtags();
+  dtype::T dt_call = dtype::ty_N; // dtype to find overload
 
   v<Data> evalled;
-  for (size_t i{}; i < args.size(); ++i)
+  for (size_t i{}; i < _args.size(); ++i)
   {
-    Data res = args.at(i)->eval();
+    Data res = _args.at(i)->eval();
     evalled.push_back(res);
     // type check
     auto dt = res.dtype();
@@ -81,9 +75,9 @@ Data EFun::eval() const
     // but for now they must all be the same. so take one
     if (i==0) dt_call = dt;
   }
-  LOG_SHOW_TO_(evalled, leval);
+  // LOG_SHOW_TO_(evalled, leval);
 
-  FnTbl_key k{oper.optype(), dt_call};
+  FnTbl_key k{_oper.optype(), dt_call};
   auto it = eval_fn_tbl().find(k);
   if (it != end(eval_fn_tbl())) {
 
@@ -100,12 +94,12 @@ Data EFun::eval() const
 const m<FnTbl_key, Eval_fn>& eval_fn_tbl()
 {
 #define EXPR_FNTBL_ENTRY_BINP_(op_, opsym_, ATy_, RTy_)         \
-  {{OpType::op_, data::ATy_::dtype()},                          \
+  {{OpType::op_, data::ATy_::flag_type()},                      \
       [](v<Data> as) {                                          \
         LOG_(debug)(OpType::op_, ": " #ATy_ " -> " #RTy_);      \
         auto r0 = as.at(0).get<data::ATy_>();                   \
         auto r1 = as.at(1).get<data::ATy_>();                   \
-        Data rd{data::RTy_::dtype()};                           \
+        Data rd{data::RTy_::flag_type()};                       \
         rd.set(data::RTy_{r0.value opsym_ r1.value});           \
         return rd;                                              \
       }                                                         \
