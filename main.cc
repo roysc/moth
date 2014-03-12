@@ -41,17 +41,17 @@ int main(int argc, const char* argv[])
   // ---
   // Trigger & entity initialization
   // ---
-  auto endid = ctx.find_class("_end_");
   auto tmid = ctx.find_class("_time_");
-  auto ctrl_ent = ctx.create_entity({tmid, endid});
+  auto locid = ctx.find_class("_loc_");
+  auto ctrl_ent = ctx.create_entity({tmid, locid});
     
   // 0-condition, ends the game (bool in a builtin component)
   // when evaluated as true, ends the game. eg. run ends after 4 "days":
-  //  Trigger(= time.n_day 4) -> Halt()
+  //  Trigger(time.n_day == 4) -> Halt()
   // 
   // expressions should perhaps have value semantics
   // namespace exb = expr::builder;
-  // auto tm_expr = exb::ex(5) == ctrl_ent->ref(tmid);
+  // auto tm_expr = exb::lit(5) == ctrl_ent->ref(tmid);
   auto tm_expr = new expr::EFun("=="_op, {
       new expr::ERef(ctrl_ent->ref(tmid)),
       new expr::ELit(Data::make<data::Int>(5))
@@ -62,38 +62,30 @@ int main(int argc, const char* argv[])
 
   ctx.set_trigger(tm_trig);
     
-  Compt_addr end_flag = ctrl_ent->ref(endid);
+  // Compt_addr end_flag = ctrl_ent->ref(endid);
   Compt_addr tm_ctr = ctrl_ent->ref(tmid);
 
   LOG_PUSH_TO_(lloop, lmain)("main loop");
-  for (bool end_cond{}; !end_cond; ) {
-
-    LOG_SHOW_TO_(*end_flag(), lmain);
-    LOG_SHOW_TO_(*tm_ctr(), lmain);
+  for (bool stop{}; !stop; ) {
+    std::this_thread::sleep_for(std::chrono::milliseconds{200});
 
     auto evts = run::eval_triggers(ctx);
     // There must be some way to know when the model is invalidated, or aborted
-    auto valid = run::run_events(ctx, evts);
-    if (!valid) break;
-    
-    // namespace stb = stmt::builder;
-    // auto inc_stmt = ++stb::ref(tmid);
-    // => new stmt::Update{tmid, (exb::ref(tmid) + 1)}
-    // => new stmt::Update{tmid, new expr::EFun("+"_op, new expr::ERef(tmid), new expr::ELit<)}
+    // return bool from run_events indicating current validity
+    stop = !run::run_events(ctx, evts);
 
-    // auto loc = ctx.find_class("location");
-    // for (int i = 0; i < m; ++i)
-    //   auto e = ctx.create_entity({loc});
-
-    std::this_thread::sleep_for(std::chrono::milliseconds{200});
+    // LOG_SHOW_TO_(*tm_ctr(), lmain);
 
     // LOG_SHOW_TO_(ctx.entities().size(), lloop);
     // LOG_SHOW_TO_(ctx.triggers().size(), lloop);
 
+    // tick the clock
+    // namespace stb = stmt::builder;
+    // auto inc_stmt = ++stb::ref(tmid);
+    // => new stmt::Update{tmid, (exb::ref(tmid) + 1)}
+    // => new stmt::Update{tmid, new expr::EFun("+"_op, new expr::ERef(tmid), new expr::ELit(data::Int{1}))}
     data::Int tmct{tm_ctr()->get<data::Int>().value + 1};
     tm_ctr()->set(tmct);
-    
-    end_cond = end_flag()->get<data::Bool>().value;
   }
   
   return 0;

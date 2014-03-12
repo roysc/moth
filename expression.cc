@@ -20,9 +20,7 @@ Data ERef::eval() const
 dtype::T ERef::result_of() const {return _addr()->dtype();}
 string ERef::to_string() const 
 {
-  return util::concat('(', _addr.first->get_name(_addr.second),
-                      ':', eval().to_string(), ')');
-  // return util::concat("~", eval().to_string());
+  return util::concat("\"", _addr.first->get_name(_addr.second), "\":", eval());
 }
 
 // function/op

@@ -112,26 +112,25 @@ string Data::to_string() const
   // `val_' for value
 #define DATA_TO_STRING_CASE_(dt_, Type_, str_expr_) \
   case dtype::dt_: {                                \
-    data::Type_ val_ = get<data::Type_>();          \
+    const data::Type_ val_ = get<data::Type_>();    \
     ret = ("{" #Type_ ", ") + (str_expr_) + '}';    \
   } break
     
-  switch (_dtype)
-  {
-    DATA_TO_STRING_CASE_(ty_bool, Bool, util::concat(val_.value));
-    DATA_TO_STRING_CASE_(ty_int, Int, util::concat(val_.value));
-    DATA_TO_STRING_CASE_(ty_float, Float, util::concat(val_.value));
-    DATA_TO_STRING_CASE_(ty_rdisc, RlmDisc, util::concat(
-                           '(', val_.index,
-                           ',', val_.realm_max, 
-                           ',', val_.offset, 
-                           ')'));
-    DATA_TO_STRING_CASE_(ty_rcont, RlmCont, util::concat(
-                           '(', val_.index,
-                           ',', val_.realm_max, 
-                           ',', val_.offset, 
-                           ')'));
-    DATA_TO_STRING_CASE_(ty_str, Str, string("\"\""));
+  switch (_dtype) {
+  DATA_TO_STRING_CASE_(ty_bool, Bool, util::concat(val_.value));
+  DATA_TO_STRING_CASE_(ty_int, Int, util::concat(val_.value));
+  DATA_TO_STRING_CASE_(ty_float, Float, util::concat(val_.value));
+  DATA_TO_STRING_CASE_(ty_rdisc, RlmDisc, util::concat(
+                         '(', val_.index,
+                         ',', val_.realm_max, 
+                         ',', val_.offset, 
+                         ')'));
+  DATA_TO_STRING_CASE_(ty_rcont, RlmCont, util::concat(
+                         '(', val_.index,
+                         ',', val_.realm_max, 
+                         ',', val_.offset, 
+                         ')'));
+  DATA_TO_STRING_CASE_(ty_str, Str, string("\"\""));
 #undef DATA_TO_STRING_CASE_
       
   default:
