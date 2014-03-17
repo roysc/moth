@@ -29,16 +29,16 @@
 #endif
 
 // 
-#define THROW_BASIC_(Type_, w_)                 \
-  throw (err::Type_(w_))
+#define THROW_BASIC_(Type_, ...)                \
+  throw (err::Type_{__VA_ARGS__})
 
-#define THROW_DIAGS_(Type_, w_)                 \
-  throw (err::WrapDiagnostics<err::Type_>(      \
-           err::Type_{w_}                       \
-         ).set_diagnostics(                     \
-           ERR_THROWFILE_ARG_,                  \
-           ERR_THROWLINE_ARG_,                  \
-           ERR_THROWFUNC_ARG_                   \
+#define THROW_DIAGS_(Type_, ...)                 \
+  throw (err::WrapDiagnostics<err::Type_>(       \
+           err::Type_{__VA_ARGS__}               \
+         ).set_diagnostics(                      \
+           ERR_THROWFILE_ARG_,                   \
+           ERR_THROWLINE_ARG_,                   \
+           ERR_THROWFUNC_ARG_                    \
          ))
   
 // // throw with template arg
@@ -46,9 +46,9 @@
 //   throw (err::WrapArg<err::Type_>(w_, a_))
 
 #ifdef USE_ERR_DIAGNOSTICS
-#define THROW_(Type_, w_) THROW_DIAGS_(Type_, w_)
+#define THROW_(Type_, ...) THROW_DIAGS_(Type_, __VA_ARGS__)
 #else
-#define THROW_(Type_, w_) THROW_BASIC_(Type_, w_)
+#define THROW_(Type_, ...) THROW_BASIC_(Type_, __VA_ARGS__)
 #endif
 
 namespace err
@@ -90,8 +90,9 @@ struct Not_found_T: public Runtime
 {
   T _value;
   // using Runtime::Runtime;
-  Not_found_T(const T& x):
-    Runtime(util::concat(x)),
+  Not_found_T(const T& x, string w = ""):
+    Runtime(w.empty()? util::concat(x) :
+            w + " (" + util::concat(x) + ')'),
     _value(x) {}
 };
 
