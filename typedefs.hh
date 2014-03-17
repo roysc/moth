@@ -19,7 +19,7 @@
 using std::string;
 using std::set;
 template <class T> using v = std::vector<T>;
-template <class K,class V> using m = std::map<K,V>;
+using std::map;
 using std::pair;
 template <class K,class V> using table = std::unordered_map<K,V>;
 using std::thread;

@@ -16,7 +16,7 @@ struct Compt_addr: pair<Entity_ptr, Compt_id>
 struct Entity;
 
 // 
-using Compt_data = m<Compt_id, Data>;
+using Compt_data = map<Compt_id, Data>;
 struct Entity
 {
 protected:

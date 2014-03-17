@@ -65,7 +65,7 @@ OpType to_operation(string s)
 inline
 string to_string(OpType op)
 {
-  static const m<OpType, string> tbl = {
+  static const map<OpType, string> tbl = {
     {OpType::op_gt, ">"},
     {OpType::op_lt, "<"},
     {OpType::op_ge, ">="},
@@ -93,7 +93,7 @@ std::basic_ostream<Ch,Tr>&
 operator<<(std::basic_ostream<Ch,Tr>& out, OpType ot)
 // {out << to_string(ot); return out;}
 {
-  static const m<OpType, string> tbl = {
+  static const map<OpType, string> tbl = {
     {OpType::op_gt, "op_gt"},
     {OpType::op_lt, "op_lt"},
     {OpType::op_ge, "op_ge"},
@@ -145,7 +145,7 @@ public:
   v<dtype::Tag> arg_dtags() const
   {
     using dtype::Tag;
-    static const m<OpType, v<Tag> > tbl = {
+    static const map<OpType, v<Tag> > tbl = {
       {OpType::op_gt, {Tag::number, Tag::number}},
       {OpType::op_lt, {Tag::number, Tag::number}},
       {OpType::op_ge, {Tag::number, Tag::number}},
@@ -168,7 +168,7 @@ public:
   // function result types
   dtype::T res_dtag() const
   {
-    static const m<OpType, dtype::T> tbl = {
+    static const map<OpType, dtype::T> tbl = {
       {OpType::op_gt, dtype::ty_bool},
       {OpType::op_ge, dtype::ty_bool},
       {OpType::op_lt, dtype::ty_bool},

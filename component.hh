@@ -49,7 +49,7 @@ template <class Ch,class Tr>
 std::basic_ostream<Ch,Tr>& 
 operator<<(std::basic_ostream<Ch,Tr>& out, Tag tag)
 {
-  static const m<Tag, string> tbl = {
+  static const map<Tag, string> tbl = {
     {Tag::boolean, "Tag::boolean"},
     {Tag::number, "Tag::number"},
     {Tag::realm, "Tag::realm"},

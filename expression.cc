@@ -90,7 +90,7 @@ Data EFun::eval() const
 }
 
 // eval functions
-const m<FnTbl_key, Eval_fn>& eval_fn_tbl()
+const map<FnTbl_key, Eval_fn>& eval_fn_tbl()
 {
 #define EXPR_FNTBL_ENTRY_BINP_(op_, opsym_, ATy_, RTy_)         \
   {{OpType::op_, data::ATy_::flag_type()},                      \
@@ -108,7 +108,7 @@ const m<FnTbl_key, Eval_fn>& eval_fn_tbl()
   EXPR_FNTBL_ENTRY_BINP_(op_, opsym_, Float, Bool)
 
   
-  static const m<FnTbl_key, Eval_fn> _eval_fn_tbl = {
+  static const map<FnTbl_key, Eval_fn> _eval_fn_tbl = {
     // not: bool -> bool
     {{OpType::op_not, dtype::ty_bool},
      [](v<Data> as) {

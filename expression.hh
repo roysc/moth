@@ -16,7 +16,7 @@ namespace expr
 {
 using FnTbl_key = pair<OpType, dtype::T>;
 using Eval_fn = fn<Data(v<Data>)>;
-const m<FnTbl_key, Eval_fn>& eval_fn_tbl();
+const map<FnTbl_key, Eval_fn>& eval_fn_tbl();
 
 // expression types
 struct Expr {

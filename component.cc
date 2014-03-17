@@ -9,7 +9,7 @@ namespace
 {
 Tag tag_of(T dt)
 {
-  const m<T, Tag> map = {
+  const map<T, Tag> map = {
     // boolean
     {dtype::ty_bool, Tag::boolean},
     // special tag for now, but maybe 
@@ -61,7 +61,7 @@ bool operator%(dtype::T s, Tag t) {return tag_of(s) % t;};
 
 unsigned size(T dt) 
 {
-  const m<T, unsigned> map = {
+  const map<T, unsigned> map = {
     {dtype::ty_bool, sizeof(data::Bool)},
     {dtype::ty_int, sizeof(data::Int)},
     {dtype::ty_float, sizeof(data::Float)},
@@ -75,7 +75,7 @@ unsigned size(T dt)
 
 T from_string(string s)
 {
-  const m<string, T> map = {
+  const map<string, T> map = {
     {"bool", dtype::ty_bool},
     {"int", dtype::ty_int},
     {"float", dtype::ty_float},
@@ -92,7 +92,7 @@ T from_string(string s)
 
 string to_string(T dt)
 {
-  const m<T, string> map = {
+  const map<T, string> map = {
     {dtype::ty_bool, "bool"},
     {dtype::ty_int, "int"},
     {dtype::ty_float, "float"},

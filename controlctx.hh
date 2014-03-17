@@ -20,7 +20,7 @@ struct ControlCtx
 {
 protected:
   ModelGen* _modelgen;
-  m<Compt_id, SystemHandle*> _systems;
+  map<Compt_id, SystemHandle*> _systems;
   // entity and trigger data
   set<uptr<Trigger> > _triggers;
   set<uptr<Entity> > _entities;
@@ -44,7 +44,7 @@ public:
     for (auto&& t: _triggers) ret.insert(t.get());
     return ret;
   }
-  // m<Compt_id, SystemHandle*> systems() const {return _systems;}
+  // map<Compt_id, SystemHandle*> systems() const {return _systems;}
   // create ents., triggers
   Entity_ptr create_entity(v<Compt_id> cs)
   {

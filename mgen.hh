@@ -12,23 +12,23 @@
 // """
 class ModelGen 
 {
-  using CptClasses = m<Compt_id, const CptClass>;
-  using CptIDs = m<const CptClass*, Compt_id>;
+  using CptClasses = map<Compt_id, const CptClass>;
+  using CptIDs = map<const CptClass*, Compt_id>;
 protected:
   Compt_id _next_id;
   // Types
   CptClasses _cptclasses;
   CptIDs _cpt_ids;
-  m<string, Compt_id> _ctrl_cpts;
-  // const m<string, dtype::T> _builtins;
+  map<string, Compt_id> _ctrl_cpts;
+  // const map<string, dtype::T> _builtins;
   
 public:
   ModelGen(Json js);
 
   Compt_id fresh_id() {return ++_next_id;}
-  m<Compt_id, const CptClass*> component_classes() 
+  map<Compt_id, const CptClass*> component_classes() 
   {
-    m<Compt_id, const CptClass*> ret;
+    map<Compt_id, const CptClass*> ret;
     for (auto&& c: _cptclasses) ret.emplace(c.first, &c.second);
     return ret;
   }
