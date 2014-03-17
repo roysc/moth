@@ -15,7 +15,7 @@
 
 int main(int argc, const char* argv[])
 {
-  v<string> args(argv, argv + argc);
+  vector<string> args(argv, argv + argc);
 
   if (argc < 2) {
     std::cout << "Usage: " << args[0] << " <file>.json\n";

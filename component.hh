@@ -106,7 +106,7 @@ struct Str {
 struct Data
 {
 protected:
-  using Bytes = v<uint8_t>;
+  using Bytes = vector<uint8_t>;
   // using Bytes = uint8_t*;
   dtype::T _dtype;
   Bytes _bytes;

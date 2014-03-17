@@ -15,7 +15,7 @@
 namespace expr
 {
 using FnTbl_key = pair<OpType, dtype::T>;
-using Eval_fn = fn<Data(v<Data>)>;
+using Eval_fn = fn<Data(vector<Data>)>;
 const map<FnTbl_key, Eval_fn>& eval_fn_tbl();
 
 // expression types
@@ -46,8 +46,8 @@ public:
 
 // function/operator
 struct EFun: Expr {
-  using Args_own = v<uptr<Expr> >;
-  using Args = v<Expr*>;
+  using Args_own = vector<uptr<Expr> >;
+  using Args = vector<Expr*>;
   Operation _oper; 
   Args_own _args;
 

@@ -46,7 +46,7 @@ public:
   }
   // map<Compt_id, SystemHandle*> systems() const {return _systems;}
   // create ents., triggers
-  Entity_ptr create_entity(v<Compt_id> cs)
+  Entity_ptr create_entity(vector<Compt_id> cs)
   {
     auto insr = _entities.emplace(new Entity(this, cs));
     return insr.second? insr.first->get() : LOG_EVAL_(nullptr);

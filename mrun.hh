@@ -26,9 +26,9 @@
 namespace run
 {
 // transform conditions... read-only here.
-v<uptr<Event> > eval_triggers(ControlCtx& ctx)
+vector<uptr<Event> > eval_triggers(ControlCtx& ctx)
 {
-  v<uptr<Event> > evtv;
+  vector<uptr<Event> > evtv;
   LOG_PUSH_(ltrig)(__func__);
   for (auto&& cond: ctx.triggers()) {    
     LOG_TO_(debug, ltrig)(*cond);

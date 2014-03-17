@@ -142,10 +142,10 @@ public:
   // it's used now to "promote" results that can form valid C++
   // expressions together (int, float for now)
   // * see EFun::EFun type-check
-  v<dtype::Tag> arg_dtags() const
+  vector<dtype::Tag> arg_dtags() const
   {
     using dtype::Tag;
-    static const map<OpType, v<Tag> > tbl = {
+    static const map<OpType, vector<Tag> > tbl = {
       {OpType::op_gt, {Tag::number, Tag::number}},
       {OpType::op_lt, {Tag::number, Tag::number}},
       {OpType::op_ge, {Tag::number, Tag::number}},

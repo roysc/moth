@@ -40,7 +40,7 @@ EFun::EFun(Operation o, Args as):
 }
 string EFun::to_string() const
 {
-  v<string> argstrs;
+  vector<string> argstrs;
   for (auto&& e: _args)
     argstrs.push_back(e->to_string());
   return util::concat('(', _oper, ',', argstrs,')');
@@ -55,12 +55,12 @@ Data EFun::eval() const
   LOG_PUSH_(leval)(__PRETTY_FUNCTION__);
   
   // recursively evaluate args
-  // _args: v<Expr*>
-  // dtags: v<DTag>
+  // _args: vector<Expr*>
+  // dtags: vector<DTag>
   auto dtags = _oper.arg_dtags();
   dtype::T dt_call = dtype::ty_N; // dtype to find overload
 
-  v<Data> evalled;
+  vector<Data> evalled;
   for (size_t i{}; i < _args.size(); ++i)
   {
     Data res = _args.at(i)->eval();
@@ -94,7 +94,7 @@ const map<FnTbl_key, Eval_fn>& eval_fn_tbl()
 {
 #define EXPR_FNTBL_ENTRY_BINP_(op_, opsym_, ATy_, RTy_)         \
   {{OpType::op_, data::ATy_::flag_type()},                      \
-      [](v<Data> as) {                                          \
+      [](vector<Data> as) {                                          \
         LOG_(debug)(OpType::op_, ": " #ATy_ " -> " #RTy_);      \
         auto r0 = as.at(0).get<data::ATy_>();                   \
         auto r1 = as.at(1).get<data::ATy_>();                   \
@@ -111,7 +111,7 @@ const map<FnTbl_key, Eval_fn>& eval_fn_tbl()
   static const map<FnTbl_key, Eval_fn> _eval_fn_tbl = {
     // not: bool -> bool
     {{OpType::op_not, dtype::ty_bool},
-     [](v<Data> as) {
+     [](vector<Data> as) {
        LOG_(debug)(OpType::op_not, ": Bool -> Bool");
        auto res = as.at(0).get<data::Bool>();
        // return

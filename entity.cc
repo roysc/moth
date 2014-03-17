@@ -8,7 +8,7 @@
 Data_ptr Compt_addr::operator()() const {return first->get(second);}
 
 // constructed with set of classes
-Entity::Entity(ControlCtx* cx, v<Compt_id> cpts):
+Entity::Entity(ControlCtx* cx, vector<Compt_id> cpts):
   _ctx(cx)
 {
   LOG_PUSH_(lctor)(__PRETTY_FUNCTION__);

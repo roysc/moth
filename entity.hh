@@ -25,7 +25,7 @@ protected:
   
 public:
   // constructed with set of classes
-  Entity(ControlCtx* cx, v<Compt_id> cpts);  
+  Entity(ControlCtx* cx, vector<Compt_id> cpts);  
 
   // O(log n)
   Compt_ptr get(Compt_id id)
