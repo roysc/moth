@@ -24,8 +24,4 @@ using std::pair;
 template <class K,class V> using table = std::unordered_map<K,V>;
 using std::thread;
 template <class F> using fn = std::function<F>;
-
-template <class T> using ptr = T*; // can write "T*" or "ptr<T>", maybe remove
 template <class T> using uptr = std::unique_ptr<T>;
-template <class T> using sptr = std::shared_ptr<T>;
-template <class T> using wptr = std::weak_ptr<T>;
