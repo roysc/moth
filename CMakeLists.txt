@@ -29,13 +29,14 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CFLAG_STD_}")
 # main executable
 add_executable(main
   main.cc
-  log.cc
-  entity.cc
-  component.cc
-  expression.cc
-  statement.cc
-  controlctx.cc
   mgen.cc
+  controlctx.cc
+  statement.cc
+  expression.cc
+  operation.cc
+  component.cc
+  entity.cc
+  log.cc
 
   # should be in sep. library
   util/demangle.cc

@@ -33,6 +33,7 @@ enum T: unsigned
   ty_str,   // string, for what?
   // ty_tuple, // tuple rather than child grouping?
   // ty_calc,  // compt. calculated on reference?..
+  ty_ref,
   ty_N // the nil-type
 };
 
@@ -90,15 +91,20 @@ struct Float {
 };
 struct RlmDisc {
   uint32_t index;
-  uint32_t realm_max; uint32_t offset; static dtype
-  ::T flag_type() {return dtype::ty_rdisc;}};
+  uint32_t realm_max; uint32_t offset;
+  static dtype::T flag_type() {return dtype::ty_rdisc;}};
 struct RlmCont {
   float index;
-  float realm_max; float offset; static dtype
-  ::T flag_type() {return dtype::ty_rcont;}};
+  float realm_max; float offset;
+  static dtype::T flag_type() {return dtype::ty_rcont;}};
 struct Str {
   int _;
   static dtype::T flag_type() {return dtype::ty_str;}
+};
+template <class D>
+struct Ref {
+  D* value;
+  static dtype::T flag_type() {return dtype::ty_ref;}
 };
 }
 

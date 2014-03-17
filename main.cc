@@ -52,7 +52,7 @@ int main(int argc, const char* argv[])
   // expressions should perhaps have value semantics
   // namespace exb = expr::builder;
   // auto tm_expr = exb::lit(5) == ctrl_ent->ref(tmid);
-  auto tm_expr = new expr::EFun("=="_op, {
+  auto tm_expr = new expr::EFun("="_op, {
       new expr::ERef(ctrl_ent->ref(tmid)),
       new expr::ELit(Data::make<data::Int>(5))
     });

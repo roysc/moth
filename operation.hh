@@ -3,9 +3,9 @@
 #pragma once
 
 #include <functional>
+#include <algorithm>
 
 #include "err.hh"
-// TODO rename to data.hh
 #include "component.hh"
 
 namespace expr
@@ -26,6 +26,8 @@ enum class OpType: unsigned
   op_nof, // ∉,
   op_match, // ~
   op_not, // !
+  op_and,
+  op_or,
   op_N // how many
 };
 
@@ -38,55 +40,8 @@ enum class OpType: unsigned
 //   }
 // };
 
-inline
-OpType to_operation(string s)
-{
-  static const table<string, OpType> tbl = {
-    {">", OpType::op_gt},
-    {"<", OpType::op_lt},
-    {">=", OpType::op_ge},
-    {"<=", OpType::op_le},
-    {"==", OpType::op_eq},
-    {"!=", OpType::op_ne},
-    {"+", OpType::op_add},
-    {"-", OpType::op_sub},
-    {"*", OpType::op_mul},
-    {"/", OpType::op_div},
-    {"∈", OpType::op_eof},
-    {"∉", OpType::op_nof},
-    {"~", OpType::op_match},
-    {"!", OpType::op_not},
-  };
-  auto it = tbl.find(s);
-  return it != end(tbl)? it->second
-    : THROW_(Not_found, __PRETTY_FUNCTION__);
-}
-
-inline
-string to_string(OpType op)
-{
-  static const map<OpType, string> tbl = {
-    {OpType::op_gt, ">"},
-    {OpType::op_lt, "<"},
-    {OpType::op_ge, ">="},
-    {OpType::op_le, "<="},
-    {OpType::op_eq, "=="},
-    {OpType::op_ne, "!="},
-    {OpType::op_add, "+"},
-    {OpType::op_sub, "-"},
-    {OpType::op_mul, "*"},
-    {OpType::op_div, "/"},
-    {OpType::op_eof, "∈"},
-    {OpType::op_nof, "∉"},
-    {OpType::op_match, "~"},
-    {OpType::op_not, "!"},
-  };
-  auto it = tbl.find(op);
-  return it != end(tbl)? it->second : (
-    THROW_(Not_found, __PRETTY_FUNCTION__)
-    // THROW_(Not_found, util::concat(__PRETTY_FUNCTION__, ": ", (int)op))
-  );
-}
+OpType to_operation(string s);
+string to_string(OpType op);
 
 template <class Ch,class Tr>
 std::basic_ostream<Ch,Tr>& 
