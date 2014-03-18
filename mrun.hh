@@ -14,7 +14,7 @@
 #include "controlctx.hh"
 
 // "Runnable model."
-// 1. instantiate systems
+// 1. instantiate controls
 // 2. start iterating:
 //   x = end condition
 //   until x()

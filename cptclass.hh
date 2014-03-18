@@ -4,11 +4,11 @@
 
 #include "log.hh"
 // #include "basic.hh"
-#include "system.hh"
+#include "control.hh"
 #include "component.hh"
 
 // # each CptClass C
-// # represents state that is shared across System s
+// # represents state that is shared across Control s
 // # hence, instantiate once. no need for special ctor.
 // # def __init__(self, Cs):
 // struct Entity;
@@ -37,9 +37,9 @@ public:
 
   // user control integration:
   // create a control context for components of this type
-  // system_handle() => Handle(_) -- supports user control
+  // control_handle() => Handle(_) -- supports user control
   //                  | nullptr   -- no
-  SystemHandle* system_handle() const {return {};}
+  ControlHandle* control_handle() const {return {};}
 
   Data create() const {return {_dtype};}
   // bool operator<(const CptClass& that) {return _id }

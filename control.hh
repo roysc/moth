@@ -6,7 +6,7 @@
 
 struct CptClass;
 
-struct SystemHandle
+struct ControlHandle
 {
   const CptClass* cptclass() const {return _cptclass;}
 protected:

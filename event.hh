@@ -12,7 +12,7 @@
 // Event
 // contains a statement (chain) to be evaluated
 // * these are used to define behavior
-// * access data of all involved components (Agent, System, Object)
+// * access data of all involved components (Agent, Control, Object)
 // * create/destroy Entities
 // * ?
 // 

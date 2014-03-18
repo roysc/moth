@@ -19,7 +19,7 @@ ModelGen::ModelGen(Json js):
   auto ents_js = js.get_child_optional("entities");
 
   // Create CptClass
-  auto make_cpt = [&lctor, this](string n, dtype::T dt) -> Compt_id
+  auto make_cpt = [this, &lctor](string n, dtype::T dt) -> Compt_id
     {
       auto cpid = fresh_id();
       LOG_PUSH_TO_(lmk, lctor)(
@@ -33,6 +33,7 @@ ModelGen::ModelGen(Json js):
         LOG_TO_(error, lmk)("CptClass insertion failed");
       else {
         auto cptr = &(insr.first->second);
+        // double-index
         auto insr2 = _cpt_ids.emplace(cptr, cpid);
         if (!insr2.second)
           LOG_TO_(error, lmk)("Compt_id insertion failed");
@@ -59,10 +60,10 @@ ModelGen::ModelGen(Json js):
         LOG_(warning)("builtin \"", name, "\" redefined (ignoring)");
     }
 
-    // get the system specs for the component
+    // get the control specs for the component
     // not sure how this works yet
-    auto sys = c.second.get_optional<string>("system");
-    // if (!sys) THROW_(Invalid, "system");
+    auto sys = c.second.get_optional<string>("control");
+    // if (!sys) THROW_(Invalid, "control");
 
     // get types
     // ----

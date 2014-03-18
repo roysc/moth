@@ -16,15 +16,15 @@ struct ControlCtx;
 
 ControlCtx::ControlCtx(ModelGen* mg):
   _modelgen(mg),
-  _systems(),
+  _controls(),
   _triggers(),
   _entities()
 { 
-  // _systems:
+  // controls:
   auto cpks = _modelgen->component_classes();
   for (auto&& c : cpks) {
-    auto sh = c.second->system_handle();
-    if (sh) _systems.emplace(c.first, sh);
+    auto sh = c.second->control_handle();
+    if (sh) _controls.emplace(c.first, sh);
   }
 }
 

@@ -9,12 +9,12 @@
 // struct CptClass;
 
 // // a CptClass that yields controllers
-// struct SystemHandle;
-// using SystemHandle_opt = uptr<SystemHandle>;
+// struct ControlHandle;
+// using ControlHandle_opt = uptr<ControlHandle>;
 
 // // Control structs
 // struct ControlCtx;
-// struct SystemHandle;
+// struct ControlHandle;
 
 // // Generator and Runner
 // class ModelGen;

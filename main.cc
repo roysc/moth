@@ -58,8 +58,6 @@ int main(int argc, const char* argv[])
     });
   
   auto tm_trig = new Trigger(tm_expr, ctrl_ent, new stmt::Halt);
-  // auto tick_stmt = new stmt::Spawn("_tick_");
-
   ctx.set_trigger(tm_trig);
     
   // Compt_addr end_flag = ctrl_ent->ref(endid);
