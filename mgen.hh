@@ -42,7 +42,7 @@ public:
   const CptClass* get_class(Compt_id cpid) 
   {
     auto it = _cptclasses.find(cpid);
-    return it != end(_cptclasses) ? &it->second : nullptr;
+    return it != end(_cptclasses) ? &(it->second) : nullptr;
   }
 
   Compt_id find_class(string nm) 

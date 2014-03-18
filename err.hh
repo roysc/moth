@@ -79,22 +79,24 @@ struct WrapDiagnostics: public Err
   const char* what() const noexcept override {return _what.c_str();}
 };
 
+// Store a value of type T
+template <class Err, class T>
+struct WithArg: public Err
+{
+  T _value;
+  WithArg(const T& x, string w = ""):
+    Err((w.empty()? "" : w + " ") + util::concat('(', x, ')')),
+    _value(x) {}
+};
+
 // runtime
 struct Runtime: public std::runtime_error
 {using runtime_error::runtime_error;};
 
 struct Invalid: public Runtime {using Runtime::Runtime;};
+template <class T> using Invalid_T = WithArg<Invalid, T>;
 struct Not_found: public Runtime {using Runtime::Runtime;};
-template <class T>
-struct Not_found_T: public Runtime
-{
-  T _value;
-  // using Runtime::Runtime;
-  Not_found_T(const T& x, string w = ""):
-    Runtime(w.empty()? util::concat(x) :
-            w + " (" + util::concat(x) + ')'),
-    _value(x) {}
-};
+template <class T> using Not_found_T = WithArg<Not_found, T>;
 
 // Logic
 struct Logic: public std::logic_error
