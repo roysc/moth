@@ -1,0 +1,10 @@
+* log:
+** super-lightweight stacked logs:
+   can push a 0-size anonymous obj, and log to global or thread log
+   rather than create a new logger obj.
+   simpler this way
+
+   
+* 
+   
+   
