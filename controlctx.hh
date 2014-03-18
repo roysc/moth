@@ -51,13 +51,20 @@ public:
     auto insr = _entities.emplace(new Entity(this, cs));
     return insr.second? insr.first->get() : LOG_EVAL_(nullptr);
   }
-  bool set_trigger(Trigger* t) {return _triggers.emplace(t).second;}
+  template <class... Ts>
+  bool set_trigger(Ts&&... ts) {
+    return _triggers.emplace(new Trigger{std::forward<Ts>(ts)...}).second;
+  }
 
   // handle a Signal object throw from event loop
   // relies on dynamic type
-  bool handle_signal(const stmt::Signal& sig) {return !sig.fatal();}
+  bool handle_signal(const stmt::Signal& sig)
+  {
+    // small set of important events handled directly
+    return !sig.fatal();
+  }
   
   // class lookup, fwd to modelgen
   const CptClass* get_class(Compt_id cpid) const {return _modelgen->get_class(cpid);}
-  Compt_id find_class(string nm) {return _modelgen->find_class(nm);}
+  Compt_id find_class(string nm) const {return _modelgen->find_class(nm);}
 };

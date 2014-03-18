@@ -1,0 +1,17 @@
+{
+  "components": [
+    {"name": "location", "type": "ref(real,real)" },
+    {"name": "mass", "type": "real"},
+    {"name": "size", "type": "real"},
+    {"name": "phys", "type": ["location", "mass"] },
+
+    {"name": "body", "type": ["phys", "size", "set(organ)"] }
+  ],
+  "entities": [
+    { "name": "Fish", "contains": [ "body"]},
+    { "name": "Food", "contains": ["phys", "size"]}
+  ]
+}
+
+
+

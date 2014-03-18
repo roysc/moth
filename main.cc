@@ -57,8 +57,7 @@ int main(int argc, const char* argv[])
       new expr::ELit(Data::make<data::Int>(5))
     });
   
-  auto tm_trig = new Trigger(tm_expr, ctrl_ent, new stmt::Halt);
-  ctx.set_trigger(tm_trig);
+  ctx.set_trigger(tm_expr, ctrl_ent, new stmt::Halt);
     
   // Compt_addr end_flag = ctrl_ent->ref(endid);
   Compt_addr tm_ctr = ctrl_ent->ref(tmid);
