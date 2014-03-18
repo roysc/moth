@@ -112,7 +112,7 @@ string Data::to_string() const
   // `val_' for value
 #define DATA_TO_STRING_CASE_(dt_, Type_, str_expr_) \
   case dtype::dt_: {                                \
-    const data::Type_ val_ = get<data::Type_>();    \
+    const data::Type_& val_ = get<data::Type_>();   \
     ret = ("{" #Type_ ", ") + (str_expr_) + '}';    \
   } break
     
@@ -131,10 +131,11 @@ string Data::to_string() const
                          ',', val_.offset, 
                          ')'));
   DATA_TO_STRING_CASE_(ty_str, Str, string("\"\""));
+  DATA_TO_STRING_CASE_(ty_ref, Ref<void>, util::concat(val_.value));
 #undef DATA_TO_STRING_CASE_
       
   default:
-    THROW_(Invalid, __PRETTY_FUNCTION__);
+    THROW_(Invalid_T<dtype::T>, _dtype);
   }
   return ret;
 }

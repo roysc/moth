@@ -33,7 +33,7 @@ enum T: unsigned
   ty_str,   // string, for what?
   // ty_tuple, // tuple rather than child grouping?
   // ty_calc,  // compt. calculated on reference?..
-  ty_ref,
+  ty_ref, // reference
   ty_N // the nil-type
 };
 
@@ -180,4 +180,5 @@ DATA_DEFINE_GET_SET_(Float, ty_float)
 DATA_DEFINE_GET_SET_(RlmDisc, ty_rdisc)
 DATA_DEFINE_GET_SET_(RlmCont, ty_rcont)
 DATA_DEFINE_GET_SET_(Str, ty_str)
+DATA_DEFINE_GET_SET_(Ref<void>, ty_ref)
 #undef DATA_DEFINE_GET_SET_
