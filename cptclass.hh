@@ -30,6 +30,7 @@ public:
   
   // meta data
   string name() const {return _name;}
+  dtype::T data_type() const {return _dtype;}
   // Compt_id id() const {return _id;}
 
   // components needed to impl. this one
@@ -44,3 +45,11 @@ public:
   Data create() const {return {_dtype};}
   // bool operator<(const CptClass& that) {return _id }
 };
+
+template <class Ch,class Tr>
+std::basic_ostream<Ch,Tr>& 
+operator<<(std::basic_ostream<Ch,Tr>& out, const CptClass& cpc)
+{
+  util::print_to(out, "CptClass(\"", cpc.name(), "\",", cpc.data_type(), ")");
+  return out;
+}

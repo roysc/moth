@@ -20,6 +20,7 @@ ModelGen::ModelGen(Json js):
   auto cpts_js = js.get_child_optional("components");
   auto ents_js = js.get_child_optional("entities");
   read_cpts(cpts_js? *cpts_js : THROW_(Invalid, "components node"));
+  LOG_SHOW_(_cptclasses);
   read_ents(ents_js? *ents_js : THROW_(Invalid, "entities node"));
 }
 
@@ -90,18 +91,15 @@ ModelGen::read_cpts(Json cpts_js)
       
     // has multiple child components
     else {
-      size_t i{};
       for (auto&& child: tp) {
         auto ch_name = child.first;
-        // boost sets key to "" for json arrays
-        // in that case, treat it as a tuple type, name with int. index
-        if (ch_name.empty()) {
-          ch_name = std::to_string(i);
-        }
-          
         auto ch_val = child.second.get_value<string>();
         auto dt = dtype::from_string(ch_val);
-        // LOG_TO_(info, lcpts)(name, " child: ", ch_name);
+
+        // boost sets key to "" for json arrays
+        // in that case, name it with the type
+        if (ch_name.empty())
+          ch_name = ch_val;
 
         make_cpt(util::concat(name, '.', ch_name), dt);
       }
