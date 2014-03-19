@@ -16,7 +16,7 @@ void Halt::execute(ControlCtx& ctx, Entity_ptr) const
   // Compt_addr end_flag = ctx->ctrl_component("_end_");
   // end_flag()->set(data::Bool{true});
 
-  // auto alert = ctx.create_entity({ctx.get_class("_msg_")});
+  // auto alert = ctx.create_entity({ctx.get_cptclass("_msg_")});
   
   LOG_(info)("Halt was triggered");
 

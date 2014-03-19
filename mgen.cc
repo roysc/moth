@@ -112,19 +112,16 @@ ModelGen::read_cpts(Json cpts_js)
 void
 ModelGen::read_ents(Json ents_js)
 {
-  // auto make_ent = [this](string nm, vector<Compt_id> cnts) {};
+  // auto make_entd = [this](string nm, set<Compt_id> cnts) {};
   
   // process entities
   for (auto&& e: ents_js) {
     auto name = e.second.get<string>("name");
     auto cpts = e.second.get_child("contains");
-    for (auto&& cpt: cpts) {
-      auto contents = util::range::map<vector<Compt_id> >(
-        cpts, [&](Json::value_type& c) -> Compt_id {
-          return find_class(cpt.second.get_value<string>());
-        }
-      );
-      // make_ent(name, contents);
-    }
+    
+    auto contents = util::map<set<Compt_id> >(
+      cpts, [this](Json::value_type& c) {return find_cptclass(c.second.get_value<string>());}
+    );
+    _entdefs.emplace(name, contents);
   }
 }

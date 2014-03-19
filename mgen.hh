@@ -12,7 +12,7 @@
 // Namespace of Generation implementation
 // """
 using CptClasses = map<Compt_id, const CptClass>;
-using EntDefs = map<string, EntDef>;
+using EntDefs = map<string, set<Compt_id> >;
 using CptIDs = map<const CptClass*, Compt_id>;
 class ModelGen 
 {
@@ -39,25 +39,32 @@ public:
   }
   Compt_id control_cpt(string nm) const {return _ctrl_cpts.at(nm);}
 
-  const CptClass* get_class(Compt_id cpid) 
+  const CptClass* get_cptclass(Compt_id cpid) 
   {
     auto it = _cptclasses.find(cpid);
     return it != end(_cptclasses) ? &(it->second) : nullptr;
   }
 
-  Compt_id find_class(string nm) 
+  Compt_id find_cptclass(string nm) 
   {
     auto it = find_if(
       begin(_cptclasses), end(_cptclasses),
-      [=](CptClasses::value_type p) {return p.second.name() == nm;});
+      [=](CptClasses::value_type p) {return p.second.name() == nm;}
+    );
     return it != end(_cptclasses) ? it->first : THROW_(Not_found, nm);
   }
   
   // stupid
-  Compt_id unget_class(const CptClass* cp)
+  Compt_id unget_cptclass(const CptClass* cp)
   {
     auto it = _cpt_ids.find(cp);
     return it != end(_cpt_ids)? it->second : THROW_(Not_found, util::concat(cp));
+  }
+
+  EntDef get_entdef(string n) const
+  {
+    auto it = _entdefs.find(n);
+    return it != end(_entdefs) ? EntDef{n, it->second} : THROW_(Not_found, n);
   }
 };
 

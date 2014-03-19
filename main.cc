@@ -41,8 +41,8 @@ int main(int argc, const char* argv[])
   // ---
   // Trigger & entity initialization
   // ---
-  auto tmid = ctx.find_class("_time_");
-  auto locid = ctx.find_class("_loc_");
+  auto tmid = ctx.find_cptclass("_time_");
+  auto locid = ctx.find_cptclass("_loc_");
   auto ctrl_ent = ctx.create_entity({tmid, locid});
     
   // 0-condition, ends the game (bool in a builtin component)

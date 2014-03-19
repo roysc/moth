@@ -65,6 +65,6 @@ public:
   }
   
   // class lookup, fwd to modelgen
-  const CptClass* get_class(Compt_id cpid) const {return _modelgen->get_class(cpid);}
-  Compt_id find_class(string nm) const {return _modelgen->find_class(nm);}
+  const CptClass* get_cptclass(Compt_id cpid) const {return _modelgen->get_cptclass(cpid);}
+  Compt_id find_cptclass(string nm) const {return _modelgen->find_cptclass(nm);}
 };

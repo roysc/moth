@@ -28,5 +28,5 @@ ControlCtx::ControlCtx(ModelGen* mg):
   }
 }
 
-// const CptClass* get_class(Compt_id cpid) {return _modelgen->get_class(cpid);}
+// const CptClass* get_cptclass(Compt_id cpid) {return _modelgen->get_cptclass(cpid);}
 
