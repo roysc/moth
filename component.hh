@@ -19,8 +19,10 @@ using Compt_ptr_k = Data const*;
 
 namespace dtype
 {
+using T = unsigned;
+
 // essentially, built-in types
-enum T: unsigned 
+enum Type: T
 { 
   // emacs indentation sucks
   ty_bool,                 // could be impl'd as discrete realm of 0|1
@@ -44,7 +46,7 @@ enum class Tag: unsigned
 // "any term of type S can be safely used in a context where a
 //  term of type T is expected" -WP
 bool operator%(Tag s, Tag t);
-bool operator%(dtype::T s, Tag t);
+bool operator%(T s, Tag t);
 
 template <class Ch,class Tr>
 std::basic_ostream<Ch,Tr>& 
@@ -59,15 +61,24 @@ operator<<(std::basic_ostream<Ch,Tr>& out, Tag tag)
   };
   auto it = tbl.find(tag);
   if (it != end(tbl))
-    out << it->second;
-  else 
-    THROW_(Not_found, __PRETTY_FUNCTION__);
-  return out;
+    return out << it->second;
+  THROW_(Not_found, __PRETTY_FUNCTION__);
 }
 
 unsigned size(T dt);
 T from_string(string s);
 string to_string(T dt);
+
+// meta info for dtype - serious change
+struct Meta
+{
+  T type;
+  Tag tag;
+  string name;
+  size_t size;
+};
+
+extern vector<Meta> _meta_info;
 }
 
 namespace data

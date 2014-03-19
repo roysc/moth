@@ -24,6 +24,8 @@ protected:
   CptIDs _cpt_ids;
   map<string, Compt_id> _ctrl_cpts;
   // const map<string, dtype::T> _builtins;
+  // map<dtype::T, string> _dtype_defs;
+
   void read_cpts(Json);
   void read_ents(Json);
   
