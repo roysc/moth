@@ -5,26 +5,31 @@
 #include "json.hh"
 #include "err.hh"
 #include "cptclass.hh" 
+#include "entdef.hh"
 
 // """
 // The generation context for a generator;
 // Namespace of Generation implementation
 // """
+using CptClasses = map<Compt_id, const CptClass>;
+using EntDefs = map<string, EntDef>;
+using CptIDs = map<const CptClass*, Compt_id>;
 class ModelGen 
 {
-  using CptClasses = map<Compt_id, const CptClass>;
-  using CptIDs = map<const CptClass*, Compt_id>;
 protected:
   Compt_id _next_id;
   // Types
   CptClasses _cptclasses;
+  EntDefs _entdefs;
   CptIDs _cpt_ids;
   map<string, Compt_id> _ctrl_cpts;
   // const map<string, dtype::T> _builtins;
+  void read_cpts(Json);
+  void read_ents(Json);
   
 public:
   ModelGen(Json js);
-
+  
   Compt_id fresh_id() {return ++_next_id;}
   map<Compt_id, const CptClass*> component_classes() 
   {

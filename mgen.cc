@@ -1,6 +1,8 @@
 // -*- coding: utf-8 -*-
 // mgen.cc
 
+#include "util/range/map.hh"
+
 #include "err.hh"
 #include "log.hh"
 #include "assert.hh"
@@ -17,13 +19,22 @@ ModelGen::ModelGen(Json js):
     
   auto cpts_js = js.get_child_optional("components");
   auto ents_js = js.get_child_optional("entities");
+  read_cpts(cpts_js? *cpts_js : THROW_(Invalid, "components node"));
+  read_ents(ents_js? *ents_js : THROW_(Invalid, "entities node"));
+}
 
+void
+ModelGen::read_cpts(Json cpts_js)
+{
+  LOG_PUSH_(lcpts)(__func__);
+  
   // Create CptClass
-  auto make_cpt = [this, &lctor]
+  auto make_cpt = [this, &lcpts]
     (string n, dtype::T dt) -> Compt_id {
     
     auto cpid = fresh_id();
-    LOG_PUSH_TO_(lmk, lctor)(
+    // LOG_PUSH_(info)(
+    LOG_PUSH_TO_(lmk, lcpts)(
       "creating: ", n,
       " (id: ", cpid, ", type: ", dtype::to_string(dt), ')'
     );
@@ -43,7 +54,7 @@ ModelGen::ModelGen(Json js):
   };
 
   // process components
-  for (auto&& c: cpts_js? *cpts_js : Json{}) {
+  for (auto&& c: cpts_js) {
 
     auto name = c.second.get<string>("name");
 
@@ -90,19 +101,30 @@ ModelGen::ModelGen(Json js):
           
         auto ch_val = child.second.get_value<string>();
         auto dt = dtype::from_string(ch_val);
-        // LOG_TO_(info, lctor)(name, " child: ", ch_name);
+        // LOG_TO_(info, lcpts)(name, " child: ", ch_name);
 
         make_cpt(util::concat(name, '.', ch_name), dt);
       }
     }
   } // processed components
-
-  // ---
-  // process entities
-  for (auto&& c: ents_js? *ents_js : Json{}) {
-    auto name = c.second.get<string>("name");
-    auto cpts = c.second.get_child("contains");
-    
-  }
 }
 
+void
+ModelGen::read_ents(Json ents_js)
+{
+  // auto make_ent = [this](string nm, vector<Compt_id> cnts) {};
+  
+  // process entities
+  for (auto&& e: ents_js) {
+    auto name = e.second.get<string>("name");
+    auto cpts = e.second.get_child("contains");
+    for (auto&& cpt: cpts) {
+      auto contents = util::range::map<vector<Compt_id> >(
+        cpts, [&](Json::value_type& c) -> Compt_id {
+          return find_class(cpt.second.get_value<string>());
+        }
+      );
+      // make_ent(name, contents);
+    }
+  }
+}

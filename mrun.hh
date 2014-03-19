@@ -5,8 +5,6 @@
 #include <utility>
 #include <algorithm>
 
-#include "util/range.hh"
-
 #include "log.hh"
 #include "event.hh"
 #include "trigger.hh"
