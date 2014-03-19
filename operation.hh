@@ -46,31 +46,7 @@ string to_string(OpType op);
 template <class Ch,class Tr>
 std::basic_ostream<Ch,Tr>& 
 operator<<(std::basic_ostream<Ch,Tr>& out, OpType ot)
-// {out << to_string(ot); return out;}
-{
-  static const map<OpType, string> tbl = {
-    {OpType::op_gt, "op_gt"},
-    {OpType::op_lt, "op_lt"},
-    {OpType::op_ge, "op_ge"},
-    {OpType::op_le, "op_le"},
-    {OpType::op_eq, "op_eq"},
-    {OpType::op_ne, "op_ne"},
-    {OpType::op_add, "op_add"},
-    {OpType::op_sub, "op_sub"},
-    {OpType::op_mul, "op_mul"},
-    {OpType::op_div, "op_div"},
-    {OpType::op_eof, "op_eof"},
-    {OpType::op_nof, "op_nof"},
-    {OpType::op_match, "op_match"},
-    {OpType::op_not, "op_not"},
-  };
-  auto it = tbl.find(ot);
-  if (it != end(tbl))
-    out << it->second;
-  else 
-    THROW_(Not_found, __PRETTY_FUNCTION__);
-  return out;
-}
+{out << to_string(ot); return out;}
 
 // _simple_ AST
 struct Operation

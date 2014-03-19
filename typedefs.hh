@@ -25,3 +25,6 @@ template <class K,class V> using table = std::unordered_map<K,V>;
 using std::thread;
 template <class F> using fn = std::function<F>;
 template <class T> using uptr = std::unique_ptr<T>;
+
+using std::move;
+using std::tie;

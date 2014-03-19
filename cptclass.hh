@@ -32,7 +32,7 @@ public:
   string name() const {return _name;}
   dtype::T data_type() const {return _dtype;}
   // Compt_id id() const {return _id;}
-
+  
   // components needed to impl. this one
   set<CptClass*> dependencies() const {return {};}
 
