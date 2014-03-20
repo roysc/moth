@@ -1,7 +1,7 @@
 // -*- coding: utf-8 -*-
 // mgen.cc
 
-#include "util/range/map.hh"
+#include "util/range/algo.hh"
 
 #include "err.hh"
 #include "log.hh"
@@ -179,7 +179,8 @@ ModelGen::read_ents(Json ents_js)
     auto cpts = e.second.get_child("contains");
     
     auto contents = util::map<set<Compt_id> >(
-      cpts, [this](Json::value_type& c) {return find_cptclass(c.second.get_value<string>());}
+      util::view(cpts),
+      [this](Json::value_type& c) {return find_cptclass(c.second.get_value<string>());}
     );
     _entdefs.emplace(name, contents);
   }
