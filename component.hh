@@ -66,7 +66,7 @@ operator<<(std::basic_ostream<Ch,Tr>& out, Tag tag)
 }
 
 unsigned size(T dt);
-T from_string(string s);
+T from_string(string s, bool*);
 string to_string(T dt);
 
 // meta info for dtype - serious change

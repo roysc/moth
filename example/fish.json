@@ -4,7 +4,7 @@
     {"name": "mass", "type": "real"},
     {"name": "size", "type": "real"},
     {"name": "phys", "type": ["location", "mass"] },
-    {"name": "organ", "type": {"kind": "str", "state": "real[0..1]"}},
+    {"name": "organ", "type": {"kind": "str", "health": "real[0,1]"}},
     {"name": "body", "type": ["phys", "size", "set(organ)"] }
   ],
   "entities": [

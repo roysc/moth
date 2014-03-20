@@ -27,17 +27,22 @@ unsigned size(T dt)
   return it != end(_meta_info)? it->size : THROW_(Not_found_T<T>, dt);
 }
 
-T from_string(string s)
+T from_string(string s, bool* found)
 {
   auto it = find_if(
     begin(_meta_info), end(_meta_info),
     [=](Meta m){return s == m.name;}
   );
-  return it != end(_meta_info)? it->type :
-    (LOG_(warning)(__func__, ": no dtype for \"", s, '"'),
-     ty_N)
-    // THROW_(Not_found, s)
-    ;
+
+  if (it != end(_meta_info)) {
+    if (found) *found = true;
+    return it->type;
+  }
+  else {
+    if (found) *found = false;
+    else THROW_(Not_found, s);
+    return ty_N;
+  }
 }
 
 string to_string(T dt)

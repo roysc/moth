@@ -31,7 +31,8 @@ ModelGen::read_cpts(Json cpts_js)
   LOG_PUSH_(lcpts)(__func__);
 
   // (name, [tuple members])
-  vector<pair<string, vector<string> > > dtypes_read;
+  using DtypeSpecs = pair<string, vector<string> >;
+  vector<DtypeSpecs> dtypes_read;
   
   // process
   for (auto&& c: cpts_js) {
@@ -64,9 +65,6 @@ ModelGen::read_cpts(Json cpts_js)
     // boost treats {} as ("", [...])
     if (!val.empty()) {
       dtypes_read.push_back({name, {val}});
-      // pair<string, vector<string> > dtr(name, {val});
-      // dtypes_read.push_back(dtr);
-      // dtypes_read.emplace_back(name, {val});
       ASSERT_(tp.empty(), "boost::ptree sanity check");
     }
       
@@ -101,45 +99,77 @@ ModelGen::read_cpts(Json cpts_js)
   // type check, create dtype meta
   // can just initialize w/ basic types
   vector<dtype::Meta> dtypes_meta(dtype::_meta_info);
-  
+
+  // translate dtype specs to meta data:
+  // evaluate specs, recursing into aggregates
+  fn<dtype::Meta(DtypeSpecs)> create_dtype;
+  create_dtype = // [&create_dtype, &dtypes_meta]
+    [&](DtypeSpecs dtspecs) {
+    
+    // collect meta info for aggregate members
+    vector<dtype::Meta> mems_meta;
+    for (auto&& dtnm: dtspecs.second) {
+
+      // look up in existing
+      auto it = find_if(
+        begin(dtypes_meta), end(dtypes_meta),
+        [=](dtype::Meta m){return dtnm == m.name;}
+      );
+
+      // exists already
+      if (it != end(dtypes_meta)) {
+        mems_meta.push_back(*it);
+      }
+      // need to create
+      else {
+        // look up in specs
+        auto itspec = find_if(
+          begin(dtypes_read), end(dtypes_read),
+          [=](DtypeSpecs dts){return dtnm == dts.first;}
+        );
+          
+        // found, create meta
+        if (itspec != end(dtypes_read)) {
+          // fixme: wrong, meta should be created in full set
+          mems_meta.push_back(create_dtype(*itspec));
+        } else {
+          // dtype name isn't in the spec, nothing to be done
+          // THROW_(Not_found, dtnm);
+
+          // fixme: workaround for missing basic type (ref)
+          mems_meta.push_back({dtype::ty_N, dtype::Tag::N, dtnm, 0});
+        }
+      }
+    }
+      
+    // meta info checks out. build new (meta) dtype from it
+    dtype::T dt = fresh_id();
+    // sz = sum of member types
+    auto sz = accumulate(
+      begin(mems_meta), end(mems_meta), size_t{},
+      [](size_t a, dtype::Meta m1){return a + m1.size;}
+    );
+
+    // TODO: tag
+    return dtype::Meta{dt, dtype::Tag::N, dtspecs.first, sz};
+  };
+
   // ensure all dtypes exist, or can be created
-  for (auto&& dtnew: dtypes_read) {
-    string name;
-    vector<string> mem_dts;
-    tie(name, mem_dts) = dtnew;
-    // auto itnm = find_name(dtypes_read, );
-
-    // // translate dtype specs to meta data:
-    // // evaluate specs, recursing into aggregates
-    // {
-    //   // look up in 
-    //   auto it = find_if(
-    //     begin(dtypes_meta), end(dtypes_meta),
-    //     [=](dtype::Meta m){return dtnm == m.name;}
-    //   );
-
-    //   // exists
-    //   if (it != end(dtypes_meta)) {
-        
-        
-    //   }
-    //   // need to create
-    //   else {
-    //     // dtype::T dt = ?
-    //     // auto sz = sum of member types
-    //     // dtype::Meta m{dt, dtype::Tag::N, name, sz};
-    //     // dtypes_meta.push_back(m);
-    //   }
-    // }
+  for (auto&& dtspec: dtypes_read) {
+    auto meta = create_dtype(dtspec);
+    // can do sanity check here
+    dtypes_meta.push_back(meta);
   }
 
-  // process new dtype meta
+  // process new dtypes
   vector<pair<string, dtype::T> > cpts_new;
+
   for (auto&& d: dtypes_meta) {
     // if we are good
     // cpts_new.emplace_back(util::concat(name, '.', ch_name), dt);
     // cpts_new.emplace_back(name, dt);
     
+    cpts_new.emplace_back(d.name, d.type);
   }
   
   for (auto&& c: cpts_new) {
