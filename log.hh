@@ -5,7 +5,7 @@
 #include <functional>
 #include <iostream>
 #include <cassert>
-#include "util/std/type_traits"
+#include "util/std/type_traits.hh"
 
 #include "util/io.hh"
 #include "util/demangle.hh"
