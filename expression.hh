@@ -48,11 +48,12 @@ public:
 struct EFun: Expr {
   using Args_own = vector<uptr<Expr> >;
   using Args = vector<Expr*>;
+  cpt::Ctx& _ctx;
   Operation _oper; 
   Args_own _args;
 
 public:
-  EFun(Operation, Args);
+  EFun(cpt::Ctx&, Operation, Args);
   Data eval() const override;
   dtype::T result_of() const override;
   string to_string() const override;

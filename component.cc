@@ -8,41 +8,17 @@ namespace dtype
 {
 namespace
 {
-Tag tag_of(T dt)
+Tag tag_of(dtype::T dt)
 {
-  auto it = find_if(
-    begin(_meta_info), end(_meta_info),
-    [=](Meta m){return dt == m.type;}
-  );
-  return it != end(_meta_info)? it->tag : THROW_(Not_found_T<T>, dt);
+  auto it = _meta_info.find(dt);
+  return it != end(_meta_info)? it->second.tag : THROW_(Not_found_T<dtype::T>, dt);
 }
 }
 
-unsigned size(T dt) 
+unsigned size(dtype::T dt) 
 {
-  auto it = find_if(
-    begin(_meta_info), end(_meta_info),
-    [=](Meta m){return dt == m.type;}
-  );
-  return it != end(_meta_info)? it->size : THROW_(Not_found_T<T>, dt);
-}
-
-T from_string(string s, bool* found)
-{
-  auto it = find_if(
-    begin(_meta_info), end(_meta_info),
-    [=](Meta m){return s == m.name;}
-  );
-
-  if (it != end(_meta_info)) {
-    if (found) *found = true;
-    return it->type;
-  }
-  else {
-    if (found) *found = false;
-    else THROW_(Not_found, s);
-    return ty_N;
-  }
+  auto it = _meta_info.find(dt);
+  return it != end(_meta_info)? it->second.size : THROW_(Not_found_T<dtype::T>, dt);
 }
 
 string to_string(T dt)
@@ -83,22 +59,30 @@ bool operator%(Tag s, Tag t)
 
 bool operator%(dtype::T s, Tag t) {return tag_of(s) % t;};
 
-vector<Meta> _meta_info = {
+Dtypes _meta_info {
   // boolean
-  {dtype::ty_bool, Tag::boolean, "bool", sizeof(data::Bool)},
+  {dtype::ty_bool, {Tag::boolean, sizeof(data::Bool)}},
   // numeric types
-  {dtype::ty_int, Tag::number, "int", sizeof(data::Int)},
-  {dtype::ty_float, Tag::number, "float", sizeof(data::Float)},
+  {dtype::ty_int, {Tag::number, sizeof(data::Int)}},
+  {dtype::ty_float, {Tag::number, sizeof(data::Float)}},
   // a pair (i, r, scale) Realm defn and index, scale
-  {dtype::ty_rdisc, Tag::realm, "rdisc", sizeof(data::RlmDisc)},
-  {dtype::ty_rcont, Tag::realm, "rcont", sizeof(data::RlmCont)},
+  {dtype::ty_rdisc, {Tag::realm, sizeof(data::RlmDisc)}},
+  {dtype::ty_rcont, {Tag::realm, sizeof(data::RlmCont)}},
   // --not sure how to impl. or if necessary
-  {dtype::ty_str, Tag::N, "str", sizeof(data::Str)},
-  {dtype::ty_N, Tag::N, "()", 0}
+  {dtype::ty_str, {Tag::N, sizeof(data::Str)}},
+  {dtype::ty_N, {Tag::N, 0}}
   // {dtype::ty_tuple, ...},
   // {dtype::ty_expr, sizeof(unsigned*)},
+};
 
-
+DtypeNames _meta_names = {
+  {"bool", dtype::ty_bool},
+  {"int", dtype::ty_int},
+  {"float", dtype::ty_float},
+  {"rdisc", dtype::ty_rdisc},
+  {"rcont", dtype::ty_rcont},
+  {"str", dtype::ty_str},
+  {"()", dtype::ty_N}
 };
 } // namespace dtype
 

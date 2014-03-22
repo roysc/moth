@@ -99,9 +99,8 @@ struct Not_found: public Runtime {using Runtime::Runtime;};
 template <class T> using Not_found_T = WithArg<Not_found, T>;
 
 // Logic
-struct Logic: public std::logic_error
-{using logic_error::logic_error;};
-struct Not_impl: public Logic {using Logic::Logic;};
+struct Logic: public std::logic_error {using logic_error::logic_error;};
+struct Unimplemented: public Logic {using Logic::Logic;};
 struct Internal: public Logic {using Logic::Logic;};
 struct Failed_assert: public Logic {using Logic::Logic;};
 

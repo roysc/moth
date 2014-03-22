@@ -7,6 +7,7 @@
 
 #include "err.hh"
 #include "component.hh"
+#include "cptctx.hh"
 
 namespace expr
 {
@@ -52,10 +53,12 @@ operator<<(std::basic_ostream<Ch,Tr>& out, OpType ot)
 struct Operation
 {
 protected:
+  // cpt::Ctx& _ctx;
   OpType _opn;
 
 public:
-  Operation(OpType op): _opn(op) {}
+  Operation(OpType op): // _ctx(c),
+                        _opn(op) {}
   explicit Operation(const string& e): Operation(to_operation(e)) {}
   explicit Operation(const char* e): Operation(string(e)) {}
   // check validity of string
@@ -97,7 +100,7 @@ public:
   }
 
   // function result types
-  dtype::T res_dtag() const
+  dtype::T res_dtype() const
   {
     static const map<OpType, dtype::T> tbl = {
       {OpType::op_gt, dtype::ty_bool},
@@ -119,7 +122,7 @@ public:
     auto it = tbl.find(_opn);
     return it != end(tbl)? it->second : THROW_(Not_found, __func__);
   }
-
+  
   std::size_t arity() const {return arg_dtags().size();}
 };
 }

@@ -15,18 +15,17 @@
 struct ControlCtx;
 
 ControlCtx::ControlCtx(ModelGen* mg):
-  _modelgen(mg),
   _controls(),
   _triggers(),
-  _entities()
+  _entities(),
+  _cpt_ctx(mg->make_cpts())
 { 
   // controls:
-  auto cpks = _modelgen->component_classes();
-  for (auto&& c : cpks) {
-    auto sh = c.second->control_handle();
-    if (sh) _controls.emplace(c.first, sh);
-  }
+  // for (auto&& c : _cpt_ctx.cpt_types()) {
+  //   auto sh = c.second.control_handle();
+  //   if (sh) _controls.emplace(c.first, sh);
+  // }
 }
 
-// const CptClass* get_cptclass(Compt_id cpid) {return _modelgen->get_cptclass(cpid);}
+// const cpt::Type* get_type(Compt_id cpid) {return _modelgen->get_type(cpid);}
 

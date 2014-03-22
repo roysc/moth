@@ -35,6 +35,7 @@ add_executable(main
   expression.cc
   operation.cc
   component.cc
+  cptctx.cc
   entity.cc
   log.cc
 

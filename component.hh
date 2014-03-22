@@ -42,6 +42,21 @@ enum Type: T
 enum class Tag: unsigned
 { boolean, number, realm, expr, any, N };
 
+// meta info for dtype
+struct Meta
+{
+  // T type;
+  // string name;
+  Tag tag;
+  size_t size;
+};
+
+using Dtypes = map<dtype::T, Meta>;
+using DtypeNames = map<string, dtype::T>;
+
+extern Dtypes _meta_info;
+extern DtypeNames _meta_names;
+
 // subtyping relationships on Tags
 // "any term of type S can be safely used in a context where a
 //  term of type T is expected" -WP
@@ -66,19 +81,8 @@ operator<<(std::basic_ostream<Ch,Tr>& out, Tag tag)
 }
 
 unsigned size(T dt);
-T from_string(string s, bool*);
+// T from_string(string s, bool*);
 string to_string(T dt);
-
-// meta info for dtype - serious change
-struct Meta
-{
-  T type;
-  Tag tag;
-  string name;
-  size_t size;
-};
-
-extern vector<Meta> _meta_info;
 }
 
 namespace data

@@ -41,8 +41,8 @@ int main(int argc, const char* argv[])
   // ---
   // Trigger & entity initialization
   // ---
-  auto tmid = ctx.find_cptclass("_time_");
-  auto locid = ctx.find_cptclass("_loc_");
+  auto tmid = ctx.find_type("_time_");
+  auto locid = ctx.find_type("_loc_");
   auto ctrl_ent = ctx.create_entity({tmid, locid});
     
   // 0-condition, ends the game (bool in a builtin component)
@@ -52,7 +52,7 @@ int main(int argc, const char* argv[])
   // expressions should perhaps have value semantics
   // namespace exb = expr::builder;
   // auto tm_expr = exb::lit(5) == ctrl_ent->ref(tmid);
-  auto tm_expr = new expr::EFun("="_op, {
+  auto tm_expr = ctx.expression("=", {
       new expr::ERef(ctrl_ent->ref(tmid)),
       new expr::ELit(Data::make<data::Int>(5))
     });

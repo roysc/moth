@@ -7,16 +7,6 @@
 
 namespace expr
 {
-// literal
-Data ELit::eval() const {return _value;}
-dtype::T ELit::result_of() const {return _value.dtype();}
-
-// reference
-Data ERef::eval() const
-{ // data ptr
-  auto dptr = _addr();
-  return *dptr;
-}
 dtype::T ERef::result_of() const {return _addr()->dtype();}
 string ERef::to_string() const 
 {
@@ -24,8 +14,8 @@ string ERef::to_string() const
 }
 
 // function/op
-EFun::EFun(Operation o, Args as):
-  _oper(o), _args{}
+EFun::EFun(cpt::Ctx& c, Operation o, Args as):
+  _ctx(c), _oper(o), _args{}
 {
   for (auto&& a: as) _args.emplace_back(a);
 
@@ -46,7 +36,20 @@ string EFun::to_string() const
   return util::concat('(', _oper, ',', argstrs,')');
 }
 
-dtype::T EFun::result_of() const {return _oper.res_dtag();}
+dtype::T EFun::result_of() const {return _oper.res_dtype();}
+
+// * eval *
+
+// literal
+Data ELit::eval() const {return _value;}
+dtype::T ELit::result_of() const {return _value.dtype();}
+
+// reference
+Data ERef::eval() const
+{ // data ptr
+  auto dptr = _addr();
+  return *dptr;
+}
 
 // implementing overloads makes this messy. semantics will need
 // more careful planning
@@ -80,7 +83,7 @@ Data EFun::eval() const
   auto it = eval_fn_tbl().find(k);
   if (it != end(eval_fn_tbl())) {
 
-    // *** call function ***
+    // * call function *
     return it->second(evalled);
   } else {
     LOG_TO_(warning, leval)("No operation defined for ", k);
@@ -107,8 +110,13 @@ const map<FnTbl_key, Eval_fn>& eval_fn_tbl()
   EXPR_FNTBL_ENTRY_BINP_(op_, opsym_, Int, Bool),       \
   EXPR_FNTBL_ENTRY_BINP_(op_, opsym_, Float, Bool)
 
-  
   static const map<FnTbl_key, Eval_fn> _eval_fn_tbl = {
+    EXPR_FNTBL_ENTRY_BINP_2X_(op_eq, ==),
+    EXPR_FNTBL_ENTRY_BINP_2X_(op_ne, !=),
+    EXPR_FNTBL_ENTRY_BINP_2X_(op_gt, >),
+    EXPR_FNTBL_ENTRY_BINP_2X_(op_ge, >=),
+    EXPR_FNTBL_ENTRY_BINP_2X_(op_lt, <),
+    EXPR_FNTBL_ENTRY_BINP_2X_(op_le, <=),
     // not: bool -> bool
     {{OpType::op_not, dtype::ty_bool},
      [](vector<Data> as) {
@@ -120,12 +128,6 @@ const map<FnTbl_key, Eval_fn>& eval_fn_tbl()
        return rd;
      }
     },
-    EXPR_FNTBL_ENTRY_BINP_2X_(op_eq, ==),
-    EXPR_FNTBL_ENTRY_BINP_2X_(op_ne, !=),
-    EXPR_FNTBL_ENTRY_BINP_2X_(op_gt, >),
-    EXPR_FNTBL_ENTRY_BINP_2X_(op_ge, >=),
-    EXPR_FNTBL_ENTRY_BINP_2X_(op_lt, <),
-    EXPR_FNTBL_ENTRY_BINP_2X_(op_le, <=),
   };
   
 #undef EXPR_FNTBL_ENTRY_BINP_2X_

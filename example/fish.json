@@ -1,14 +1,16 @@
 {
   "components": [
-    {"name": "location", "type": "ref(real,real)" },
+    {"name": "location", "type": "ref (real,real)" },
     {"name": "mass", "type": "real"},
-    {"name": "size", "type": "real"},
+    {"name": "size", "type": "int"},
     {"name": "phys", "type": ["location", "mass"] },
-    {"name": "organ", "type": {"kind": "str", "health": "real[0,1]"}},
-    {"name": "body", "type": ["phys", "size", "set(organ)"] }
+    {"name": "organ", "type": {".kind": "str", "health": "real [0,1]"}},
+    {"name": "body", "type": ["phys", "size", "set organ"] }
   ],
   "entities": [
-    { "name": "Fish", "contains": [ "body"]},
+    { "name": "Fish", "contains": [ "body"], "init": {
+      "body.organs": ["eyes", "fins", "teeth", "stomache", "heart", "skin"]
+    }},
     { "name": "Food", "contains": ["phys", "size"]}
   ]
 }

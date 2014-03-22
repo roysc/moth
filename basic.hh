@@ -6,9 +6,9 @@
 #include "typedefs.hh"
 
 // // Component meta-data
-// struct CptClass;
+// struct cpt::Specs;
 
-// // a CptClass that yields controllers
+// // a cpt::Specs that yields controllers
 // struct ControlHandle;
 // using ControlHandle_opt = uptr<ControlHandle>;
 

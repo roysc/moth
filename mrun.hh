@@ -8,7 +8,7 @@
 #include "log.hh"
 #include "event.hh"
 #include "trigger.hh"
-#include "cptclass.hh"
+#include "cptctx.hh"
 #include "controlctx.hh"
 
 // "Runnable model."

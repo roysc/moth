@@ -2,13 +2,11 @@
 // mrun.hh
 #pragma once
 
-// #include "cptclass.hh"
-
-struct CptClass;
+#include "cptctx.hh"
 
 struct ControlHandle
 {
-  const CptClass* cptclass() const {return _cptclass;}
+  const cpt::Specs* cptclass() const {return _cptclass;}
 protected:
-  const CptClass* _cptclass;
+  const cpt::Specs* _cptclass;
 };
