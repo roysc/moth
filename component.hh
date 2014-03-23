@@ -17,6 +17,9 @@ using Data_ptr = Data*;
 using Compt_ptr = Data*;
 using Compt_ptr_k = Data const*;
 
+// t_ can be T or Tag
+#define DTYPE_CHECK_(tag_, t_) ASSERT_BINOP_(t_, tag_, %, "Invalid type");
+
 namespace dtype
 {
 using T = unsigned;

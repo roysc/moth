@@ -25,7 +25,7 @@ EFun::EFun(cpt::Ctx& c, Operation o, Args as):
   for (size_t i{}; i < _args.size(); ++i) { 
     auto dtr = _args[i]->result_of();
     // subtyping relationship, {dtr <: dtags}
-    ASSERT_BINOP_(dtr, dtags[i], %, "Invalid arg type");
+    DTYPE_CHECK_(dtags[i], dtr);
   }
 }
 string EFun::to_string() const
