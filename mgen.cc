@@ -100,6 +100,8 @@ ModelGen::read_ents()
   for (auto&& e: ents_js? *ents_js : THROW_(Not_found, "entities")) {
     auto name = e.second.get<string>("name");
     auto cpts = e.second.get_child("contains");
+    auto ctls = e.second.get_child("controls");
+    auto init = e.second.get_child("initial");
     
     // auto contents = util::transform<set<Compt_id> >(
     //   util::view(cpts),

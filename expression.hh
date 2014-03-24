@@ -67,5 +67,6 @@ public:
   Data eval() const override;
   dtype::T result_of() const override;
   string to_string() const override;
+  Compt_addr address() const {return _addr;}
 };
 } // namespace expr

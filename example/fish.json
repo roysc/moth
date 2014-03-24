@@ -1,20 +1,26 @@
 {
   "components": [
-    {"name": "location", "type": ["R","R"] },
-    {"name": "loc_ref", "type": "ref (location)" },
-    {"name": "mass", "type": "R"},
-    {"name": "size", "type": "Z"},
-    {"name": "phys", "type": ["loc_ref", "mass"] },
-    {"name": "organ", "type": {"kind": "str", "health": "R [0,1]"}},
-    {"name": "body", "type": ["phys", "size", "set (organ)"] }
+    {"name": "_loc_", "type": ["R","R"] },
+    {"name": "_time_", "type": "Z" },
+    {"name": "Loc_ref", "type": "ref (_loc_)" },
+    {"name": "Mass", "type": "R"},
+    {"name": "Size", "type": "Z"},
+    {"name": "Phys", "type": ["Loc_ref", "Mass"] },
+    {"name": "Organ", "type": {"kind": "str", "health": "R [0,1]"}},
+    {"name": "Body", "type": ["Phys", "Size", "set (Organ)"] }
   ],
   "entities": [
-    { "name": "Space", "controls": ["location"] },
-    { "name": "Fish", "contains": [ "body"], "init": {
+    { "name": "SpaceTime", "controls": ["_loc_", "_time_"] },
+    { "name": "Fish", "contains": [ "Body"], "initial": {
       "body.organs": ["eyes", "fins", "teeth", "stomache", "heart", "skin"],
-      "body.phys.loc_ref": "Space.location"
+      "body.phys.loc_ref": "$0"
     }},
-    { "name": "Food", "contains": ["phys", "size"]}
+    { "name": "Food", "contains": ["phys", "size"], "initial": {"loc_ref": "$0"}}
+  ],
+  "initial": [
+    ["SpaceTime", "_world"],
+    ["Fish", "_freddy", [0,5]],
+    ["Food", "_lunch", [4,0]]
   ]
 }
 

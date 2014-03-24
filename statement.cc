@@ -6,15 +6,15 @@
 
 namespace stmt
 {
-void Update::execute(ControlCtx& ctx, Entity* ent) const 
+// set target data
+void Update::execute(ControlCtx& ctx) const 
 {
   LOG_(debug)(__PRETTY_FUNCTION__);
-  // set target data
   auto res = _expr->eval();
-  ent->ref(_cpid)(0)->set(res);
+  _caddr(0)->set(res);
 }
 
-void Halt::execute(ControlCtx& ctx, Entity_ptr) const
+void Halt::execute(ControlCtx& ctx) const
 {
   LOG_(debug)(__PRETTY_FUNCTION__);
   // create warning entity?

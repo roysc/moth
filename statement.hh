@@ -33,7 +33,7 @@ public:
   virtual string name() const {return _name;};
   virtual bool fatal() const {return false;}
   virtual string to_string() const = 0;
-  virtual void execute(ControlCtx&, Entity*) const = 0;
+  virtual void execute(ControlCtx&) const = 0;
   
   template <class Ch,class Tr>
   friend std::basic_ostream<Ch,Tr>& operator<<(
@@ -44,22 +44,27 @@ public:
 
 struct Update: Statement
 {
-  Compt_id _cpid;
+  // Compt_id _cpid;
+  Compt_addr _caddr;
   uptr<expr::Expr> _expr;
+  
 public:
-  Update(string n, Compt_id ci, expr::Expr* e):
-    Statement("update"), _cpid(ci), _expr(e) {}
-  void execute(ControlCtx& ctx, Entity* ent) const override;
+  Update(string n, Compt_addr ca, expr::Expr* e):
+    Statement("update"), _caddr(ca), _expr(e) {}
+  void execute(ControlCtx& ctx) const override;
   string to_string() const
   {
-    return _name + util::concat_pair(_cpid, *_expr);
+    return _name + ": " + util::concat(_caddr);
   }
 };
 
 struct Spawn: Statement
 {
   using Statement::Statement;
-  void execute(ControlCtx&, Entity*) const override {}
+  void execute(ControlCtx&) const override
+  {
+    // TODO: create entity
+  }
   string to_string() const {return _name;}
 };
 
@@ -73,7 +78,7 @@ struct Halt: Signal
 {
 public:
   Halt(): Signal("_halt_") {}
-  void execute(ControlCtx& ctx, Entity*) const override;
+  void execute(ControlCtx& ctx) const override;
   string to_string() const {return _name;}
   bool fatal() const override {return true;}
 };

@@ -46,6 +46,8 @@ int main(int argc, const char* argv[])
   Compt_id
     tmid = ctx.find_type("_time_").at(0),
     locid = ctx.find_type("_loc_").at(0);
+
+  // auto ctrl_ent = ctx
   auto ctrl_ent = ctx.create_entity({tmid, locid});
     
   // 0-condition, ends the game (bool in a builtin component)
@@ -60,7 +62,7 @@ int main(int argc, const char* argv[])
       new expr::ELit(Data::make<data::Int>(5))
     });
   
-  ctx.set_trigger(tm_expr, ctrl_ent, new stmt::Halt);
+  ctx.set_trigger(tm_expr, new stmt::Halt);
     
   // Compt_addr end_flag = ctrl_ent->ref(endid);
   Compt_addr tm_ctr = ctrl_ent->ref(tmid);

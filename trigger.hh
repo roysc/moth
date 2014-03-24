@@ -22,14 +22,12 @@ struct Trigger
   using Stmt = stmt::Statement;
 protected:
   uptr<Expr> _expr;
-  Entity_ptr _ent;              // the "bound" entity
+  // Entity* _ent;                 // the "bound" entity
   uptr<Stmt> _stmt;
 
 public:
-  Trigger(Expr* ex, Entity_ptr ent, Stmt* st):
-    _expr(ex), _ent(ent), _stmt(st) {}
-  // Trigger(uptr<Expr> ex, uptr<Stmt> st):
-  //   _expr(move(ex)), _stmt(move(st)) {}
+  Trigger(Expr* ex, Stmt* st):
+    _expr(move(ex)), _stmt(st) {}
 
   // ~~~ m a g i c ~~~
   // Here shall happen the magic
@@ -49,7 +47,7 @@ public:
     
     if (result.get<data::Bool>().value) {
       // bind statement to entity
-      evtp.reset(new Event(_stmt.get(), _ent));
+      evtp.reset(new Event(_stmt.get()));
     }
     return evtp;
   }

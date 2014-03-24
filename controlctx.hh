@@ -20,10 +20,11 @@ struct ControlCtx
 protected:
   // ModelGen* _modelgen;
   cpt::Ctx _cpt_ctx;
+  // EntCtx _ent_ctx;
   map<Compt_id, ControlHandle*> _controls;
   // entity and trigger data
-  set<uptr<Trigger> > _triggers;
   set<uptr<Entity> > _entities;
+  set<uptr<Trigger> > _triggers;
   uptr<Entity> _ctrl_ent;
 
 public:
@@ -56,9 +57,8 @@ public:
   }
 
   // set a condition, statement set
-  template <class... Ts>
-  bool set_trigger(Ts&&... ts) {
-    return _triggers.emplace(new Trigger{std::forward<Ts>(ts)...}).second;
+  bool set_trigger(expr::Expr* e, stmt::Statement* s) {
+    return _triggers.emplace(new Trigger{e, s}).second;
   }
 
   // handle a Signal object throw from event loop
