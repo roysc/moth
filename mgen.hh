@@ -34,7 +34,9 @@ protected:
   void read_ents();
   
 public:
-  ModelGen(Json js): _json(js) {}
+  ModelGen(Json js):
+    _json(js), _next_id{}, _entdefs{}, _ctrl_cpts{}
+  {}
   
   cpt::Ctx make_cpts();
   

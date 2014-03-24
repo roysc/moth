@@ -11,7 +11,7 @@ void Update::execute(ControlCtx& ctx, Entity* ent) const
   LOG_(debug)(__PRETTY_FUNCTION__);
   // set target data
   auto res = _expr->eval();
-  ent->ref(_cpid)()->set(res);
+  ent->ref(_cpid)(0)->set(res);
 }
 
 void Halt::execute(ControlCtx& ctx, Entity_ptr) const

@@ -17,20 +17,21 @@ namespace cpt
 {
 const dtype::Dtypes Ctx::Ctx::_dtypes(dtype::_meta_info);
 
-CptPath::CptPath(const string& s)
+CptPath::CptPath(const string& s):
+  _parts{}
 {
   namespace rx = std;
-  // namespace rx = boost::regex;
+  // = boost::regex;
   static const rx::regex parts_regex;
-  vector<string> p;
-  bool r;
+
+  if (s.empty()) return;
   
-  r = parse_cptpath(s, p);
+  vector<string> p;
+  bool r = parse_cptpath(s, p);
   // rx::smatch m;
   // r = regex_match(begin(s), end(s), m, parts_regex);
-  
   if (!r) THROW_(Invalid, s);
-
+  
   _parts = p;
 }
 
@@ -38,151 +39,190 @@ Ctx::Ctx(ModelGen& mg, vector<Specs > cpt_specs):
   // _dtypes(dtype::_meta_info),
   _dtype_names(dtype::_meta_names)
 {
-  map<Compt_id, string> cpt_defns;
+  map<Compt_id, CptDefn> cpt_defns;
+  CptNames cpt_names;
   CptAggrs cpt_aggrs;
+
+  auto create_basic = [&] (CptPath path, CptDefn cdef) -> Compt_id {
+    LOG_PUSH_(lbc)("create_basic(", path, ",", cdef, ")");
+    // create a basic component
+    auto cpid = mg.fresh_id();
+        
+    // have to do definition last
+    //   names can refer to specs names
+    //   ref is a dependent type
+    auto rt = cpt_defns.emplace(cpid, cdef);
+    ASSERT_(rt.second, "cpt defn insert: ", cpid);
+
+    auto rn = cpt_names.emplace(cpid, path);
+    ASSERT_(rn.second, "cpt name insert: ", path);
+
+    return cpid;
+  };
   
   // translate dtype specs to meta data
   // evaluate specs, recursing into aggregates
-  fn<vector<Compt_id>(Specs, vector<string>)> create_aggr;
-  create_aggr = [&](Specs cpspecs, vector<string> prefix) -> vector<Compt_id> {
+  fn<vector<Compt_id>(Specs, CptPath)> create_aggr;
+  create_aggr = [&](Specs cpspecs, CptPath prefix) -> vector<Compt_id> {
+    LOG_PUSH_(lcra)("create_aggr(", cpspecs, ',',  prefix,')');
 
-    const auto name = cpspecs.name();
     const auto tpmems = cpspecs.members();
-
+    const CptPath bpath{cpspecs.name()};
+    const auto fpath = prefix + bpath;
+    
     // collect ids for aggregate members
     vector<Compt_id> ret;
     for (auto&& p: tpmems) {
       string tpk, tpv;
       tie(tpk, tpv) = p;
 
-      // if tpk is empty, this is like:
-      // Specs(name, {"", dt}) -> basic compt.
-      if (tpk.empty()) {
-        ASSERT_EQ_(1, tpmems.size(), "logical duct tape");
-        tpk = name;
+      // could be a dtype, but defined inside another defn
+      // or an aggregate...
+      auto itb = cpt_aggrs.find(tpk);
+      if (itb != end(cpt_aggrs)) {
+        for (auto&& c: itb->second)
+          ret.push_back(c);
       }
-      
-      Data init;
-      bool r;
-      LOG_(debug)("Parsing: \"", tpv, '"');
-      if ((r = parse_data(tpv, init))) {
-        LOG_(debug)("=> success: ", init);
-          
-        // THROW_(Invalid, "basic component must refer to dtype (" + tpv + ")");
-      
-        // create a basic component
-        auto cpid = mg.fresh_id();
-
-        // have to do definition last
-        //   names can refer to specs names
-        //   ref is a dependent type
-        // auto dt = init.dtype();
-        // auto rt = cpt_defns.emplace(cpid, CptType(dt, init));
-        auto rt = cpt_defns.emplace(cpid, tpv);
-        ASSERT_(rt.second, "cpt defn insert: ", cpid);
-
-        // append current to path
-        // prefix.push_back(tpk);
-        auto nm = util::io::join(prefix, '.');
-        auto rn = _cpt_names.emplace(nm, cpid);
-        ASSERT_(rn.second, "cpt name insert: ", nm);
-        
-        // CptAggrs::value_type e(tpv, {cpid});
-        auto ra = cpt_aggrs.insert({tpv, {cpid}});
-        ASSERT_(ra.second, "cpt aggr insert: ", tpv);
-
-        // base case: 1 dtype member, "basic" component
-        ret.push_back(cpid);
-      }
-        
-      // next, check if created already
-      // 
-      // hairy here, a name can refer to a basic type or aggregate
-      // we want absolute mapping for basic types
-      // and another mapping for aggregates
-      // 
-      //   auto it = _cpt_names.find(tpk);
-      //   if (it != end(_cpt_names)) {
-      //     for (auto&& e: it->second)
-      //       ret.push_back(e);
-      //   }
-
-        
-      auto it = cpt_aggrs.find(tpk);
-      if (it != end(cpt_aggrs)) {
-        // add all those aggregates to this aggregate
-        for (auto&& e: it->second)
-          ret.push_back(e);
-      }
-      // not found, create it
       else {
-
-        // look up type in specs
-        auto itspec = find_if(
-          begin(cpt_specs), end(cpt_specs),
-          [=](Specs s){return tpv == s.name();}
-        );
-        if (itspec != end(cpt_specs)) {
-          prefix.push_back(itspec->name());
-          for (auto&& c: create_aggr(*itspec, prefix))
-            ret.push_back(c);
+        LOG_(debug)("not in cpt_aggrs: ", tpk);
+        // base case: 1 dtype member, "basic" component
+        CptDefn cdef; bool r;
+        if ((r = parse_data(tpv, cdef))) {
+          LOG_(debug)("=> success: ", cdef);
+          auto cpid = create_basic(bpath + tpk, cdef);
+          ret.push_back(cpid);
         }
-        
-        // todo: implement rest of dtypes (refs, realms)
+        else {
+          LOG_(dtype)("=> failed!");
+          // not dtype, not defined yet. look up in specs
+          LOG_(debug)("looking up type in specs: ", tpv);
 
-        LOG_SHOW_(cpt_specs);
-        // LOG_SHOW_(cpt_aggrs);
-        LOG_SHOW_(_cpt_names);
-        
-        // compt name isn't in the spec, nothing to be done
-        THROW_(Not_found_T<decltype(p)>, p);
+          auto itspec = find_if(
+            begin(cpt_specs), end(cpt_specs),
+            [=](Specs s){return tpv == s.name();}
+          );
+          
+          // found in specs
+          if (itspec != end(cpt_specs)) {
+            LOG_(debug)("=> found");
+            for (auto&& c: create_aggr(*itspec, fpath + tpk))
+              ret.push_back(c);
+            
+          }
+          else {          
+            // compt name isn't in the spec, nothing to be done
+            // THROW_(Not_found_T<decltype(p)>, p);
+            THROW_(Not_found, tpv);
+          }
+        }
       }
-    }
+    } // for tpmems
+      
     return ret;
   };
 
   // iterate and recurse
   for (auto&& s: cpt_specs) {
-    auto aggr = create_aggr(s, {s.name()});
+    auto aggr = create_aggr(s, {});
     auto r = cpt_aggrs.emplace(s.name(), aggr);
-    ASSERT_(r.second, "aggr. insert");
+    // ASSERT_(r.second, "aggr. insert: ", *r.first);
+    if (!r.second) ASSERT_("aggr. insert failed: ", *r.first);
+  }
+  LOG_SHOW_(cpt_specs);
+  LOG_SHOW_(cpt_names);
+  LOG_SHOW_(cpt_aggrs);
+            
+  _cpt_names = cpt_names;
+  _cpt_aggrs = cpt_aggrs;
+
+  // translate to basic types
+  for (auto&& e: cpt_defns) {
+    LOG_PUSH_(lcdf)("CptDefn: ", e.first, " ", get_name(e.first));
+    
+    auto& init = get<0>(e.second);
+    string dep = get<1>(e.second);
+    // a dependent type?
+    if (!dep.empty()) {
+      // LOG_(debug)("  depends on \"", dep, '"');
+
+      auto it = cpt_aggrs.find(dep);
+      if (it == end(cpt_aggrs)) THROW_(Not_found, dep);
+      auto depids = it->second;
+
+      // set init
+      init.set(data::Ref{Compt_addr(depids)});
+    }
+
+    LOG_(debug)("=> ", init);
+    // store type
+    _cpt_types.emplace(e.first, init);
   }
 
-  _cpt_aggrs = cpt_aggrs;
-  // _cpt_types <- cpt_defns;
-  
+  // LOG_SHOW_(_cpt_types);
 }
 
 // using Str_it = string::iterator;
-bool Ctx::parse_data(string str, Data& out) const
+bool Ctx::parse_data(string str, CptDefn& out) const
 {
-  LOG_PUSH_(lprs)(__func__);
-  auto log_at = [&](string s) {
-    return [&, s]{ LOG_(debug)("at: ", s); };
-  };
+  LOG_PUSH_(lprs)(__func__, "(\"", str, "\")");
 
-  const vector<string> simple_dts{"bool", "int", "real", "str", "nil"};
-
+  using qi::int_;
+  using qi::double_;
+  using qi::lit;
   using It = string::iterator;
-  Rule<It> r_simple;
-  for (auto&& e: simple_dts) {
-    auto it = _dtype_names.find(e);
-    if (it == end(_dtype_names)) THROW_(Not_found, e);
-    
-    r_simple |= rule_dtype<It>(out, e, it->second) [log_at(e)];
-  }
-
-  // named references parsed
-  // 
-  vector<string> refs;
   
-  auto r_data =
-    r_simple |
-    rule_realm<It>(out) |
-    rule_ref<It>(out, [&](string s){refs.push_back(s);}) ;
+  Rule<It> r_data;
+
+  qi::symbols<char, dtype::T> r_dt_sym;
+  for (auto&& e: _dtype_names)
+    r_dt_sym.add(e.first, e.second);
+
+  auto cpt_sym = r_sym;
+  
+  r_data =
+    lit("R") [ (                // unbound R
+      [&] { get<0>(out) = Data{dtype::ty_float}; }
+    )] >> -(                    // R [a, b]
+      ('[' >> (double_ % ',') >> ']') [(
+          [&] (vector<double> v) {
+            ASSERT_EQ_(2, v.size(), "realm args");
+            Data r{dtype::ty_rcont};
+            r.set(data::RlmCont{0, v.at(0), v.at(1)});
+            get<0>(out) = r;
+          })]
+    ) |
+    
+    lit("Z") [ (                // unbound Z
+      [&] { get<0>(out) = Data{dtype::ty_int}; }
+    )] >> -(                    // Z [a, b]
+      ('[' >> (int_ % ',') >> ']') [(
+          [&] (vector<int> v) {
+            ASSERT_EQ_(2, v.size(), "realm args");
+            Data r{dtype::ty_rdisc};
+            r.set(data::RlmDisc{0, v.at(0), v.at(1)});
+            get<0>(out) = r;
+          })]
+    ) |
+    
+    // ref (cptsym)
+    lit("ref") >> ('(' >> cpt_sym >> ')') [(
+      [&] (string s) {
+        get<0>(out) = Data{dtype::ty_ref};
+        get<1>(out) = s;
+      }
+    )] |
+    // set(cptsym)
+    lit("set") >> '(' >> cpt_sym >> ')' |
+
+    // dtype name
+    r_dt_sym // [([&](dtype::T dt){get<0>(out) = Data{dt};})]
+
+    // component name
+    // cpt_sym
+    ;
 
   auto f = begin(str), l = end(str);
-  auto r = phrase_parse(f, l, r_data, ascii::space);
+  bool r = phrase_parse(f, l, r_data, ascii::space);
   
   if (f != l) return {};
   return r;

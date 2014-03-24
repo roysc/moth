@@ -13,11 +13,12 @@ using T = unsigned;
 struct Entity;
 struct Data;
 
-struct Compt_addr: pair<Entity*, Compt_id>
+struct Compt_addr: pair<Entity*, vector<Compt_id> >
 {
   using pair::pair;
-  Compt_addr(Compt_id c): Compt_addr(0, c) {}
-  Data* operator()() const;
+  Compt_addr(vector<Compt_id> cs): Compt_addr(0, cs) {}
+  Compt_addr(Compt_id c): Compt_addr(0, {c}) {}
+  Data* operator()(size_t ix) const;
 };
 
 namespace data

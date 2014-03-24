@@ -4,12 +4,6 @@
 #include "entity.hh"
 #include "controlctx.hh"
 
-// dereference
-Data* Compt_addr::operator()() const
-{
-  return first->get(second);
-}
-
 // constructed with set of classes
 // need to "flatten" components
 Entity::Entity(cpt::Ctx& cx, vector<Compt_id>  cpts):
@@ -33,7 +27,6 @@ Entity::Entity(cpt::Ctx& cx, vector<Compt_id>  cpts):
       // ASSERT_EQ_(1, cpts.size(), "logic fail");
       auto r = _compts.emplace(c, _ctx.create_type(c));
       
-      // Data d{cpts.at(0)};
     }
     else {
       THROW_(Internal, "Compt_id not found " + std::to_string(c));

@@ -71,5 +71,5 @@ public:
   
   // class lookup, fwd to modelgen
   // const cpt::Type* get_type(Compt_id cpid) const {return _cpt_ctx.get_type(cpid);}
-  Compt_id find_type(string nm) const {return _cpt_ctx.find_type(nm);}
+  vector<Compt_id> find_type(string nm) const {return _cpt_ctx.find_type(nm);}
 };

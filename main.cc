@@ -43,8 +43,9 @@ int main(int argc, const char* argv[])
   // ---
   // Trigger & entity initialization
   // ---
-  auto tmid = ctx.find_type("_time_");
-  auto locid = ctx.find_type("_loc_");
+  Compt_id
+    tmid = ctx.find_type("_time_").at(0),
+    locid = ctx.find_type("_loc_").at(0);
   auto ctrl_ent = ctx.create_entity({tmid, locid});
     
   // 0-condition, ends the game (bool in a builtin component)
@@ -83,8 +84,8 @@ int main(int argc, const char* argv[])
     // auto inc_stmt = ++stb::ref(tmid);
     // => new stmt::Update{tmid, (exb::ref(tmid) + 1)}
     // => new stmt::Update{tmid, new expr::EFun("+"_op, new expr::ERef(tmid), new expr::ELit(data::Int{1}))}
-    data::Int tmct{tm_ctr()->get<data::Int>().value + 1};
-    tm_ctr()->set(tmct);
+    data::Int tmct{tm_ctr(0)->get<data::Int>().value + 1};
+    tm_ctr(0)->set(tmct);
   }
   
   return 0;

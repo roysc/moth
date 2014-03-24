@@ -52,7 +52,7 @@ ModelGen::make_cpts()
     auto val = tp.get_value<string>();
     if (!val.empty()) {
       // val is present, so it's a single type
-      cpt_specs.push_back({name, {{"", val}}});
+      cpt_specs.push_back({name, {{"0", val}}});
       ASSERT_(tp.empty(), "boost::ptree sanity check");
     }
       

@@ -2,15 +2,27 @@
 // trigger.cc
 
 #include "expression.hh"
+
+#include "util/range/algo.hh"
+
 #include "log.hh"
 #include "entity.hh"
 
 namespace expr
 {
-dtype::T ERef::result_of() const {return _addr()->dtype();}
+dtype::T ERef::result_of() const {return _addr(0)->dtype();}
 string ERef::to_string() const 
 {
-  return util::concat("\"", _addr.first->get_name(_addr.second), "\":", eval());
+  switch (_addr.second.size()) {
+  case 1:
+    return util::concat("\"", _addr.first->get_name(_addr.second.at(0)), "\":", eval());
+  default:
+    return util::concat(
+      "\"", util::range::transform<vector<string> >(
+        util::range::view(_addr.second),
+        [this](Compt_id c) {return _addr.first->get_name(c);}
+      ), "\":", eval());
+  }
 }
 
 // function/op
@@ -47,7 +59,7 @@ dtype::T ELit::result_of() const {return _value.dtype();}
 // reference
 Data ERef::eval() const
 { // data ptr
-  auto dptr = _addr();
+  auto dptr = _addr(0);
   return *dptr;
 }
 

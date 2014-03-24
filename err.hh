@@ -51,6 +51,11 @@
 #define THROW_(Type_, ...) THROW_BASIC_(Type_, __VA_ARGS__)
 #endif
 
+#define THROW_T_a_(TypeBase_, a, ...)                   \
+  THROW_(TypeBase_##_T<decltype(a)>, (a), __VA_ARGS__)
+#define THROW_T_(TypeBase_, ...)                \
+  THROW_T_a_(TypeBase_, __VA_ARGS__)
+
 namespace err
 {
 // wrapper class including diagnostics
@@ -84,6 +89,7 @@ template <class Err, class T>
 struct WithArg: public Err
 {
   T _value;
+
   WithArg(const T& x, string w = ""):
     Err((w.empty()? "" : w + " ") + util::concat('(', x, ')')),
     _value(x) {}
@@ -97,6 +103,17 @@ struct Invalid: public Runtime {using Runtime::Runtime;};
 template <class T> using Invalid_T = WithArg<Invalid, T>;
 struct Not_found: public Runtime {using Runtime::Runtime;};
 template <class T> using Not_found_T = WithArg<Not_found, T>;
+
+template <class N>
+struct Out_of_bounds_T: public std::out_of_range
+{
+  N _val, _high, _low;
+  using out_of_range::out_of_range;
+  Out_of_bounds_T(N v, N h, N l = 0):
+    out_of_range(util::concat(v, " ∉ [", l, h, "]")),
+    _val(v), _high(h), _low(l)
+  { }
+};
 
 // Logic
 struct Logic: public std::logic_error {using logic_error::logic_error;};
