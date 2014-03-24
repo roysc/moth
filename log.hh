@@ -20,15 +20,14 @@
 #endif
 
 // static & thread macros
-#define LOG_(chan_) LOG_TO_(chan_, ::logging::get_global_log())
-// #define LOG_THR_(chan_) (log::get_thread_log()) // thr_?
+#define LOG_(chan_) LOG_TO_(chan_, ::logging::get_thread_log())
 
-// scope a log by "pushing" to (global, or specific) log
+// // scope a log by "pushing" to (global, or specific) log
 #define LOG_PUSH_TO_(logpush_, logtop_)             \
-  ::logging::Log logpush_(#logpush_, &(logtop_)); LOG_TO_(info, logpush_)
+  ::logging::Log logpush_(#logpush_, &(logtop_));   \
+  LOG_TO_(info, logpush_)
 
-#define LOG_PUSH_(logpush_)                         \
-  LOG_PUSH_TO_(logpush_, ::logging::get_global_log())
+#define LOG_PUSH_(logpush_) LOG_PUSH_TO_(logpush_, ::logging::get_thread_log())
 
 #define LOG_SHOW_TO_(x_, log_) LOG_TO_(debug, log_)("(" #x_ ") = ", (x_))
 #define LOG_SHOW_(x_) LOG_(debug)("(" #x_ ") = ", (x_))
@@ -89,9 +88,10 @@ public:
     _name(nm), _out(l->_out), _indent(++l->_indent), _base(l) {}
   ~Log() 
   {
-    if (!_base) return;
-    assert(_base->_indent > 0);
-    --_base->_indent;
+    if (_base) {
+      assert(_base->_indent > 0);
+      --_base->_indent;
+    }
   }
 
   string name() const {return _name;}

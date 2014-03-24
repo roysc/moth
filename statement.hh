@@ -4,7 +4,12 @@
 
 #include "log.hh"
 #include "typedefs.hh"
+
 #include "expression.hh"
+// #include "controlctx.hh"
+
+struct Entity;
+struct ControlCtx;
 
 namespace stmt
 {
@@ -25,10 +30,11 @@ public:
     _name(n)
   {}
 
-  string name() const {return _name;};
+  virtual string name() const {return _name;};
+  virtual bool fatal() const {return false;}
   virtual string to_string() const = 0;
-  virtual void execute(ControlCtx&, Entity_ptr) const = 0;
-
+  virtual void execute(ControlCtx&, Entity*) const = 0;
+  
   template <class Ch,class Tr>
   friend std::basic_ostream<Ch,Tr>& operator<<(
     std::basic_ostream<Ch,Tr>& out, 
@@ -43,13 +49,7 @@ struct Update: Statement
 public:
   Update(string n, Compt_id ci, expr::Expr* e):
     Statement("update"), _cpid(ci), _expr(e) {}
-  void execute(ControlCtx& ctx, Entity_ptr ent) const override
-  {
-    LOG_(debug)(__PRETTY_FUNCTION__);
-    // set target data
-    auto res = _expr->eval();
-    ent->ref(_cpid)()->set(res);
-  }
+  void execute(ControlCtx& ctx, Entity* ent) const override;
   string to_string() const
   {
     return _name + util::concat_pair(_cpid, *_expr);
@@ -59,7 +59,7 @@ public:
 struct Spawn: Statement
 {
   using Statement::Statement;
-  void execute(ControlCtx&, Entity_ptr) const override {}
+  void execute(ControlCtx&, Entity*) const override {}
   string to_string() const {return _name;}
 };
 
@@ -67,14 +67,13 @@ struct Spawn: Statement
 struct Signal: Statement
 {
   using Statement::Statement;
-  virtual bool fatal() const = 0;
 };
 
 struct Halt: Signal
 {
 public:
   Halt(): Signal("_halt_") {}
-  void execute(ControlCtx& ctx, Entity_ptr) const override;
+  void execute(ControlCtx& ctx, Entity*) const override;
   string to_string() const {return _name;}
   bool fatal() const override {return true;}
 };

@@ -10,7 +10,7 @@
 
 #include "basic.hh"
 #include "operation.hh"
-#include "entity.hh"
+// #include "entity.hh"
 
 namespace expr
 {

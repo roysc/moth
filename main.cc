@@ -7,10 +7,12 @@
 #include <thread>
 #include <chrono>
 
-#include "json.hh"
 #include "log.hh"
+#include "json.hh"
 
+#include "typedefs.hh"
 #include "mgen.hh"
+#include "controlctx.hh"
 #include "mrun.hh"
 
 int main(int argc, const char* argv[])
@@ -32,10 +34,10 @@ int main(int argc, const char* argv[])
 
   LOG_PUSH_(lmain)("main()");
 
-  LOG_TO_(info, lmain)("creating ModelGen");
+  LOG_(info)("creating ModelGen");
   ModelGen mg(js);
   
-  LOG_TO_(info, lmain)("creating ControlCtx");
+  LOG_(info)("creating ControlCtx");
   ControlCtx ctx(&mg);
 
   // ---
@@ -62,7 +64,7 @@ int main(int argc, const char* argv[])
   // Compt_addr end_flag = ctrl_ent->ref(endid);
   Compt_addr tm_ctr = ctrl_ent->ref(tmid);
 
-  LOG_PUSH_TO_(lloop, lmain)("main loop");
+  LOG_PUSH_(lloop)("main loop");
   for (bool stop{}; !stop; ) {
     std::this_thread::sleep_for(std::chrono::milliseconds{200});
 

@@ -1,13 +1,12 @@
 // -*- coding: utf-8 -*-
 // mgen.cc
 
+#include "mgen.hh"
+
 #include "util/range/algo.hh"
 
-#include "err.hh"
 #include "log.hh"
 #include "assert.hh"
-
-#include "mgen.hh"
 
 using cpt::Specs;
 // using cpt::Ctx::CptType;
@@ -21,7 +20,7 @@ ModelGen::make_cpts()
 
   // (name, [tuple members])
   // using Specs = pair<string, vector<string> >;
-  vector<Specs> dtype_specs;
+  vector<Specs> cpt_specs;
   
   // process
   for (auto&& c: cpts_js? *cpts_js : THROW_(Not_found, "components")) {
@@ -53,7 +52,7 @@ ModelGen::make_cpts()
     auto val = tp.get_value<string>();
     if (!val.empty()) {
       // val is present, so it's a single type
-      dtype_specs.push_back({name, {val}});
+      cpt_specs.push_back({name, {{"", val}}});
       ASSERT_(tp.empty(), "boost::ptree sanity check");
     }
       
@@ -62,6 +61,7 @@ ModelGen::make_cpts()
       // tuple member types
       Specs::Members mems;
 
+      size_t ix{};
       for (auto&& child: tp) {
         auto ch_name = child.first;
         auto ch_val = child.second.get_value<string>();
@@ -70,34 +70,23 @@ ModelGen::make_cpts()
           THROW_(Invalid, util::concat("empty type name (for \"", ch_name, "\")"));
           
         // boost sets key to "" for json arrays
-        // in that case, name it with the type
+        // in that case, name it with the index
         if (ch_name.empty())
-          ch_name = ch_val;
-        else {
-          if (ch_name.at(0) == '.') {
-            // ".name" means create inline, dont look up type
-            // actual name is created like "parent__name"
-            auto nm = name + "__" + ch_name.substr(1);
-            dtype_specs.push_back({nm, {ch_val}});
-          }
-        }
+          ch_name = std::to_string(ix++);
         
-        mems.push_back(ch_val);
-        
-        // to be able to set a custom name, it must be recorded somehow
-        // as.emplace(ch_name, ch_val);
+        mems.emplace_back(ch_name, ch_val);
       }
-      dtype_specs.emplace_back(name, mems);
+      cpt_specs.push_back({name, mems});
     }
           
     // no children; it's an empty {}
     else {
       LOG_(warning)("empty component \"", name, "\"");
-      dtype_specs.push_back({name, {}});
+      cpt_specs.push_back({name, {}});
     }
   } // processed json
   
-  return cpt::Ctx(*this, dtype_specs);
+  return cpt::Ctx(*this, cpt_specs);
 }
 
 void

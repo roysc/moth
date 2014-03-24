@@ -3,6 +3,7 @@
 
 #include <algorithm>
 #include "component.hh"
+#include "data.hh"
 
 namespace dtype
 {
@@ -78,45 +79,11 @@ Dtypes _meta_info {
 DtypeNames _meta_names = {
   {"bool", dtype::ty_bool},
   {"int", dtype::ty_int},
-  {"float", dtype::ty_float},
-  {"rdisc", dtype::ty_rdisc},
-  {"rcont", dtype::ty_rcont},
+  {"real", dtype::ty_float},
+  {"realm(int)", dtype::ty_rdisc},
+  {"realm(real)", dtype::ty_rcont},
   {"str", dtype::ty_str},
-  {"()", dtype::ty_N}
+  {"nil", dtype::ty_N}
 };
 } // namespace dtype
 
-string Data::to_string() const
-{
-  string ret;
-    
-  // `val_' for value
-#define DATA_TO_STRING_CASE_(dt_, Type_, str_expr_) \
-  case dtype::dt_: {                                \
-    const data::Type_& val_ = get<data::Type_>();   \
-    ret = ("{" #Type_ ", ") + (str_expr_) + '}';    \
-  } break
-    
-  switch (_dtype) {
-  DATA_TO_STRING_CASE_(ty_bool, Bool, util::concat(val_.value));
-  DATA_TO_STRING_CASE_(ty_int, Int, util::concat(val_.value));
-  DATA_TO_STRING_CASE_(ty_float, Float, util::concat(val_.value));
-  DATA_TO_STRING_CASE_(ty_rdisc, RlmDisc, util::concat(
-                         '(', val_.index,
-                         ',', val_.realm_max, 
-                         ',', val_.offset, 
-                         ')'));
-  DATA_TO_STRING_CASE_(ty_rcont, RlmCont, util::concat(
-                         '(', val_.index,
-                         ',', val_.realm_max, 
-                         ',', val_.offset, 
-                         ')'));
-  DATA_TO_STRING_CASE_(ty_str, Str, string("\"\""));
-  DATA_TO_STRING_CASE_(ty_ref, Ref<void>, util::concat(val_.value));
-#undef DATA_TO_STRING_CASE_
-      
-  default:
-    THROW_(Invalid_T<dtype::T>, _dtype);
-  }
-  return ret;
-}

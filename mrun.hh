@@ -2,13 +2,8 @@
 // mrun.hh
 #pragma once
 
-#include <utility>
-#include <algorithm>
-
 #include "log.hh"
 #include "event.hh"
-#include "trigger.hh"
-#include "cptctx.hh"
 #include "controlctx.hh"
 
 // "Runnable model."
@@ -29,7 +24,7 @@ vector<uptr<Event> > eval_triggers(ControlCtx& ctx)
   vector<uptr<Event> > evtv;
   LOG_PUSH_(ltrig)(__func__);
   for (auto&& cond: ctx.triggers()) {    
-    LOG_TO_(debug, ltrig)(*cond);
+    LOG_(debug)(*cond);
     auto e = (*cond)();
     if (e) evtv.push_back(move(e));
   }

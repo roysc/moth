@@ -6,6 +6,14 @@
 
 namespace stmt
 {
+void Update::execute(ControlCtx& ctx, Entity* ent) const 
+{
+  LOG_(debug)(__PRETTY_FUNCTION__);
+  // set target data
+  auto res = _expr->eval();
+  ent->ref(_cpid)()->set(res);
+}
+
 void Halt::execute(ControlCtx& ctx, Entity_ptr) const
 {
   LOG_(debug)(__PRETTY_FUNCTION__);

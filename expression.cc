@@ -86,7 +86,7 @@ Data EFun::eval() const
     // * call function *
     return it->second(evalled);
   } else {
-    LOG_TO_(warning, leval)("No operation defined for ", k);
+    LOG_(warning)("No operation defined for ", k);
     // return nil for dtype
     return {result_of()};
   }

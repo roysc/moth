@@ -3,10 +3,12 @@
 #pragma once
 
 #include <algorithm>
+
+#include "util/range/adapt.hh"
 #include "util/range/algo.hh"
 
 #include "log.hh"
-// #include "basic.hh"
+#include "data.hh"
 #include "component.hh"
 
 // # each cpt type C
@@ -23,16 +25,16 @@ namespace cpt
 // Aggregate Specs
 struct Specs
 {
-  using Members = vector<string>;
-  using Aliases = map<string, string>;
+  using Members = vector<pair<string, string> >;
+  // using Aliases = map<string, string>;
 protected:
   string _name;
   Members _members;
   // Aliases _aliases;
   
 public:
-  Specs(string n, Members ms, Aliases as = {}): 
-    _name(n), _members(ms)// , _aliases(as)
+  Specs(string n, Members ms): 
+    _name(n), _members(ms)
   {}
 
 public:
@@ -45,6 +47,41 @@ public:
   ControlHandle* control_handle() const {return {};}
 };
 
+// attempt at a well-behaved path key
+struct CptPath
+{
+  using Parts = vector<string>;
+  Parts _parts;
+  
+  CptPath(const Parts& ps): _parts(ps) {}
+  CptPath(const string& s);
+    
+  // using RangeT = decltype(util::range::join(std::declval<Parts>(), char{}));
+  // RangeT range() const { return util::range::join(_parts, '.'); }
+
+  string str() const {return util::io::join(_parts, "");}
+    
+  bool operator==(const CptPath& that) const {return _parts == that._parts;}
+  bool operator<(const CptPath& that) const
+  {
+    auto ps = that._parts;
+    auto it = begin(ps);
+      
+    for (auto&& e: _parts) {
+      if (it == end(ps)) return false;
+      if (e < *it) return true;
+      if (e > *it) return false;
+      ++it;
+    }
+    return false;
+  }
+};
+
+template <class Ch, class Tr>
+std::basic_ostream<Ch,Tr>&
+operator<<(std::basic_ostream<Ch,Tr>& out, const CptPath& p)
+{ return out << '"' << p.str() << '"'; }
+
 //! The "context" of a set of well-defined components
 //
 // distinction between dtypes, component types, and component data:
@@ -53,28 +90,33 @@ public:
 // component type: tuple(of basic components) : (name, [basic])
 struct Ctx
 {
-  struct CptType;
-
   struct CptType
   {
     enum Kind { basic, named };
     Kind _kind;
     dtype::T _dtype;
+    
     CptType(bool k, dtype::T dt):
       _kind(k? basic : named), _dtype(dt) {}
-    // bool is_basic() const {return 1 == _mems.size();}
+    
     bool is_basic() const {return _kind == Kind::basic;}
+    Data init() const
+    {
+      Data ret{_dtype};
+      // 
+      return ret;
+    }
   };
-  
+
+  using DtypeNames = map<string, dtype::T>;
+  // using Dtype_ids = map<dtype::T, const dtype::Meta*>;
   using CptTypes = map<Compt_id, CptType>;
-  using CptNames = map<string, Compt_id>;
+  // using CptNames = map<string, Compt_id>;
+  using CptNames = map<CptPath, Compt_id>;
   using CptAggrs = map<string, vector<Compt_id>>;
   // using CptNames = CptAggrs;
   
 protected:
-  using DtypeNames = map<string, dtype::T>;
-  // using Dtype_ids = map<dtype::T, const dtype::Meta*>;
-
   static const dtype::Dtypes _dtypes;
   const DtypeNames _dtype_names;
   // Dtype_ids _dtype_ids;
@@ -86,14 +128,23 @@ protected:
 
 public:
   Ctx(ModelGen& mg, vector<Specs> cts);
+
+  bool parse_data(string s, Data& out) const;  
+  // Data parse_data(string s) const
+  // {
+  //   Data ret;
+  //   if (!parse_data(begin(s), end(s), ret)) THROW_(Invalid, "parsing failed");
+  //   return ret;
+  // }
   
   Data create_type(Compt_id c) const
   {
     auto cpt = get_type(c);
     if (!cpt) THROW_(Not_found_T<Compt_id>, c);
 
-    THROW_(Unimplemented, __func__);
-    return Data{};
+    return cpt->init();
+    // THROW_(Unimplemented, __func__);
+    // return Data{};
   }
   
   const CptType* get_type(Compt_id cpid) const
@@ -106,17 +157,18 @@ public:
     THROW_(Not_found_T<Compt_id>, cpid);
   }
   
-  Compt_id find_type(string nm) const
+  Compt_id find_type(CptPath p) const
   {
-    auto it = _cpt_names.find(nm);
-    return it != end(_cpt_names) ? it->second : THROW_(Not_found, nm);
+    // CptPath cp(p);
+    auto it = _cpt_names.find(p);
+    return it != end(_cpt_names) ? it->second : THROW_(Not_found, p.str());
   }
 
-  string get_name(Compt_id cpid) const
+  CptPath get_name(Compt_id cpid) const
   {
     auto rg = filter(
-      util::view(_cpt_names),
-      [=](CptNames::value_type e){return cpid == e.second;}
+      util::range::view(_cpt_names),
+      [=](const CptNames::value_type& e){return cpid == e.second;}
     );
     ASSERT_EQ_(1, count(rg), "component name is not unique");
     return rg.front().first;
@@ -127,7 +179,7 @@ template <class Ch,class Tr>
 std::basic_ostream<Ch,Tr>& 
 operator<<(std::basic_ostream<Ch,Tr>& out, const Specs& cpc)
 {
-  util::print_to(out, "CptClass(\"", cpc.name(), "\",", cpc.members(), ")");
+  util::print_to(out, "Specs(\"", cpc.name(), "\",", cpc.members(), ")");
   return out;
 }
 }

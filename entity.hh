@@ -2,21 +2,11 @@
 // entity.hh
 #pragma once
 
+#include "data.hh"
 #include "component.hh"
 #include "cptctx.hh"
 
-struct ControlCtx;
-
-// struct ControlCtx;
-struct Compt_addr: pair<Entity_ptr, Compt_id>
-{
-  using pair::pair;
-  Data_ptr operator()() const;
-};
-
 // An object instance in the running model
-struct Entity;
-
 //
 using Compts = map<Compt_id, Data>;
 // using Compts = map<Compt_id, Data
@@ -31,7 +21,7 @@ public:
   Entity(cpt::Ctx& cx, vector<Compt_id> cpts);  
 
   // O(log n)
-  Compt_ptr get(Compt_id id)
+  Data* get(Compt_id id)
   {
     auto it = _compts.find(id);
     return it != end(_compts) ? &(it->second) : THROW_(Not_found_T<Compt_id>, id);

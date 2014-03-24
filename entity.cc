@@ -5,7 +5,7 @@
 #include "controlctx.hh"
 
 // dereference
-Data_ptr Compt_addr::operator()() const
+Data* Compt_addr::operator()() const
 {
   return first->get(second);
 }
@@ -45,7 +45,7 @@ Entity::Entity(cpt::Ctx& cx, vector<Compt_id>  cpts):
 
 string Entity::get_name(Compt_id id) const
 {
-  return _ctx.get_name(id);
+  return _ctx.get_name(id).str();
 }
 
 // // O(n)

@@ -6,8 +6,9 @@
 
 #include "json.hh"
 #include "err.hh"
-#include "cptctx.hh" 
+
 #include "entdef.hh"
+#include "cptctx.hh" 
 
 // """
 // The generation context for a generator;

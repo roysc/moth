@@ -2,20 +2,16 @@
 // controlctx.hh
 #pragma once
 
-// #include "cptctx.hh"
 #include "log.hh"
+#include "expression.hh"
 #include "statement.hh"
 #include "trigger.hh"
 #include "entity.hh"
-#include "control.hh"
-#include "mgen.hh"
 
 // "Contexts" for components needing centralized control
 // eg. Location/coordinates
 //     Physics
 //     Information network
-
-struct ModelGen;
 
 // TODO controller strategy
 // Control context for sim. instance
@@ -34,9 +30,9 @@ public:
   ControlCtx(ModelGen* mg);
   virtual ~ControlCtx() {}
 
-  set<Entity_ptr> entities() const
+  set<Entity*> entities() const
   {
-    set<Entity_ptr> ret;
+    set<Entity*> ret;
     for (auto&& e: _entities) ret.insert(e.get());
     return ret;
   }
@@ -48,14 +44,14 @@ public:
   }
   // map<Compt_id, ControlHandle*> controls() const {return controls;}
   // create ents., triggers
-  Entity_ptr create_entity(vector<Compt_id> cs)
+  Entity* create_entity(vector<Compt_id> cs)
   {
     auto insr = _entities.emplace(new Entity(_cpt_ctx, cs));
     return insr.second? insr.first->get() : LOG_EVAL_(nullptr);
   }
 
   // set a condition, statement set
-  expr::Expr* expression(string o, expr::EFun::Args as) {
+  expr::Expr* expression(string o, vector<expr::Expr*> as) {
     return new expr::EFun(_cpt_ctx, expr::Operation(o), as);
   }
 
@@ -67,7 +63,7 @@ public:
 
   // handle a Signal object throw from event loop
   // relies on dynamic type
-  bool handle_signal(const stmt::Signal& sig)
+  bool handle_signal(const stmt::Statement& sig)
   {
     // small set of important events handled directly
     return !sig.fatal();
