@@ -52,8 +52,8 @@ public:
   }
 
   // set a condition, statement set
-  expr::Expr* expression(string o, vector<expr::Expr*> as) {
-    return new expr::EFun(_cpt_ctx, expr::Operation(o), as);
+  expr::Expr* expression(string o, vector<const expr::Expr*> as) {
+    return new expr::EFun(expr::Operation(o), as);
   }
 
   // set a condition, statement set

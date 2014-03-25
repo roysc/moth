@@ -39,4 +39,17 @@ void Halt::execute(ControlCtx& ctx) const
   // hacky, works for now
   throw *this;
 }
+
+namespace builder
+{
+Update* operator<<(Ref_ r, const expr::Expr* v)
+{
+  return new Update(r.address, v);
+}
+
+Incr* operator+=(Ref_ r, int v)
+{
+  return new Incr(r.address, v);
+}
+}
 }

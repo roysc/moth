@@ -26,8 +26,8 @@ string ERef::to_string() const
 }
 
 // function/op
-EFun::EFun(cpt::Ctx& c, Operation o, Args as):
-  _ctx(c), _oper(o), _args{}
+EFun::EFun(Operation o, Args as):
+  _oper(o), _args{}
 {
   for (auto&& a: as) _args.emplace_back(a);
 
@@ -146,6 +146,16 @@ const map<FnTbl_key, Eval_fn>& eval_fn_tbl()
 #undef EXPR_FNTBL_ENTRY_BINP_
   
   return _eval_fn_tbl;
+}
+
+inline
+namespace builder
+{
+EFun* operator==(const Expr& a, const Expr& b)
+{
+  return new EFun(Operation("="), {&a, &b});
+}
+
 }
 
 }

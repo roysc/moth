@@ -13,6 +13,7 @@
 #include "typedefs.hh"
 #include "mgen.hh"
 #include "controlctx.hh"
+// #include "expression.hh"
 #include "mrun.hh"
 
 int main(int argc, const char* argv[])
@@ -58,16 +59,17 @@ int main(int argc, const char* argv[])
   // 
   auto tm_ctr = ctrl_ent->ref({tmid});
 
-  // when to stop
-  auto end_ex = ctx.expression("=", {
-      new expr::ERef(tm_ctr),
-      new expr::ELit(Data::make<data::Int>(10))
-    });
-  ctx.set_trigger(end_ex, new stmt::Halt);
+  namespace exb = expr::builder;
+  namespace stb = stmt::builder;
 
   // tick the clock
-  auto tick_st = new stmt::Incr(tm_ctr, +1);
-  ctx.set_trigger(nullptr, tick_st);
+  ctx.set_trigger(nullptr, stb::ref(tm_ctr) += 1);
+
+  // when to stop
+  ctx.set_trigger(
+    (*exb::ref(tm_ctr) == *exb::lit<data::Int>(10)),
+    stb::halt()
+  );
 
   LOG_PUSH_(lloop)("main loop");
   for (bool stop{}; !stop; ) {

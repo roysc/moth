@@ -46,10 +46,10 @@ struct Update: Statement
 {
   // Compt_id _cpid;
   Compt_addr _caddr;
-  uptr<expr::Expr> _expr;
+  uptr<const expr::Expr> _expr;
   
 public:
-  Update(string n, Compt_addr ca, expr::Expr* e):
+  Update(Compt_addr ca, const expr::Expr* e):
     Statement("update"), _caddr(ca), _expr(e) {}
   void execute(ControlCtx& ctx) const override;
   string to_string() const
@@ -62,7 +62,7 @@ struct Incr: Update
 {
   int _amt;
 public:
-  Incr(Compt_addr ca, int a): Update("incr", ca, 0), _amt(a) {}
+  Incr(Compt_addr ca, int a): Update(ca, 0), _amt(a) {}
   void execute(ControlCtx& ctx) const override;
 };
 
@@ -90,4 +90,22 @@ public:
   string to_string() const {return _name;}
   bool fatal() const override {return true;}
 };
+
+namespace builder
+{
+
+// template <class V>
+// Incr operator+=(expr::ERef& r, V&& v);x
+
+struct Ref_ { Compt_addr address; };
+inline
+Ref_ ref(Compt_addr ca) {return Ref_{ca}; }
+
+Update* operator<<(Ref_ r, const expr::Expr* v);
+
+Incr* operator+=(Ref_ r, int v);
+
+inline
+Halt* halt() {return new Halt;}
+}
 }

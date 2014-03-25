@@ -46,14 +46,14 @@ public:
 
 // function/operator
 struct EFun: Expr {
-  using Args_own = vector<uptr<Expr> >;
-  using Args = vector<Expr*>;
-  cpt::Ctx& _ctx;
+  using Args_own = vector<uptr<const Expr> >;
+  using Args = vector<const Expr*>;
+  // cpt::Ctx& _ctx;
   Operation _oper; 
   Args_own _args;
 
 public:
-  EFun(cpt::Ctx&, Operation, Args);
+  EFun(Operation, Args);
   Data eval() const override;
   dtype::T result_of() const override;
   string to_string() const override;
@@ -69,4 +69,25 @@ public:
   string to_string() const override;
   Compt_addr address() const {return _addr;}
 };
+
+inline
+namespace builder
+{
+// struct Ref_ { Compt_addr address; };
+
+inline
+// Ref_ ref(Compt_addr ca) {return Ref_{ca};}
+ERef* ref(Compt_addr ca) {return new ERef(ca);}
+
+template <class D, class... Ts>
+ELit* lit(Ts&&... vs)
+{
+  return new ELit(Data::make<D>(std::forward<Ts>(vs)...));
+}
+
+// EFun* operator==(Ref_ r,  const Expr& b);
+// EFun* operator==(const Expr& a,  Ref_ r);
+EFun* operator==(const Expr& a,  const Expr& b);
+}
+
 } // namespace expr
