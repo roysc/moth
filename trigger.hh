@@ -21,13 +21,13 @@ struct Trigger
   using Expr = expr::Expr;
   using Stmt = stmt::Statement;
 protected:
-  uptr<Expr> _expr;
+  uptr<const Expr> _expr;
   // Entity* _ent;                 // the "bound" entity
   uptr<Stmt> _stmt;
 
 public:
-  Trigger(Expr* ex, Stmt* st):
-    _expr(move(ex)), _stmt(st) {}
+  Trigger(const Expr* ex, Stmt* st):
+    _expr(ex), _stmt(st) {}
 
   // ~~~ m a g i c ~~~
   // Here shall happen the magic

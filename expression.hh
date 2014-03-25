@@ -70,24 +70,33 @@ public:
   Compt_addr address() const {return _addr;}
 };
 
-inline
 namespace builder
 {
-// struct Ref_ { Compt_addr address; };
+// ADL-assistance class for operators
+struct Ex
+{
+  const Expr* _expr;
+  Ex(Compt_addr r): _expr(new ERef(r)) {}
+  Ex(Data d): _expr(new ELit(d)) {}
+  Ex(string o, EFun::Args as): _expr(new EFun(Operation(o), as)) {}
+  // template <class... Es>
+  // Ex(string o, const Es&... es): _expr(new EFun(Operation(o), {es...})) {}
+
+  operator const Expr*() const {return _expr;}
+};
 
 inline
-// Ref_ ref(Compt_addr ca) {return Ref_{ca};}
-ERef* ref(Compt_addr ca) {return new ERef(ca);}
+Ex ref(Compt_addr ca) {return Ex{ca};}
 
 template <class D, class... Ts>
-ELit* lit(Ts&&... vs)
-{
-  return new ELit(Data::make<D>(std::forward<Ts>(vs)...));
-}
+Ex lit(Ts&&... vs) { return Ex(Data::make<D>(std::forward<Ts>(vs)...)); }
 
-// EFun* operator==(Ref_ r,  const Expr& b);
-// EFun* operator==(const Expr& a,  Ref_ r);
-EFun* operator==(const Expr& a,  const Expr& b);
+inline Ex operator==(Ex a, Ex b) { return Ex("=", {a, b}); }
+inline Ex operator!=(Ex a, Ex b) { return Ex("≠", {a, b}); }
+inline Ex operator>(Ex a, Ex b) { return Ex(">", {a, b}); }
+inline Ex operator<(Ex a, Ex b) { return Ex("<", {a, b}); }
+inline Ex operator>=(Ex a, Ex b) { return Ex("≥", {a, b}); }
+inline Ex operator<=(Ex a, Ex b) { return Ex("≤", {a, b}); }
 }
 
 } // namespace expr

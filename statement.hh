@@ -93,19 +93,22 @@ public:
 
 namespace builder
 {
-
-// template <class V>
-// Incr operator+=(expr::ERef& r, V&& v);x
+// same as expression wrapper
+struct St
+{
+  Statement* _stmt;
+};
 
 struct Ref_ { Compt_addr address; };
-inline
-Ref_ ref(Compt_addr ca) {return Ref_{ca}; }
+inline Ref_ ref(Compt_addr ca) {return Ref_{ca}; }
+// inline St ref(Compt_addr ca) {return Ref_{ca}; }
 
 Update* operator<<(Ref_ r, const expr::Expr* v);
-
 Incr* operator+=(Ref_ r, int v);
+// St operator<<(Ref_ r, const expr::Expr* v);
+// St operator+=(Ref_ r, int v);
 
-inline
-Halt* halt() {return new Halt;}
+inline Halt* halt() {return new Halt;}
+// inline St halt() {return St(new Halt);}
 }
 }

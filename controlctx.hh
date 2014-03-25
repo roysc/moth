@@ -57,7 +57,7 @@ public:
   }
 
   // set a condition, statement set
-  bool set_trigger(expr::Expr* e, stmt::Statement* s) {
+  bool set_trigger(const expr::Expr* e, stmt::Statement* s) {
     // for nil expression, set const Pred = 1
     if (!e)
       e = new expr::ELit(Data::make<data::Bool>(true));

@@ -148,13 +148,8 @@ const map<FnTbl_key, Eval_fn>& eval_fn_tbl()
   return _eval_fn_tbl;
 }
 
-inline
 namespace builder
 {
-EFun* operator==(const Expr& a, const Expr& b)
-{
-  return new EFun(Operation("="), {&a, &b});
-}
 
 }
 

@@ -63,11 +63,11 @@ int main(int argc, const char* argv[])
   namespace stb = stmt::builder;
 
   // tick the clock
-  ctx.set_trigger(nullptr, stb::ref(tm_ctr) += 1);
+  ctx.set_trigger(nullptr, (stb::ref(tm_ctr) += 1));
 
   // when to stop
   ctx.set_trigger(
-    (*exb::ref(tm_ctr) == *exb::lit<data::Int>(10)),
+    (exb::ref(tm_ctr) >= exb::lit<data::Int>(10)),
     stb::halt()
   );
 
@@ -80,7 +80,7 @@ int main(int argc, const char* argv[])
     auto evts = run::eval_triggers(ctx);
     // return val indicates current validity
     stop = !run::run_events(ctx, evts);
-
+    
     // LOG_SHOW_TO_(ctx.entities().size(), lloop);
     // LOG_SHOW_TO_(ctx.triggers().size(), lloop);
   }
