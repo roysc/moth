@@ -55,7 +55,7 @@ struct Meta
 };
 
 using Dtypes = map<dtype::T, Meta>;
-using DtypeNames = map<string, dtype::T>;
+using DtypeNames = map<dtype::T, string>;
 
 extern Dtypes _meta_info;
 extern DtypeNames _meta_names;

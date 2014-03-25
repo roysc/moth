@@ -28,7 +28,7 @@ protected:
   uptr<Entity> _ctrl_ent;
 
 public:
-  ControlCtx(ModelGen* mg);
+  ControlCtx(ModelGen& mg);
   virtual ~ControlCtx() {}
 
   set<Entity*> entities() const

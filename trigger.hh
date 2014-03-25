@@ -45,7 +45,7 @@ public:
     auto result = _expr->eval();
     LOG_(debug)("=> ", result);
     
-    if (result.get<data::Bool>().value) {
+    if (result.get_at<data::Bool, 0>()) {
       // bind statement to entity
       evtp.reset(new Event(_stmt.get()));
     }

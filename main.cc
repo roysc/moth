@@ -38,16 +38,15 @@ int main(int argc, const char* argv[])
   ModelGen mg(js);
   
   LOG_(info)("creating ControlCtx");
-  ControlCtx ctx(&mg);
+  ControlCtx ctx(mg);
 
   // ---
   // Trigger & entity initialization
   // ---
   Compt_id
-    tmid = ctx.find_type("_time_").at(0),
-    locid = ctx.find_type("_loc_").at(0);
+    tmid = ctx.find_type("_Time_").at(0),
+    locid = ctx.find_type("_Loc_").at(0);
 
-  // auto ctrl_ent = ctx
   auto ctrl_ent = ctx.create_entity({tmid, locid});
 
   // expressions DSL would be cool
@@ -62,7 +61,7 @@ int main(int argc, const char* argv[])
   // when to stop
   auto end_ex = ctx.expression("=", {
       new expr::ERef(tm_ctr),
-      new expr::ELit(Data::make<data::Int>(5))
+      new expr::ELit(Data::make<data::Int>(10))
     });
   ctx.set_trigger(end_ex, new stmt::Halt);
 
@@ -74,7 +73,7 @@ int main(int argc, const char* argv[])
   for (bool stop{}; !stop; ) {
 
     // zzz
-    std::this_thread::sleep_for(std::chrono::milliseconds{200});
+    std::this_thread::sleep_for(std::chrono::milliseconds{100});
     
     auto evts = run::eval_triggers(ctx);
     // return val indicates current validity

@@ -108,19 +108,19 @@ Data EFun::eval() const
 const map<FnTbl_key, Eval_fn>& eval_fn_tbl()
 {
 #define EXPR_FNTBL_ENTRY_BINP_(op_, opsym_, ATy_, RTy_)         \
-  {{OpType::op_, data::ATy_::flag_type()},                      \
+  {{OpType::op_, data::flag_type<data::ATy_>()},                  \
       [](vector<Data> as) {                                          \
         LOG_(debug)(OpType::op_, ": " #ATy_ " -> " #RTy_);      \
-        auto r0 = as.at(0).get<data::ATy_>();                   \
-        auto r1 = as.at(1).get<data::ATy_>();                   \
-        Data rd{data::RTy_::flag_type()};                       \
-        rd.set(data::RTy_{r0.value opsym_ r1.value});           \
+        auto r0 = as.at(0).get_at<data::ATy_, 0>();                  \
+        auto r1 = as.at(1).get_at<data::ATy_, 0>();                    \
+        Data rd{data::flag_type<data::RTy_>()};                \
+        rd.set<data::RTy_>(r0 opsym_ r1);                     \
         return rd;                                              \
       }                                                         \
   }
 #define EXPR_FNTBL_ENTRY_BINP_2X_(op_, opsym_)          \
   EXPR_FNTBL_ENTRY_BINP_(op_, opsym_, Int, Bool),       \
-  EXPR_FNTBL_ENTRY_BINP_(op_, opsym_, Float, Bool)
+  EXPR_FNTBL_ENTRY_BINP_(op_, opsym_, Real, Bool)
 
   static const map<FnTbl_key, Eval_fn> _eval_fn_tbl = {
     EXPR_FNTBL_ENTRY_BINP_2X_(op_eq, ==),
@@ -133,10 +133,10 @@ const map<FnTbl_key, Eval_fn>& eval_fn_tbl()
     {{OpType::op_not, dtype::ty_bool},
      [](vector<Data> as) {
        LOG_(debug)(OpType::op_not, ": Bool -> Bool");
-       auto res = as.at(0).get<data::Bool>();
+       auto res = as.at(0).get_at<data::Bool, 0>();
        // return
        Data rd(dtype::ty_bool);
-       rd.set(data::Bool{!res.value});
+       rd.set<data::Bool>(!res);
        return rd;
      }
     },

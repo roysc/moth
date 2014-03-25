@@ -117,7 +117,7 @@ using CptType = Data;
 // component type: tuple(of basic components) : (name, [basic])
 struct Ctx
 {
-  using DtypeNames = map<string, dtype::T>;
+  using DtypeNames = map<dtype::T, string>;
   using CptTypes = map<Compt_id, CptType>;
   using CptNames = map<Compt_id, CptPath>;
   using CptAggrs = map<string, vector<Compt_id>>;

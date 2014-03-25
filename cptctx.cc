@@ -22,7 +22,7 @@ CptPath::CptPath(const string& s):
 {
   namespace rx = std;
   // = boost::regex;
-  static const rx::regex parts_regex;
+  // static const rx::regex parts_regex;
 
   if (s.empty()) return;
   
@@ -150,7 +150,7 @@ Ctx::Ctx(ModelGen& mg, vector<Specs > cpt_specs):
       auto depids = it->second;
 
       // set init
-      init.set(data::Ref{Compt_addr(depids)});
+      init.set<data::Ref>(Compt_addr(depids));
     }
 
     LOG_(debug)("=> ", init);
@@ -175,7 +175,7 @@ bool Ctx::parse_data(string str, CptDefn& out) const
 
   qi::symbols<char, dtype::T> r_dt_sym;
   for (auto&& e: _dtype_names)
-    r_dt_sym.add(e.first, e.second);
+    r_dt_sym.add(e.second, e.first);
 
   auto cpt_sym = r_sym;
   
@@ -187,7 +187,7 @@ bool Ctx::parse_data(string str, CptDefn& out) const
           [&] (vector<double> v) {
             ASSERT_EQ_(2, v.size(), "realm args");
             Data r{dtype::ty_rcont};
-            r.set(data::RlmCont{0, v.at(0), v.at(1)});
+            r.set<data::Real_rlm>(0, v.at(0), v.at(1));
             get<0>(out) = r;
           })]
     ) |
@@ -199,7 +199,7 @@ bool Ctx::parse_data(string str, CptDefn& out) const
           [&] (vector<int> v) {
             ASSERT_EQ_(2, v.size(), "realm args");
             Data r{dtype::ty_rdisc};
-            r.set(data::RlmDisc{0, v.at(0), v.at(1)});
+            r.set<data::Int_rlm>(0, v.at(0), v.at(1));
             get<0>(out) = r;
           })]
     ) |

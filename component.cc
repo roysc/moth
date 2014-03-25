@@ -9,17 +9,23 @@ namespace dtype
 {
 namespace
 {
-Tag tag_of(dtype::T dt)
+Tag tag_of(T dt)
 {
   auto it = _meta_info.find(dt);
   return it != end(_meta_info)? it->second.tag : THROW_(Not_found_T<dtype::T>, dt);
 }
 }
 
-unsigned size(dtype::T dt) 
+unsigned size(T dt) 
 {
   auto it = _meta_info.find(dt);
   return it != end(_meta_info)? it->second.size : THROW_(Not_found_T<dtype::T>, dt);
+}
+
+string to_string(T dt)
+{
+  auto it = _meta_names.find(dt);
+  return it != end(_meta_names)? it->second : THROW_(Not_found_T<dtype::T>, dt);
 }
 
 bool operator%(Tag s, Tag t)
@@ -51,10 +57,10 @@ Dtypes _meta_info = {
   {dtype::ty_bool, {Tag::boolean, sizeof(data::Bool)}},
   // numeric types
   {dtype::ty_int, {Tag::number, sizeof(data::Int)}},
-  {dtype::ty_float, {Tag::number, sizeof(data::Float)}},
+  {dtype::ty_float, {Tag::number, sizeof(data::Real)}},
   // a pair (i, r, scale) Realm defn and index, scale
-  {dtype::ty_rdisc, {Tag::realm, sizeof(data::RlmDisc)}},
-  {dtype::ty_rcont, {Tag::realm, sizeof(data::RlmCont)}},
+  {dtype::ty_rdisc, {Tag::realm, sizeof(data::Int_rlm)}},
+  {dtype::ty_rcont, {Tag::realm, sizeof(data::Real_rlm)}},
   {dtype::ty_ref, {Tag::N, sizeof(data::Ref)}},
   // --not sure how to impl. or if necessary
   {dtype::ty_str, {Tag::N, sizeof(data::Str)}},
@@ -64,14 +70,14 @@ Dtypes _meta_info = {
 };
 
 DtypeNames _meta_names = {
-  {"bool", dtype::ty_bool},
-  {"int", dtype::ty_int},
-  {"real", dtype::ty_float},
-  {"realm(int)", dtype::ty_rdisc},
-  {"realm(real)", dtype::ty_rcont},
-  {"ref", dtype::ty_ref},
-  {"str", dtype::ty_str},
-  {"nil", dtype::ty_N}
+  {dtype::ty_bool, "bool"},
+  {dtype::ty_int, "int"},
+  {dtype::ty_float, "real"},
+  {dtype::ty_rdisc, "realm(int)"},
+  {dtype::ty_rcont, "realm(real)"},
+  {dtype::ty_ref, "ref"},
+  {dtype::ty_str, "str"},
+  {dtype::ty_N, "nil"}
 };
 } // namespace dtype
 
