@@ -67,7 +67,8 @@ int main(int argc, const char* argv[])
 
   // when to stop
   ctx.set_trigger(
-    (exb::ref(tm_ctr) >= exb::lit<data::Int>(10)),
+    // (exb::ref(tm_ctr) >= exb::lit<data::Int>(10)),
+    (exb::ref(tm_ctr) >= Data::make<data::Int>(10)),
     stb::halt()
   );
 
