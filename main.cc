@@ -49,45 +49,39 @@ int main(int argc, const char* argv[])
 
   // auto ctrl_ent = ctx
   auto ctrl_ent = ctx.create_entity({tmid, locid});
-    
-  // 0-condition, ends the game (bool in a builtin component)
-  // when evaluated as true, ends the game. eg. run ends after 4 "days":
-  //  Trigger(time.n_day == 4) -> Halt()
-  // 
-  // expressions should perhaps have value semantics
+
+  // expressions DSL would be cool
   // namespace exb = expr::builder;
   // auto tm_expr = exb::lit(5) == ctrl_ent->ref(tmid);
-  auto tm_expr = ctx.expression("=", {
-      new expr::ERef(ctrl_ent->ref(tmid)),
+  
+  // 0-condition, ends the game (bool in a builtin component)
+  // when evaluated as true, ends the game. eg. run ends after 5 ticks:
+  // 
+  auto tm_ctr = ctrl_ent->ref({tmid});
+
+  // when to stop
+  auto end_ex = ctx.expression("=", {
+      new expr::ERef(tm_ctr),
       new expr::ELit(Data::make<data::Int>(5))
     });
-  
-  ctx.set_trigger(tm_expr, new stmt::Halt);
-    
-  // Compt_addr end_flag = ctrl_ent->ref(endid);
-  Compt_addr tm_ctr = ctrl_ent->ref(tmid);
+  ctx.set_trigger(end_ex, new stmt::Halt);
+
+  // tick the clock
+  auto tick_st = new stmt::Incr(tm_ctr, +1);
+  ctx.set_trigger(nullptr, tick_st);
 
   LOG_PUSH_(lloop)("main loop");
   for (bool stop{}; !stop; ) {
+
+    // zzz
     std::this_thread::sleep_for(std::chrono::milliseconds{200});
-
+    
     auto evts = run::eval_triggers(ctx);
-    // There must be some way to know when the model is invalidated, or aborted
-    // return bool from run_events indicating current validity
+    // return val indicates current validity
     stop = !run::run_events(ctx, evts);
-
-    // LOG_SHOW_TO_(*tm_ctr(), lmain);
 
     // LOG_SHOW_TO_(ctx.entities().size(), lloop);
     // LOG_SHOW_TO_(ctx.triggers().size(), lloop);
-
-    // tick the clock
-    // namespace stb = stmt::builder;
-    // auto inc_stmt = ++stb::ref(tmid);
-    // => new stmt::Update{tmid, (exb::ref(tmid) + 1)}
-    // => new stmt::Update{tmid, new expr::EFun("+"_op, new expr::ERef(tmid), new expr::ELit(data::Int{1}))}
-    data::Int tmct{tm_ctr(0)->get<data::Int>().value + 1};
-    tm_ctr(0)->set(tmct);
   }
   
   return 0;

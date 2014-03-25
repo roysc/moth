@@ -74,11 +74,11 @@ public:
   // template <class D>
   // explicit Data(D&& dv): Data(typename std::decay<D>::type::flag_type()) {set(dv);}
     
-  template <class D, class V>
-  static Data make(V&& v)
+  template <class D, class... Vs>
+  static Data make(Vs&&... vs)
   {
     Data ret(D::flag_type());
-    ret.set(D{v});
+    ret.set(D{vs...});
     return ret;
   }
   

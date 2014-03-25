@@ -58,6 +58,14 @@ public:
   }
 };
 
+struct Incr: Update
+{
+  int _amt;
+public:
+  Incr(Compt_addr ca, int a): Update("incr", ca, 0), _amt(a) {}
+  void execute(ControlCtx& ctx) const override;
+};
+
 struct Spawn: Statement
 {
   using Statement::Statement;

@@ -14,6 +14,13 @@ void Update::execute(ControlCtx& ctx) const
   _caddr(0)->set(res);
 }
 
+void Incr::execute(ControlCtx& ctx) const 
+{
+  LOG_(debug)(__PRETTY_FUNCTION__);
+  auto v = _caddr(0)->get<data::Int>();
+  _caddr(0)->set(data::Int{v.value + _amt});
+}
+
 void Halt::execute(ControlCtx& ctx) const
 {
   LOG_(debug)(__PRETTY_FUNCTION__);
