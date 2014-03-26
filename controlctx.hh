@@ -51,19 +51,28 @@ public:
     return insr.second? insr.first->get() : LOG_EVAL_(nullptr);
   }
 
-  // set a condition, statement set
-  expr::Expr* expression(string o, vector<const expr::Expr*> as) {
-    return new expr::EFun(expr::Operation(o), as);
-  }
-
-  // set a condition, statement set
-  bool set_trigger(const expr::Expr* e, stmt::Statement* s) {
-    // for nil expression, set const Pred = 1
+  // set a (condition, statement)
+  Trigger* set_trigger(const expr::Expr* e, stmt::Statement* s)
+  {
     if (!e)
+    // for nil expression, set const Pred = 1
       e = new expr::ELit(Data::make<data::Bool>(true));
-    return _triggers.emplace(new Trigger{e, s}).second;
+    auto tr = new Trigger{e, s};
+    auto r = _triggers.emplace(tr);
+    return r.second? r.first->get() : THROW_T_(Insertion, *tr);
   }
-
+  bool remove_trigger(const Trigger* tr)
+  {
+    auto it = find_if(
+      begin(_triggers), end(_triggers),
+      [=](const decltype(_triggers)::value_type& tp){return tr == tp.get();}
+    );
+    if (it == end(_triggers))
+      return false;
+    _triggers.erase(it);
+    return true;
+  }
+  
   // handle a Signal object throw from event loop
   // relies on dynamic type
   bool handle_signal(const stmt::Statement& sig)

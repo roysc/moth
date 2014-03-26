@@ -6,6 +6,7 @@
 #include <string>
 #include <thread>
 #include <chrono>
+#include <random>
 
 #include "log.hh"
 #include "json.hh"
@@ -24,6 +25,7 @@ int main(int argc, const char* argv[])
     std::cout << "Usage: " << args[0] << " <file>.json\n";
     exit(1);
   }
+
   // file, n turns, m entities/turn
   int n = 5, m = 10;
   if (argc >= 3) n = stoi(args[2]);
@@ -63,15 +65,35 @@ int main(int argc, const char* argv[])
   namespace stb = stmt::builder;
 
   // tick the clock
-  ctx.set_trigger(nullptr, (stb::ref(tm_ctr) += 1));
+  ctx.set_trigger({}, (stb::ref(tm_ctr) += 1));
 
   // when to stop
   ctx.set_trigger(
-    // (exb::ref(tm_ctr) >= exb::lit<data::Int>(10)),
-    (exb::ref(tm_ctr) >= Data::make<data::Int>(10)),
+    exb::ref(tm_ctr) >= Data::make<data::Int>(10),
     stb::halt()
   );
+  
+  // auto f = ctx.create_entity("Fish", {0, 0});
+  // f->set("_Loc_")(0,0);
+  // ctrl_ent->set()
+  auto lrid = ctx.find_type("Loc_ref");
+    
+  // "Move fish (x,y)", possible syntax:
+  // ''''
+  // (x,y) = uniform(Space:Loc)
+  // # mx = Fish:max_swim
+  // # Rng = R[-mx,mx]
+  // # (x,y) = uniform(Rng,Rng)
+  // (Fish).loc <- loc(x,y)
+  // ''''
+  // ctx.set_trigger({}, stb::ref(f->ref(lrid)) += data(+1, -1));
 
+  // auto swd = ctx.free_cpt("Item", {"sword", "atk:+5", "dur:2"});
+  // auto shl = ctx.free_cpt("Item", {"shield", "def:+5", "dur:4"});
+  // auto get_loc = exb::data(5,5);
+  // auto get_ex = exb::ref(f, lrid) == get_loc;
+  // ctx.set_trigger(get_ex, stb::ref(f, "Inv") << swd << shl);
+  
   LOG_PUSH_(lloop)("main loop");
   for (bool stop{}; !stop; ) {
 

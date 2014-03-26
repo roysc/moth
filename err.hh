@@ -103,6 +103,8 @@ struct Invalid: public Runtime {using Runtime::Runtime;};
 template <class T> using Invalid_T = WithArg<Invalid, T>;
 struct Not_found: public Runtime {using Runtime::Runtime;};
 template <class T> using Not_found_T = WithArg<Not_found, T>;
+struct Insertion: public Runtime {using Runtime::Runtime;};
+template <class T> using Insertion_T = WithArg<Insertion, T>;
 
 template <class N>
 struct Out_of_bounds_T: public std::out_of_range
@@ -111,8 +113,7 @@ struct Out_of_bounds_T: public std::out_of_range
   using out_of_range::out_of_range;
   Out_of_bounds_T(N v, N h, N l = 0):
     out_of_range(util::concat(v, " ∉ [", l, h, "]")),
-    _val(v), _high(h), _low(l)
-  { }
+    _val(v), _high(h), _low(l) { }
 };
 
 // Logic
