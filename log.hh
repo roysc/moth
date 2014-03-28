@@ -77,7 +77,7 @@ protected:
   string _file;
   unsigned _line = 0;
   // options
-  // truncate long [file:num] sections in prelude. TODO
+  // TODO: truncate long [file:num] sections in prelude
   unsigned _truncate_file;
   // string _suffix = "\n";
 

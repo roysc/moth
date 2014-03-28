@@ -47,8 +47,8 @@ int main(int argc, const char* argv[])
   // Trigger & entity initialization
   // ---
   Compt_id
-    tmid = ctx.find_type("_Time_").at(0),
-    locid = ctx.find_type("_Loc_").at(0);
+    tmid = ctx.find_type("_Time").at(0),
+    locid = ctx.find_type("_Loc").at(0);
 
   auto ctrl_ent = ctx.create_entity({tmid, locid});
 
@@ -70,6 +70,7 @@ int main(int argc, const char* argv[])
   // when to stop
   ctx.set_trigger(
     exb::ref(tm_ctr) >= Data::make<data::Int>(10),
+    // exb::ref(tm_ctr) >= exb::data(10),
     stb::halt()
   );
   

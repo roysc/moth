@@ -11,15 +11,15 @@ void Update::execute(ControlCtx& ctx) const
 {
   LOG_(debug)(__PRETTY_FUNCTION__);
   auto res = _expr->eval();
-  _caddr(0)->set(res);
+  _caddr()->set(res);
 }
 
 void Incr::execute(ControlCtx& ctx) const 
 {
   LOG_(debug)(__PRETTY_FUNCTION__);
-  auto v = _caddr(0)->get_at<data::Int, 0>();
+  auto v = _caddr()->get_at<data::Int, 0>();
   // _caddr(0)->set_at<data::Int, 0>(v + _amt);
-  _caddr(0)->set<data::Int>(v + _amt);
+  _caddr()->set<data::Int>(v + _amt);
 }
 
 void Halt::execute(ControlCtx& ctx) const

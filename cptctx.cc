@@ -150,7 +150,7 @@ Ctx::Ctx(ModelGen& mg, vector<Specs > cpt_specs):
       auto depids = it->second;
 
       // set init
-      init.set<data::Ref>(Compt_addr(depids));
+      init.set<data::Ref>(Compt_mult{0,depids});
     }
 
     LOG_(debug)("=> ", init);
