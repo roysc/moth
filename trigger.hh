@@ -23,10 +23,10 @@ struct Trigger
 protected:
   uptr<const Expr> _expr;
   // Entity* _ent;                 // the "bound" entity
-  uptr<Stmt> _stmt;
+  Stmt _stmt;
 
 public:
-  Trigger(const Expr* ex, Stmt* st):
+  Trigger(const Expr* ex, Stmt st):
     _expr(ex), _stmt(st) {}
 
   // ~~~ m a g i c ~~~
@@ -45,9 +45,9 @@ public:
     auto result = _expr->eval();
     LOG_(debug)("=> ", result);
     
-    if (result.get_at<data::Bool, 0>()) {
+    if (result.at<data::Bool, 0>()) {
       // bind statement to entity
-      evtp.reset(new Event(_stmt.get()));
+      evtp.reset(new Event(_stmt));
     }
     return evtp;
   }
@@ -56,7 +56,8 @@ public:
   friend std::basic_ostream<Ch,Tr>& operator<<(
     std::basic_ostream<Ch,Tr>& out, 
     const Trigger& c)
-  { return out << "Trigger{" << *c._expr << ":\"" << *c._stmt << "\"}"; }
+  { return out << "Trigger{" << *c._expr << ":\"" // << c._stmt
+               << "?" << "\"}"; }
 
 };
 using Cond_ptr = Trigger*;

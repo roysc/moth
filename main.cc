@@ -62,10 +62,10 @@ int main(int argc, const char* argv[])
   namespace stb = stmt::builder;
 
   // tick the clock
-  ctx.set_trigger({}, (stb::ref(tm_ctr) += 1));
+  ctx.create_trigger({}, stb::incr(tm_ctr, 1));
 
   // when to stop
-  ctx.set_trigger(
+  ctx.create_trigger(
     exb::ref(tm_ctr) >= exb::lit(10),
     stb::halt()
   );

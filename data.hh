@@ -114,6 +114,8 @@ public:
     ret.set<D>(D{std::forward<Vs>(vs)...});
     return ret;
   }
+
+  
   
   void set(const Data& that)
   {
@@ -124,10 +126,10 @@ public:
   // Data& operator=(const Data& that) {set(that); return *this;}
   
   dtype::T dtype() const {return _dtype;}
-  const void* raw() const
+  void* raw() const
   {
     assert(!_bytes.empty() && "data not initialized");
-    return static_cast<const void*>(&_bytes[0]);
+    return static_cast<void*>(const_cast<Bytes::pointer>(&_bytes[0]));
   }
   string to_string() const;
   
@@ -139,11 +141,11 @@ public:
       _dtype, dt,
       "Data::get(", dtype::to_string(dt), "): wrong dtype"
     );
-    return D(*static_cast<const D*>(raw()));
+    return D{*static_cast<D*>(raw())};
   }
 
   template <class D, size_t n>
-  util::type_at<D, n> get_at() const
+  util::type_at<D, n>& at()
   {
     const auto dt = data::d_type<D>();    
     ASSERT_EQ_(
@@ -151,7 +153,7 @@ public:
       "Data::get(", dtype::to_string(dt), "): wrong dtype"
     );
     // util::type_at<D,n> ret = std::get<n>(get<D>());
-    util::type_at<D,n> ret = std::get<n>(*static_cast<const D*>(raw()));
+    auto&& ret = std::get<n>(*static_cast<D*>(raw()));
     return ret;
   }
 

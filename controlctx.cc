@@ -34,7 +34,7 @@ Entity* ControlCtx::create_entity(vector<Compt_id> cs)
 }
 
 // set a (condition, statement)
-Trigger* ControlCtx::create_trigger(const expr::Expr* e, stmt::Statement* s)
+Trigger* ControlCtx::create_trigger(const expr::Expr* e, stmt::Statement s)
 {
   if (!e)
     // for nil expression, set const Pred = 1

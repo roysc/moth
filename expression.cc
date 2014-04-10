@@ -98,8 +98,8 @@ const map<FnTbl_key, Eval_fn>& eval_fn_tbl()
   {{OpType::op_, data::d_type<data::ATy_>()},                  \
       [](vector<Data> as) {                                          \
         LOG_(debug)(OpType::op_, ": " #ATy_ " -> " #RTy_);      \
-        auto r0 = as.at(0).get_at<data::ATy_, 0>();                  \
-        auto r1 = as.at(1).get_at<data::ATy_, 0>();                    \
+        auto r0 = as.at(0).at<data::ATy_, 0>();                  \
+        auto r1 = as.at(1).at<data::ATy_, 0>();                    \
         Data rd{data::d_type<data::RTy_>()};                \
         rd.set<data::RTy_>(r0 opsym_ r1);                     \
         return rd;                                              \
@@ -120,7 +120,7 @@ const map<FnTbl_key, Eval_fn>& eval_fn_tbl()
     {{OpType::op_not, dtype::ty_bool},
      [](vector<Data> as) {
        LOG_(debug)(OpType::op_not, ": Bool -> Bool");
-       auto res = as.at(0).get_at<data::Bool, 0>();
+       auto res = as.at(0).at<data::Bool, 0>();
        // return
        Data rd(dtype::ty_bool);
        rd.set<data::Bool>(!res);

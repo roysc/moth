@@ -15,17 +15,6 @@
 //     Physics
 //     Information network
 
-struct PtrCompare: std::less<uptr>
-{
-  // using is_transparent = int;
-
-  // template <class A, class B>
-  // operator()(const A& a, const B& b)
-  // {
-  //   return a < b;
-  // }
-};
-
 // TODO controller strategy
 // Control context for sim. instance
 struct ControlCtx 
@@ -39,8 +28,8 @@ protected:
   using Entity_id = size_t;
   using Trigger_id = size_t;
 
-  using Entities = set<uptr<Entity>, PtrCompare>;
-  using Triggers = set<uptr<Trigger>, PtrCompare>;
+  using Entities = set<uptr<Entity>>;
+  using Triggers = set<uptr<Trigger>>;
   Entities _entities;
   Triggers _triggers;
   
@@ -57,20 +46,20 @@ public:
   // create ents., triggers
   Entity* create_entity(vector<Compt_id> cs);  
   // set a (condition, statement) pair
-  Trigger* create_trigger(const expr::Expr* e, stmt::Statement* s);
+  Trigger* create_trigger(const expr::Expr* e, stmt::Statement s);
   
-  bool delete_trigger(const Trigger* tr)
-  {
-    auto it = _triggers.find(tr);
-    if (it == end(_triggers))
-      return false;
-    _triggers.erase(it);
-    return true;
-  }
+  // bool delete_trigger(const Trigger* tr)
+  // {
+  //   auto it = _triggers.find(tr);
+  //   if (it == end(_triggers))
+  //     return false;
+  //   _triggers.erase(it);
+  //   return true;
+  // }
   
   // handle a Signal object throw from event loop
   // relies on dynamic type
-  bool handle_signal(const stmt::Statement& sig)
+  bool handle_signal(const stmt::Signal& sig)
   {
     // small set of important events handled directly
     return !sig.fatal();
