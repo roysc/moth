@@ -5,10 +5,16 @@
 #include "entity.hh"
 
 // dereference
-Data* Compt_addr::operator()(size_t ix) const
+Data& Compt_addr::operator()() const
 {
-  if (ix >= second.size()) THROW_T_(Out_of_bounds, ix, second.size());
-  return first->get(second.at(ix));
+  return *first->get(second);
+}
+
+// dereference
+Data& Compt_mult::operator()(size_t ix) const
+{
+  if (ix >= third.size()) THROW_T_(Out_of_bounds, ix, third.size());
+  return *first->get(third.at(ix));
 }
 
 string Data::to_string() const
@@ -29,7 +35,7 @@ string Data::to_string() const
 //   } break
 
 #define DATA_TO_STRING_CASE_NEW_(Type_, str_expr_)  \
-    case (data::flag_type<data::Type_>()): {        \
+    case (data::d_type<data::Type_>()): {        \
       const data::Type_& val_ = get<data::Type_>(); \
         ret = ("{" #Type_ ",") + (str_expr_) + '}'; \
     }  break                                        \

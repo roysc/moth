@@ -3,7 +3,10 @@
 #pragma once
 
 #include "util/std/type_traits.hh"
-
+#include "util/range/adapt.hh"
+#include "util/range/algo.hh"
+#include "util/traits.hh"
+#include "util/mp.hh"
 #include "basic.hh"
 #include "component.hh"
 
@@ -15,12 +18,25 @@ using T = unsigned;
 struct Entity;
 struct Data;
 
-struct Compt_addr: pair<Entity*, vector<Compt_id> >
+// fixme: clean up
+struct Compt_addr: pair<Entity*, Compt_id >
 {
   using pair::pair;
-  Compt_addr(vector<Compt_id> cs): Compt_addr(0, cs) {}
-  Compt_addr(Compt_id c): Compt_addr(0, {c}) {}
-  Data* operator()(size_t ix) const;
+  Compt_addr(Compt_id c): Compt_addr{0, c} {}
+  Data& operator()() const;
+};
+struct Compt_mult: Compt_addr
+{
+  using Compt_addr::Compt_addr;
+  vector<Compt_id> third;
+  Compt_mult(Entity* e, vector<Compt_id> cs):
+    Compt_addr{0, cs.at(0)}// ,
+  // third{util::transform<vector<Compt_id>>(util::slice(cs, 1))} {}
+  {
+    ASSERT_BINOP_(1, cs.size(), <=, "fixme");
+    third.assign(begin(cs) + 1, end(cs));
+  }
+  Data& operator()(size_t ix) const;
 };
 
 namespace data
@@ -42,32 +58,38 @@ using Real_rlm = tuple<double, double, double>;
 using Str = tuple<string>;
 using Ref = tuple<Compt_addr>;
 
-template <class T> struct Id_ { using type = T; };
-template <class T> using Id = Id_<T>;
-
-template <dtype::T dtype = dtype::ty_N>
-struct flag_type_
-{
-  using type = void;
-};
-
 template <class D>
-constexpr dtype::T flag_type();
+constexpr dtype::T d_type();
 
-template <>
-constexpr dtype::T flag_type<Bool>() {return dtype::ty_bool;}
-template <>
-constexpr dtype::T flag_type<Int>() {return dtype::ty_int;}
-template <>
-constexpr dtype::T flag_type<Real>() {return dtype::ty_float;}
-template <>
-constexpr dtype::T flag_type<Int_rlm>() {return dtype::ty_rdisc;}
-template <>
-constexpr dtype::T flag_type<Real_rlm>() {return dtype::ty_rcont;}
-template <>
-constexpr dtype::T flag_type<Str>() {return dtype::ty_str;}
-template <>
-constexpr dtype::T flag_type<Ref>() {return dtype::ty_ref;}
+template <> constexpr dtype::T d_type<Bool>() {return dtype::ty_bool;}
+template <> constexpr dtype::T d_type<Int>() {return dtype::ty_int;}
+template <> constexpr dtype::T d_type<Real>() {return dtype::ty_float;}
+template <> constexpr dtype::T d_type<Int_rlm>() {return dtype::ty_rdisc;}
+template <> constexpr dtype::T d_type<Real_rlm>() {return dtype::ty_rcont;}
+template <> constexpr dtype::T d_type<Str>() {return dtype::ty_str;}
+template <> constexpr dtype::T d_type<Ref>() {return dtype::ty_ref;}
+
+//! Deduce a data Type
+template <class... Ts>
+struct compat_type_
+{
+  static constexpr bool num = sizeof...(Ts);
+  using all_int = util::all_satisfy<std::is_integral, Ts...>;
+  using all_float = util::all_satisfy<std::is_floating_point, Ts...>;
+  using is_str = util::is_member<util::Head<Ts...>, std::string, const char*>;
+  
+  using type = util::Cond<
+    util::Case<(all_int::value && num == 1), data::Int>,
+    util::Case<(all_int::value && num == 3), data::Int_rlm>,
+    util::Case<(all_float::value && num == 1), data::Real>,
+    util::Case<(all_float::value && num == 3), data::Real_rlm>,
+    util::Case<is_str::value, data::Str>// ,
+    // util::Case<std::is_base_of<Compt_addr, Head<Ts...> >::value, data::Ref>
+    // ...
+    >;
+};
+template <class... Ts>
+using compat_type = typename compat_type_<Ts...>::type;
 }
 
 // Tagged union-ish type
@@ -83,12 +105,12 @@ public:
   Data(dtype::T dt = dtype::ty_N): _dtype(dt), _bytes(dtype::size(dt)) {}
   Data(const Data&) = default;
   // template <class D>
-  // Data(D&& dv): Data(data::flag_type<decay_t<D> >()) {}
+  // Data(D&& dv): Data(data::d_type<decay_t<D> >()) {}
     
   template <class D, class... Vs>
   static Data make(Vs&&... vs)
   {
-    Data ret(data::flag_type<D>());
+    Data ret(data::d_type<D>());
     ret.set<D>(D{std::forward<Vs>(vs)...});
     return ret;
   }
@@ -112,7 +134,7 @@ public:
   template <class D>
   D get() const
   {
-    const auto dt = data::flag_type<D>();    
+    const auto dt = data::d_type<D>();    
     ASSERT_EQ_(
       _dtype, dt,
       "Data::get(", dtype::to_string(dt), "): wrong dtype"
@@ -123,7 +145,7 @@ public:
   template <class D, size_t n>
   util::type_at<D, n> get_at() const
   {
-    const auto dt = data::flag_type<D>();    
+    const auto dt = data::d_type<D>();    
     ASSERT_EQ_(
       _dtype, dt,
       "Data::get(", dtype::to_string(dt), "): wrong dtype"
@@ -136,7 +158,7 @@ public:
   // template <class D, size_t n, class V>
   // void set_at(V&& v)
   // {
-  //   const auto dt = data::flag_type<D>();
+  //   const auto dt = data::d_type<D>();
   //   ASSERT_EQ_(
   //     _dtype, dt,
   //     "Data::set_at(", dtype::to_string(dt), "): wrong dtype"
@@ -147,7 +169,7 @@ public:
   template <class D, class... Ts>
   void set(Ts&&... vs)
   {
-    const auto dt = data::flag_type<D>();
+    const auto dt = data::d_type<D>();
     ASSERT_EQ_(
       _dtype, dt,
       "Data::set(", dtype::to_string(dt), "): wrong dtype"
@@ -159,4 +181,4 @@ public:
   friend std::basic_ostream<Ch,Tr>& 
   operator<<(std::basic_ostream<Ch,Tr>& out, const Data& e)
   {return out << e.to_string();}
-}; // struct Data
+};

@@ -27,7 +27,8 @@ public:
     return it != end(_compts) ? &(it->second) : THROW_(Not_found_T<Compt_id>, id);
   }
   bool has(Compt_id id) const {return _compts.find(id) != end(_compts);}
-  Compt_addr ref(vector<Compt_id> id) {return {this, id};}
+  Compt_addr ref(Compt_id id) {return {this, id};}
+  Compt_mult ref_mult(vector<Compt_id> ids) {return {this, ids};}
   // string name of component
   string get_name(Compt_id id) const;
   
