@@ -1,29 +1,29 @@
 {
   "components": [
-    {"name": "_Loc_", "type": ["R","R"] },
-    {"name": "_Time_", "type": "Z" },
-    {"name": "Loc_ref", "type": "ref (_Loc_)" },
+    {"name": "_Loc", "type": ["R","R"] },
+    {"name": "_Time", "type": "Z" },
+    {"name": "Loc_ref", "type": "ref (_Loc)" },
     {"name": "Mass", "type": "R"},
     {"name": "Size", "type": "Z"},
-    {"name": "Phys", "type": ["Loc_ref", "Mass"] },
+    {"name": "Phys", "type": ["ref (_Loc)", "Mass"] },
     {"name": "Organ", "type": {"kind": "str", "health": "R [0,1]"}},
     {"name": "Body", "type": ["Phys", "Size", "set (Organ)"] }
   ],
   "entities": [
-    { "name": "SpaceTime", "controls": ["_Loc_", "_Time_"] },
-    { "name": "Fish", "contains": [ "Body"], "initial": {
+    { "name": "SpaceTime", "controls": ["_Loc", "_Time"] },
+    { "name": "Fish(loc:_Loc)", "contains": [ "Body"], "initial": {
       "body.organs": ["eyes", "fins", "teeth", "stomache", "heart", "skin"],
-      "body.phys.loc_ref": "$0"
+      "body.phys.loc_ref": "$loc"
     }},
     { "name": "Food", "contains": ["phys", "size"], "initial": {"loc_ref": "$0"}}
   ],
   "initial": [
-    ["SpaceTime", "_world"],
-    ["Fish", "_freddy", [0,5]],
-    ["Food", "_lunch", [4,0]]
+    ["SpaceTime", "world"],
+    ["Fish", "freddy", [0,5]],
+    ["Food", "lunch", [4,0]]
   ],
   "triggers": [
-    ["_", ["+=", "_Time_", "1"]]
+    ["", ["+=", "_Time", 1]]
   ]
 }
 
