@@ -2,6 +2,8 @@
 // controlctx.hh
 #pragma once
 
+#include <functional>
+
 #include "log.hh"
 #include "expression.hh"
 #include "statement.hh"
@@ -13,6 +15,17 @@
 //     Physics
 //     Information network
 
+struct PtrCompare: std::less<uptr>
+{
+  // using is_transparent = int;
+
+  // template <class A, class B>
+  // operator()(const A& a, const B& b)
+  // {
+  //   return a < b;
+  // }
+};
+
 // TODO controller strategy
 // Control context for sim. instance
 struct ControlCtx 
@@ -23,50 +36,32 @@ protected:
   // EntCtx _ent_ctx;
   map<Compt_id, ControlHandle*> _controls;
   // entity and trigger data
-  set<uptr<Entity> > _entities;
-  set<uptr<Trigger> > _triggers;
-  uptr<Entity> _ctrl_ent;
+  using Entity_id = size_t;
+  using Trigger_id = size_t;
+
+  using Entities = set<uptr<Entity>, PtrCompare>;
+  using Triggers = set<uptr<Trigger>, PtrCompare>;
+  Entities _entities;
+  Triggers _triggers;
+  
+  Entity* _ctrl_ent;
 
 public:
   ControlCtx(ModelGen& mg);
-  virtual ~ControlCtx() {}
+  ~ControlCtx() {}
 
-  set<Entity*> entities() const
-  {
-    set<Entity*> ret;
-    for (auto&& e: _entities) ret.insert(e.get());
-    return ret;
-  }
-  set<Trigger*> triggers() const
-  {
-    set<Trigger*> ret;
-    for (auto&& t: _triggers) ret.insert(t.get());
-    return ret;
-  }
+  const Entities& entities() const { return _entities; }
+  const Triggers& triggers() const { return _triggers; }
+
   // map<Compt_id, ControlHandle*> controls() const {return controls;}
   // create ents., triggers
-  Entity* create_entity(vector<Compt_id> cs)
+  Entity* create_entity(vector<Compt_id> cs);  
+  // set a (condition, statement) pair
+  Trigger* create_trigger(const expr::Expr* e, stmt::Statement* s);
+  
+  bool delete_trigger(const Trigger* tr)
   {
-    auto insr = _entities.emplace(new Entity(_cpt_ctx, cs));
-    return insr.second? insr.first->get() : LOG_EVAL_(nullptr);
-  }
-
-  // set a (condition, statement)
-  Trigger* set_trigger(const expr::Expr* e, stmt::Statement* s)
-  {
-    if (!e)
-    // for nil expression, set const Pred = 1
-      e = new expr::ELit(Data::make<data::Bool>(true));
-    auto tr = new Trigger{e, s};
-    auto r = _triggers.emplace(tr);
-    return r.second? r.first->get() : THROW_T_(Insertion, *tr);
-  }
-  bool remove_trigger(const Trigger* tr)
-  {
-    auto it = find_if(
-      begin(_triggers), end(_triggers),
-      [=](const decltype(_triggers)::value_type& tp){return tr == tp.get();}
-    );
+    auto it = _triggers.find(tr);
     if (it == end(_triggers))
       return false;
     _triggers.erase(it);

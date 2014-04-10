@@ -25,5 +25,24 @@ ControlCtx::ControlCtx(ModelGen& mg):
   // }
 }
 
+// map<Compt_id, ControlHandle*> controls() const {return controls;}
+// create ents., triggers
+Entity* ControlCtx::create_entity(vector<Compt_id> cs)
+{
+  auto insr = _entities.emplace(new Entity(_cpt_ctx, cs));
+  return insr.second? insr.first->get() : THROW_(Insertion, "Entity");
+}
+
+// set a (condition, statement)
+Trigger* ControlCtx::create_trigger(const expr::Expr* e, stmt::Statement* s)
+{
+  if (!e)
+    // for nil expression, set const Pred = 1
+    e = new expr::ELit(Data::make<data::Bool>(true));
+  auto tr = new Trigger{e, s};
+  auto r = _triggers.emplace(tr);
+  return r.second? r.first->get() : THROW_T_(Insertion, *tr);
+}
+
 // const cpt::Type* get_type(Compt_id cpid) {return _modelgen->get_type(cpid);}
 
