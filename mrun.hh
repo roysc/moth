@@ -35,6 +35,7 @@ vector<uptr<Event> > eval_triggers(ControlCtx& ctx)
 // make events happen
 // If threading, scheduling events is the tricky part
 // queue or some structure that is friendly to concurrency
+//! \return val indicates current validity
 template <class Evts>
 bool run_events(ControlCtx& ctx, const Evts& evts)
 {
@@ -56,6 +57,24 @@ bool run_events(ControlCtx& ctx, const Evts& evts)
   // ctx.entities: persist; erase triggered by end condn.
   // events: should all be evaluated, unless early terminated
   // in that case, ctx is not valid anymore, returned false
+  return true;
+}
+
+inline
+bool event_loop(ControlCtx& ctx)
+{
+  LOG_PUSH_(lloop)(__PRETTY_FUNCTION__);
+
+  const unsigned pause_ms = 100;
+  
+  for (bool stop{}; !stop; ) {
+    // zzz
+    std::this_thread::sleep_for(std::chrono::milliseconds{pause_ms});
+    
+    auto evts = eval_triggers(ctx);
+    stop = !run_events(ctx, evts);
+  }
+  
   return true;
 }
 }

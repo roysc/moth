@@ -90,20 +90,8 @@ int main(int argc, const char* argv[])
   // auto get_loc = exb::data(5,5);
   // auto get_ex = exb::ref(f, lrid) == get_loc;
   // ctx.set_trigger(get_ex, stb::ref(f, "Inv") << swd << shl);
-  
-  LOG_PUSH_(lloop)("main loop");
-  for (bool stop{}; !stop; ) {
 
-    // zzz
-    std::this_thread::sleep_for(std::chrono::milliseconds{100});
-    
-    auto evts = run::eval_triggers(ctx);
-    // return val indicates current validity
-    stop = !run::run_events(ctx, evts);
-    
-    // LOG_SHOW_TO_(ctx.entities().size(), lloop);
-    // LOG_SHOW_TO_(ctx.triggers().size(), lloop);
-  }
+  auto r = run::event_loop(ctx);
   
   return 0;
 }
