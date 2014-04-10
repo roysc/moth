@@ -19,7 +19,8 @@ using Eval_fn = fn<Data(vector<Data>)>;
 const map<FnTbl_key, Eval_fn>& eval_fn_tbl();
 
 // expression types
-struct Expr {
+struct Expr
+{
   virtual Data eval() const = 0; 
   virtual dtype::T result_of() const = 0;
   virtual string to_string() const = 0;
@@ -35,7 +36,8 @@ struct Expr {
 };
 
 // literal
-struct ELit: Expr {
+struct ELit: Expr
+{
   Data _value;
 public:
   ELit(Data v): _value(v) {}
@@ -45,7 +47,8 @@ public:
 };
 
 // function/operator
-struct EFun: Expr {
+struct EFun: Expr
+{
   using Args_own = vector<uptr<const Expr> >;
   using Args = vector<const Expr*>;
   // cpt::Ctx& _ctx;
@@ -60,7 +63,8 @@ public:
 };
 
 // compt. value reference
-struct ERef: Expr { 
+struct ERef: Expr
+{ 
   Compt_addr _addr;
 public:
   ERef(Compt_addr ca): _addr(ca) {}
@@ -89,7 +93,15 @@ inline
 Ex ref(Compt_addr ca) {return Ex{ca};}
 
 template <class D, class... Ts>
-Ex lit(Ts&&... vs) { return Ex(Data::make<D>(std::forward<Ts>(vs)...)); }
+Ex lit_(Ts&&... vs) { return Ex(Data::make<D>(std::forward<Ts>(vs)...)); }
+
+template <class... Ts>
+Ex lit(Ts&&... vs)
+{
+  using D = data::compat_type<Ts...>;
+  auto dt = data::d_type<D>();
+  return Data{dt};
+}
 
 inline Ex operator==(Ex a, Ex b) { return Ex("=", {a, b}); }
 inline Ex operator!=(Ex a, Ex b) { return Ex("≠", {a, b}); }
@@ -100,3 +112,8 @@ inline Ex operator<=(Ex a, Ex b) { return Ex("≤", {a, b}); }
 }
 
 } // namespace expr
+
+// namespace unit_test
+// {
+
+// }

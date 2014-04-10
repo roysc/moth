@@ -11,16 +11,16 @@ void Update::execute(ControlCtx& ctx) const
 {
   LOG_(debug)(__PRETTY_FUNCTION__);
   auto res = _expr->eval();
-  _caddr(0)->set(res);
+  _caddr().set(res);
 }
 
-void Incr::execute(ControlCtx& ctx) const 
-{
-  LOG_(debug)(__PRETTY_FUNCTION__);
-  auto v = _caddr(0)->get_at<data::Int, 0>();
-  // _caddr(0)->set_at<data::Int, 0>(v + _amt);
-  _caddr(0)->set<data::Int>(v + _amt);
-}
+// void Incr::execute(ControlCtx& ctx) const 
+// {
+//   LOG_(debug)(__PRETTY_FUNCTION__);
+//   auto v = _caddr().get_at<data::Int, 0>();
+//   // _caddr(0)->set_at<data::Int, 0>(v + _amt);
+//   _caddr().set<data::Int>(v + _amt);
+// }
 
 void Halt::execute(ControlCtx& ctx) const
 {
@@ -42,14 +42,16 @@ void Halt::execute(ControlCtx& ctx) const
 
 namespace builder
 {
-Update* operator<<(Ref_ r, const expr::Expr* v)
+namespace exb = expr::builder;
+
+St operator<<(Compt_addr a, Ex v)
 {
-  return new Update(r.address, v);
+  return {new Update(r.address, v)};
 }
 
-Incr* operator+=(Ref_ r, int v)
-{
-  return new Incr(r.address, v);
-}
+// St operator+=(Compt_addr a, int v)
+// {
+//   return {new Update(a, exb::lit<int>(a().get_at<data::))};
+// }
 }
 }

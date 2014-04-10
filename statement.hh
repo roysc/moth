@@ -58,20 +58,31 @@ public:
   }
 };
 
-struct Incr: Update
-{
-  int _amt;
-public:
-  Incr(Compt_addr ca, int a): Update(ca, 0), _amt(a) {}
-  void execute(ControlCtx& ctx) const override;
-};
+// struct Incr: Update
+// {
+//   int _amt;
+// public:
+//   Incr(Compt_addr ca, int a): Update(ca, 0), _amt(a) {}
+//   void execute(ControlCtx& ctx) const override;
+// };
 
-struct Spawn: Statement
+// struct Spawn: Statement
+// {
+//   using Statement::Statement;
+//   void execute(ControlCtx&) const override
+//   {
+//     // TODO: create entity
+//   }
+//   string to_string() const {return _name;}
+// };
+
+struct Create: Statement
 {
   using Statement::Statement;
   void execute(ControlCtx&) const override
   {
     // TODO: create entity
+    
   }
   string to_string() const {return _name;}
 };
@@ -97,14 +108,14 @@ namespace builder
 struct St
 {
   Statement* _stmt;
+  
 };
 
-struct Ref_ { Compt_addr address; };
-inline Ref_ ref(Compt_addr ca) {return Ref_{ca}; }
+// inline Compt_addr ref(Compt_addr ca) {return Ref_{ca}; }
 // inline St ref(Compt_addr ca) {return Ref_{ca}; }
 
-Update* operator<<(Ref_ r, const expr::Expr* v);
-Incr* operator+=(Ref_ r, int v);
+St operator<<(Ref_ r, const expr::Expr* v);
+St operator+=(Ref_ r, int v);
 // St operator<<(Ref_ r, const expr::Expr* v);
 // St operator+=(Ref_ r, int v);
 

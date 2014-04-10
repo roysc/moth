@@ -10,19 +10,10 @@
 
 namespace expr
 {
-dtype::T ERef::result_of() const {return _addr(0)->dtype();}
+dtype::T ERef::result_of() const {return _addr().dtype();}
 string ERef::to_string() const 
 {
-  switch (_addr.second.size()) {
-  case 1:
-    return util::concat("\"", _addr.first->get_name(_addr.second.at(0)), "\":", eval());
-  default:
-    return util::concat(
-      "\"", util::range::transform<vector<string> >(
-        util::range::view(_addr.second),
-        [this](Compt_id c) {return _addr.first->get_name(c);}
-      ), "\":", eval());
-  }
+  return util::concat("~", eval());
 }
 
 // function/op
@@ -57,11 +48,7 @@ Data ELit::eval() const {return _value;}
 dtype::T ELit::result_of() const {return _value.dtype();}
 
 // reference
-Data ERef::eval() const
-{ // data ptr
-  auto dptr = _addr(0);
-  return *dptr;
-}
+Data ERef::eval() const { return _addr(); }
 
 // implementing overloads makes this messy. semantics will need
 // more careful planning
@@ -108,12 +95,12 @@ Data EFun::eval() const
 const map<FnTbl_key, Eval_fn>& eval_fn_tbl()
 {
 #define EXPR_FNTBL_ENTRY_BINP_(op_, opsym_, ATy_, RTy_)         \
-  {{OpType::op_, data::flag_type<data::ATy_>()},                  \
+  {{OpType::op_, data::d_type<data::ATy_>()},                  \
       [](vector<Data> as) {                                          \
         LOG_(debug)(OpType::op_, ": " #ATy_ " -> " #RTy_);      \
         auto r0 = as.at(0).get_at<data::ATy_, 0>();                  \
         auto r1 = as.at(1).get_at<data::ATy_, 0>();                    \
-        Data rd{data::flag_type<data::RTy_>()};                \
+        Data rd{data::d_type<data::RTy_>()};                \
         rd.set<data::RTy_>(r0 opsym_ r1);                     \
         return rd;                                              \
       }                                                         \
