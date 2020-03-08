@@ -1,6 +1,7 @@
-##Moth
+Moth
+----
 
-A "game engine" whose features have crept out of scope.
+A simulation/game engine exercise (whose features have crept a bit out of scope).
 
 Entities and components are defined inside JSON files, and specify the behavior of a game or simulation. Originally this was intended to allow flexibility, letting components be changed easily. Eventually I realized I was implementing a full dynamic programming language, albeit a simple one.
 
